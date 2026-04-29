@@ -25,3 +25,11 @@ dist-ssr
 
 # Claude Code
 .claude/
+
+# ====================================================================
+# SUH-DEVOPS-TEMPLATE: Auto-added entries
+# ====================================================================
+/.claude/settings.local.json
+
+# Environment variables
+.env
