@@ -1,19 +1,37 @@
-# React + Vite
+# Quickness Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite 게임 프로젝트.
 
-Currently, two official plugins are available:
+## 시작하기
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+git clone https://github.com/greedy-team/quickness-game.git
+cd quickness-game
+npm install
+npm run dev
+```
 
-## React Compiler
+개발 서버: http://localhost:5173
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 스크립트
 
-## Expanding the ESLint configuration
+```bash
+npm run dev      # 개발 서버
+npm run build    # 빌드
+npm run preview  # 빌드 결과 미리보기
+npm run lint     # 린트 검사
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 저장 시 자동 lint (VSCode)
+
+VSCode에 **ESLint 확장**만 설치하면 **Cmd+S / Ctrl+S** 누를 때 자동 수정됩니다.
+설정 파일(`.vscode/settings.json`)은 레포에 포함돼 있어 별도 설정 불필요.
+
+## 스택
+
+- React 19 / Vite 8
+- ESLint 9 (Airbnb 스타일)
+- Node 20.19+
 
 ---
 
