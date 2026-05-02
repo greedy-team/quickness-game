@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -111,6 +112,11 @@ function App() {
             </li>
           </ul>
         </div>
+      </section>
+
+    <div className="ticks"></div>
+      <section style={{ padding: '40px 0' }}>
+        <TenSecondsGame />
       </section>
 
       <div className="ticks"></div>
