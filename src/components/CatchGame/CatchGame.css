@@ -1,0 +1,29 @@
+/* === 캐치 게임 — 떨어지는 아이템 === */
+.catch-falling-item {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  font-size: 48px;
+  pointer-events: none;
+  will-change: transform;
+  animation-name: catch-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  z-index: 5;
+}
+
+@keyframes catch-fall {
+  from { transform: translate(-50%, 0); }
+  to   { transform: translate(-50%, var(--catch-stage-height, 600px)); }
+}
+
+.catch-item-emoji {
+  display: inline-block;
+  animation: catch-spin 1.2s linear infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+@keyframes catch-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
