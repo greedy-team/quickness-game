@@ -212,3 +212,65 @@
   color: #f0f0f0;
   border: 2px solid #555;
 }
+
+/* === 캐치 게임 — 폴리시 === */
+.catch-subtitle {
+  margin: 4px 0 12px;
+  font-size: 14px;
+  font-style: italic;
+  color: #ffd700;
+  opacity: 0.9;
+}
+
+.catch-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #c0c0c0;
+}
+
+/* HUD를 가로로 두 칸 분리 */
+.catch-hud {
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 18px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.catch-hud-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+}
+
+.catch-hud-row b {
+  font-size: 18px;
+  color: #ffd700;
+}
+
+.catch-running-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: system-ui, sans-serif;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 빨간 원 펄스 효과 */
+.catch-circle {
+  animation: catch-circle-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes catch-circle-pulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(255, 90, 90, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.4); }
+  50%      { box-shadow: 0 0 36px rgba(255, 120, 120, 0.95), inset 0 0 10px rgba(255, 255, 255, 0.5); }
+}

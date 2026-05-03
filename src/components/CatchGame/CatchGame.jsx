@@ -153,7 +153,9 @@ export default function CatchGame() {
         {phase === 'idle' && (
           <div className="catch-panel catch-panel-start">
             <h2 className="catch-title">⚔️ 장비 드롭의 시련</h2>
+            <p className="catch-subtitle">"흐름을 읽고 잡아내라!"</p>
             <p>하늘에서 떨어지는 장비를 거치대(빨간 원) 위치에서 <b>→ 키</b>로 잡아라!</p>
+            <p className="catch-hint">검 ⚔️ · 방패 🛡️ · 포션 🧪 — 정확히 거치대 안에서 잡으면 50점</p>
             <button className="catch-btn catch-btn-primary" onClick={startGame} type="button">
               ▶ 시작 (Space)
             </button>
@@ -161,9 +163,17 @@ export default function CatchGame() {
         )}
 
         {phase === 'running' && (
-          <div className="catch-hud">
-            <div>남은 시간: {remainingSec.toFixed(1)}s · 점수: {score}</div>
-          </div>
+          <>
+            <div className="catch-hud">
+              <div className="catch-hud-row">
+                <span>남은 시간</span><b>{remainingSec.toFixed(1)}s</b>
+              </div>
+              <div className="catch-hud-row">
+                <span>점수</span><b>{score}</b>
+              </div>
+            </div>
+            <div className="catch-running-hint">→ 키로 거치대에서 잡아라!</div>
+          </>
         )}
 
         {phase === 'result' && (() => {
