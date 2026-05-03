@@ -2,8 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   GAME_DURATION_MS,
   FALL_DURATION_MS,
+  STAGE_HEIGHT_PX,
+  RED_CIRCLE_TOP_PX,
+  HIT_RANGE_MAX,
   planSpawnTimes,
   pickRandomType,
+  judgeHit,
+  getItemY,
 } from './catchUtils';
 import FallingItem from './FallingItem';
 import './CatchGame.css';
@@ -12,22 +17,40 @@ let nextItemId = 1;
 
 export default function CatchGame() {
   const [phase, setPhase] = useState('idle');
-  const [activeItems, setActiveItems] = useState([]);  // [{ id, type, spawnAt }]
+  const [activeItems, setActiveItems] = useState([]);
   const [elapsedMs, setElapsedMs] = useState(0);
+  const [score, setScore] = useState(0);
+  const [counts, setCounts] = useState({ perfect: 0, near: 0, fail: 0, miss: 0 });
 
   const gameStartMsRef = useRef(0);
   const spawnTimeoutsRef = useRef([]);
   const cleanupTimeoutsRef = useRef([]);
   const endTimeoutRef = useRef(null);
   const tickIntervalRef = useRef(null);
+  const activeItemsRef = useRef([]);
+  const phaseRef = useRef('idle');
+
+  // ref 미러 동기화 (closure stale 방지)
+  useEffect(() => { activeItemsRef.current = activeItems; }, [activeItems]);
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
+
+  const removeItem = useCallback((id) => {
+    setActiveItems((prev) => prev.filter((it) => it.id !== id));
+  }, []);
 
   const spawnItem = useCallback(() => {
     const id = nextItemId++;
     const spawnAt = performance.now() - gameStartMsRef.current;
     setActiveItems((prev) => [...prev, { id, type: pickRandomType(), spawnAt }]);
-    // 화면 밖으로 나간 후 자동 제거
+    // 화면 밖으로 나가면 miss 카운트 + 제거
     const tid = setTimeout(() => {
-      setActiveItems((prev) => prev.filter((it) => it.id !== id));
+      setActiveItems((prev) => {
+        const stillThere = prev.some((it) => it.id === id);
+        if (stillThere) {
+          setCounts((c) => ({ ...c, miss: c.miss + 1 }));
+        }
+        return prev.filter((it) => it.id !== id);
+      });
     }, FALL_DURATION_MS + 300);
     cleanupTimeoutsRef.current.push(tid);
   }, []);
@@ -47,6 +70,8 @@ export default function CatchGame() {
     cleanupTimers();
     setActiveItems([]);
     setElapsedMs(0);
+    setScore(0);
+    setCounts({ perfect: 0, near: 0, fail: 0, miss: 0 });
     gameStartMsRef.current = performance.now();
     setPhase('running');
 
@@ -62,6 +87,50 @@ export default function CatchGame() {
       setPhase('result');
     }, GAME_DURATION_MS);
   }, [cleanupTimers, spawnItem]);
+
+  // 키보드 입력 (→ : 캐치, Space : 시작)
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        if (phaseRef.current !== 'running') return;
+        const nowSinceStart = performance.now() - gameStartMsRef.current;
+        const items = activeItemsRef.current;
+        if (items.length === 0) return;  // 활성 아이템 없으면 무시 (페널티 X)
+
+        // 빨간 원과 가장 가까운 활성 아이템 찾기
+        let bestId = null;
+        let bestDist = Infinity;
+        for (const it of items) {
+          const elapsed = nowSinceStart - it.spawnAt;
+          if (elapsed < 0) continue;
+          const y = getItemY(elapsed, STAGE_HEIGHT_PX, FALL_DURATION_MS);
+          const dist = Math.abs(y - RED_CIRCLE_TOP_PX);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestId = it.id;
+          }
+        }
+        if (bestId === null) return;
+        if (bestDist > HIT_RANGE_MAX) {
+          // 사거리 밖 입력 — fail 카운트만 (점수 0)
+          setCounts((c) => ({ ...c, fail: c.fail + 1 }));
+          return;
+        }
+        const result = judgeHit(bestDist);
+        setScore((s) => s + result.score);
+        setCounts((c) => ({ ...c, [result.kind]: c[result.kind] + 1 }));
+        removeItem(bestId);
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        if (phaseRef.current === 'idle' || phaseRef.current === 'result') {
+          startGame();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [removeItem, startGame]);
 
   // 컴포넌트 unmount 시 cleanup
   useEffect(() => () => cleanupTimers(), [cleanupTimers]);
@@ -91,14 +160,15 @@ export default function CatchGame() {
 
         {phase === 'running' && (
           <div className="catch-hud">
-            <div>남은 시간: {remainingSec.toFixed(1)}s</div>
+            <div>남은 시간: {remainingSec.toFixed(1)}s · 점수: {score}</div>
           </div>
         )}
 
         {phase === 'result' && (
           <div className="catch-panel">
-            <h2>임시 결과 (Task 5·6에서 완성)</h2>
-            <button className="catch-btn" onClick={startGame} type="button">다시 도전</button>
+            <h2>임시 결과 — 점수 {score} (Task 6에서 완성)</h2>
+            <p>완벽: {counts.perfect} · 근접: {counts.near} · 실패: {counts.fail} · 놓침: {counts.miss}</p>
+            <button className="catch-btn" onClick={startGame} type="button">다시 도전 (Space)</button>
           </div>
         )}
       </div>
