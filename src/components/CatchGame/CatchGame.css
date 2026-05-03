@@ -27,3 +27,114 @@
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+/* === 캐치 게임 — 스테이지/UI === */
+.catch-stage {
+  position: relative;
+  width: min(1200px, 100%);
+  height: 600px;
+  margin: 0 auto;
+  background: #1a1a2e;
+  overflow: hidden;
+  border: 2px solid #333;
+  --catch-stage-height: 600px;
+}
+
+.catch-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/bg/world.png');
+  background-size: cover;
+  background-position: center bottom;
+  image-rendering: pixelated;
+  z-index: 1;
+}
+
+/* 무방비 그린이 sprite (8프레임 walking, 0.8s loop) */
+.catch-greenie {
+  position: absolute;
+  bottom: 151px;
+  left: 50%;
+  margin-left: -200px;
+  width: 400px;
+  height: 220px;
+  background-image: url('/sprites/unified_5_walk_no_weapon.png');
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: catch-greenie-walk 0.8s steps(8) infinite;
+  z-index: 2;
+}
+
+@keyframes catch-greenie-walk {
+  to { background-position: -3200px 0; }
+}
+
+/* 빨간 원 = 장비 거치대 */
+.catch-circle {
+  position: absolute;
+  top: 420px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #d42b2b 70%);
+  box-shadow: 0 0 24px rgba(255, 90, 90, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.4);
+  z-index: 3;
+}
+
+/* UI 오버레이 */
+.catch-ui-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.catch-panel {
+  pointer-events: auto;
+  background: rgba(15, 15, 26, 0.92);
+  color: #f0f0f0;
+  padding: 28px 36px;
+  border-radius: 12px;
+  border: 2px solid #4ade80;
+  text-align: center;
+  max-width: 480px;
+  font-family: system-ui, sans-serif;
+}
+
+.catch-title {
+  margin: 0 0 12px;
+  font-size: 24px;
+  color: #ffd700;
+}
+
+.catch-btn {
+  margin-top: 16px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 2px solid #f0f0f0;
+  background: #4ade80;
+  color: #0f0f1a;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.catch-btn:hover { filter: brightness(1.1); }
+
+.catch-hud {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: system-ui, sans-serif;
+  pointer-events: none;
+}
