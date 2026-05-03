@@ -4,6 +4,7 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
+import ColorReactionGame from './components/ColorReactionGame/ColorReactionGame';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -114,10 +115,17 @@ function App() {
         </div>
       </section>
 
-    <div className="ticks"></div>
+<div className="ticks"></div>
       <section style={{ padding: '40px 0' }}>
         <TenSecondsGame />
       </section>
+
+      {/* --- 여기에 두 번째 게임 섹션을 추가합니다 --- */}
+      <div className="ticks"></div>
+      <section style={{ padding: '40px 0', backgroundColor: '#0f0f1a' }}>
+        <ColorReactionGame />
+      </section>
+      {/* --------------------------------------------- */}
 
       <div className="ticks"></div>
       <section id="spacer"></section>
