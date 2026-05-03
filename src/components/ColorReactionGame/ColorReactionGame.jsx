@@ -29,8 +29,8 @@ export default function ColorReactionGame() {
       });
     }, 10);
 
-    // 2초 ~ 6초 사이 랜덤한 시간에 눈에 불이 들어옴
-    const randomDelay = Math.random() * 4000 + 2000;
+    // 4초 ~ 10초 사이 랜덤한 시간에 눈에 불이 들어옴
+    const randomDelay = Math.random() * 6000 + 4000;
     timeoutIdRef.current = setTimeout(() => {
       setPhase("react");
       glowStartTimeRef.current = performance.now();
