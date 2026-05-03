@@ -9,8 +9,10 @@ import {
   pickRandomType,
   judgeHit,
   getItemY,
+  getCatchResult,
 } from './catchUtils';
 import FallingItem from './FallingItem';
+import StarRating from '../TenSecondsGame/StarRating';
 import './CatchGame.css';
 
 let nextItemId = 1;
@@ -164,13 +166,48 @@ export default function CatchGame() {
           </div>
         )}
 
-        {phase === 'result' && (
-          <div className="catch-panel">
-            <h2>임시 결과 — 점수 {score} (Task 6에서 완성)</h2>
-            <p>완벽: {counts.perfect} · 근접: {counts.near} · 실패: {counts.fail} · 놓침: {counts.miss}</p>
-            <button className="catch-btn" onClick={startGame} type="button">다시 도전 (Space)</button>
-          </div>
-        )}
+        {phase === 'result' && (() => {
+          const result = getCatchResult(score);
+          const totalJudged = counts.perfect + counts.near + counts.fail + counts.miss;
+          return (
+            <div
+              className="catch-panel catch-panel-result"
+              style={{ '--catch-result-color': result.color }}
+            >
+              <div className="catch-grade-badge" data-grade={result.grade}>{result.grade}</div>
+              <div className="catch-result-title" style={{ color: result.color }}>{result.title}</div>
+              <StarRating count={result.stars} />
+
+              <div className="catch-stats">
+                <div className="catch-stat-row">
+                  <span>총점</span><span className="catch-stat-value">{score}</span>
+                </div>
+                <div className="catch-stat-row">
+                  <span>완벽 (50점)</span><span>{counts.perfect}</span>
+                </div>
+                <div className="catch-stat-row">
+                  <span>근접 (20점)</span><span>{counts.near}</span>
+                </div>
+                <div className="catch-stat-row">
+                  <span>실패 / 놓침</span><span>{counts.fail + counts.miss}</span>
+                </div>
+                <div className="catch-stat-row catch-stat-row-highlight">
+                  <span>판정 횟수</span><span>{totalJudged}</span>
+                </div>
+              </div>
+              <p className="catch-result-desc">{result.desc}</p>
+
+              <div className="catch-result-btns">
+                <button className="catch-btn catch-btn-primary" onClick={startGame} type="button">
+                  ▶ 다시 도전 (Space)
+                </button>
+                <button className="catch-btn catch-btn-ghost" onClick={() => setPhase('idle')} type="button">
+                  ↩ 처음으로
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
