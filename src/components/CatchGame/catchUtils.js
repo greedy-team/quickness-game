@@ -8,9 +8,9 @@ export const ITEM_EMOJI = {
   potion: '🧪',
 };
 
-export const TARGET_DISTANCE_PERFECT = 10;  // px
-export const TARGET_DISTANCE_NEAR = 20;     // px
-export const HIT_RANGE_MAX = 60;            // px (이 범위 밖 입력은 fail로 카운트)
+export const TARGET_DISTANCE_PERFECT = 15;  // px (시각 inner 30px 반지름)
+export const TARGET_DISTANCE_NEAR = 30;     // px (시각 outer 60px 반지름)
+export const HIT_RANGE_MAX = 90;            // px (이 범위 밖 입력은 fail로 카운트)
 
 export const GAME_DURATION_MS = 10_000;
 export const SPAWN_COUNT = 6;
