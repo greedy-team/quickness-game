@@ -470,6 +470,290 @@ NOTE: 푸시·PR 생성은 외부 영향이 있으므로 controller가 사용자
 
 ---
 
+### Task 3: 표적 가시성 + 피드백 (UX add-on)
+
+**Files:**
+- Modify: `src/components/CatchGame/CatchGame.jsx`
+- Modify: `src/components/CatchGame/CatchGame.css`
+
+(spec §12 참조)
+
+- [ ] **Step 1: CatchGame.jsx — feedback state + ref + 헬퍼 추가**
+
+상단 state 선언 그룹 (`useState(...)` 호출들 옆)에 추가:
+```jsx
+const [feedback, setFeedback] = useState(null);  // { kind, label, id } or null
+```
+
+ref 그룹 (`useRef(...)` 호출들 옆)에 추가:
+```jsx
+const feedbackTimeoutRef = useRef(null);
+const feedbackIdRef = useRef(0);
+```
+
+`cleanupTimers` 함수 본문에 다음 추가 (다른 timer 정리 옆):
+```jsx
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    feedbackTimeoutRef.current = null;
+```
+
+`startGame` 본문에서 게임 초기화 시 feedback도 클리어:
+```jsx
+    setFeedback(null);
+```
+(기존 `setActiveItems([])`, `setElapsedMs(0)`, `setScore(0)`, `setCounts(...)` 옆에 추가)
+
+`removeItem` 정의 바로 아래에 새 헬퍼 추가:
+```jsx
+  const showFeedback = useCallback((kind, label) => {
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    const id = ++feedbackIdRef.current;
+    setFeedback({ kind, label, id });
+    feedbackTimeoutRef.current = setTimeout(() => {
+      setFeedback((prev) => (prev && prev.id === id ? null : prev));
+      feedbackTimeoutRef.current = null;
+    }, 600);
+  }, []);
+```
+
+- [ ] **Step 2: CatchGame.jsx — keydown 핸들러에서 피드백 호출**
+
+기존 keydown 핸들러의 ArrowRight 분기에서, `bestId === null` 이후의 흐름을 다음으로 갱신:
+
+기존:
+```jsx
+        if (bestId === null) return;
+        if (bestDist > HIT_RANGE_MAX) {
+          // 사거리 밖 입력 — fail 카운트만 (점수 0)
+          setCounts((c) => ({ ...c, fail: c.fail + 1 }));
+          return;
+        }
+        const result = judgeHit(bestDist);
+        setScore((s) => s + result.score);
+        setCounts((c) => ({ ...c, [result.kind]: c[result.kind] + 1 }));
+        removeItem(bestId);
+```
+
+다음으로 교체 (3개 분기 모두 showFeedback 호출):
+```jsx
+        if (bestId === null) return;
+        if (bestDist > HIT_RANGE_MAX) {
+          // 사거리 밖 입력 — fail 카운트만 (점수 0)
+          setCounts((c) => ({ ...c, fail: c.fail + 1 }));
+          showFeedback('fail', 'FAIL');
+          return;
+        }
+        const result = judgeHit(bestDist);
+        setScore((s) => s + result.score);
+        setCounts((c) => ({ ...c, [result.kind]: c[result.kind] + 1 }));
+        const label = result.kind === 'perfect' ? 'PERFECT +50'
+                    : result.kind === 'near'    ? 'GOOD +20'
+                    :                              'FAIL';
+        showFeedback(result.kind, label);
+        removeItem(bestId);
+```
+
+또한 `useEffect`의 `addEventListener('keydown', onKey)` deps에 `showFeedback` 추가:
+
+기존:
+```jsx
+  }, [removeItem, startGame]);
+```
+
+다음으로:
+```jsx
+  }, [removeItem, startGame, showFeedback]);
+```
+
+- [ ] **Step 3: CatchGame.jsx — spawnItem의 자연 miss에 피드백 호출**
+
+기존 spawnItem 함수의 setTimeout 콜백 내부 — miss 카운트 증가 위치에 피드백 추가:
+
+기존:
+```jsx
+    const tid = setTimeout(() => {
+      setActiveItems((prev) => {
+        const stillThere = prev.some((it) => it.id === id);
+        if (stillThere) {
+          setCounts((c) => ({ ...c, miss: c.miss + 1 }));
+        }
+        return prev.filter((it) => it.id !== id);
+      });
+    }, FALL_DURATION_MS + 300);
+```
+
+다음으로 교체:
+```jsx
+    const tid = setTimeout(() => {
+      setActiveItems((prev) => {
+        const stillThere = prev.some((it) => it.id === id);
+        if (stillThere) {
+          setCounts((c) => ({ ...c, miss: c.miss + 1 }));
+          showFeedback('miss', 'MISS');
+        }
+        return prev.filter((it) => it.id !== id);
+      });
+    }, FALL_DURATION_MS + 300);
+```
+
+`spawnItem`의 `useCallback` deps에 `showFeedback` 추가:
+
+기존:
+```jsx
+  }, []);
+```
+(spawnItem useCallback 닫는 부분)
+
+다음으로:
+```jsx
+  }, [showFeedback]);
+```
+
+- [ ] **Step 4: CatchGame.jsx — 표적 div 구조 변경 + 피드백 div 렌더**
+
+stage div 내부에서 기존:
+```jsx
+      <div className="catch-circle" aria-hidden="true" />
+```
+
+다음으로 교체 (인너 코어 추가):
+```jsx
+      <div className="catch-circle" aria-hidden="true">
+        <div className="catch-target-inner" />
+      </div>
+```
+
+그리고 같은 stage div 내부 (FallingItem 렌더 직후, UI overlay 직전)에 피드백 렌더 추가:
+
+```jsx
+      {phase === 'running' && feedback && (
+        <div
+          key={feedback.id}
+          className={`catch-feedback catch-feedback-${feedback.kind}`}
+          aria-hidden="true"
+        >
+          {feedback.label}
+        </div>
+      )}
+```
+
+(`{phase === 'running' && activeItems.map(...)}` 블록과 `<div className="catch-ui-overlay">` 블록 사이에 삽입)
+
+- [ ] **Step 5: CatchGame.css — `.catch-circle` 크기 조정 + flex 중앙 정렬**
+
+`.catch-circle` 블록 (Step 8 of Task 1 이후의 모습)을 다음으로 교체:
+
+기존:
+```css
+.catch-circle {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #d42b2b 70%);
+  box-shadow: 0 0 24px rgba(255, 90, 90, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.4);
+  z-index: 3;
+}
+```
+
+다음으로 교체 (40px로 축소 + 색상 톤 다운 + flex 중앙 정렬):
+```css
+.catch-circle {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.35), rgba(220, 60, 60, 0.55) 75%);
+  box-shadow: 0 0 24px rgba(255, 90, 90, 0.6), inset 0 0 6px rgba(255, 255, 255, 0.3);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+```
+
+(Task 7의 cascade `.catch-circle { animation: catch-circle-pulse ... }` 블록은 그대로 유지)
+
+- [ ] **Step 6: CatchGame.css — `.catch-target-inner` + `.catch-feedback` + 애니메이션 추가**
+
+CatchGame.css 파일 끝에 다음 블록 추가:
+
+```css
+/* === 캐치 게임 — 표적 인너 코어 + 피드백 === */
+.catch-target-inner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff8c8, #ffd700 70%);
+  box-shadow:
+    0 0 12px rgba(255, 215, 0, 0.95),
+    inset 0 0 6px rgba(255, 255, 255, 0.7);
+}
+
+.catch-feedback {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -120%);
+  font-family: system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 1px;
+  pointer-events: none;
+  z-index: 6;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+  animation: catch-feedback-rise 0.6s ease-out forwards;
+  white-space: nowrap;
+}
+
+.catch-feedback-perfect { color: #ffd700; }
+.catch-feedback-near    { color: #86efac; }
+.catch-feedback-fail    { color: #9ca3af; }
+.catch-feedback-miss    { color: #f87171; }
+
+@keyframes catch-feedback-rise {
+  0%   { opacity: 0; transform: translate(-50%, -100%); }
+  20%  { opacity: 1; transform: translate(-50%, -150%); }
+  100% { opacity: 0; transform: translate(-50%, -250%); }
+}
+```
+
+- [ ] **Step 7: 빌드 통과 확인**
+
+```bash
+cd /Users/luca/workspace/greedy/quickness-game
+npm run build 2>&1 | grep -E "(error|✓|built|Error)" | head -10
+```
+
+Expected: `✓ built in ...`. 에러 없음.
+
+- [ ] **Step 8: 정적 검증**
+
+```bash
+git diff --stat HEAD
+```
+Expected: 2 파일 변경 (CatchGame.jsx, CatchGame.css). 다른 파일 없음.
+
+```bash
+grep -n "showFeedback\|catch-target-inner\|catch-feedback" src/components/CatchGame/
+```
+Expected: 새 토큰들이 jsx와 css에 적절히 등장.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add src/components/CatchGame/CatchGame.jsx src/components/CatchGame/CatchGame.css
+git commit -m "feat: 캐치 게임 표적 가시성 개선 및 캐치 피드백 추가 (#10)"
+```
+
+---
+
 ## Self-Review
 
 ### 1. Spec coverage

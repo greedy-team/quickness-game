@@ -235,3 +235,63 @@ phase machine, 게임 루프, 입력 처리, 결과 패널 — 모두 v1과 동�
   - CatchGame.jsx에 신전 요소 div 4개
 - 동작 차이: 시각만 변경, 게임 로직/점수/키 동일
 - 4번 병렬 게임(#11) 작업 시 base 무대로 그대로 활용 가능
+
+---
+
+## 12. 표적 가시성 + 피드백 개선 (UX add-on)
+
+### 12.1 문제 인식
+
+신전 리워크 후에도 표적(`.catch-circle`)이 단일 56px(또는 40px 변경 후) 원이라 **판정 존이 시각적으로 표현되지 않음** — 사용자가 어디서 누르면 perfect/near/fail/miss인지 직관적으로 모름.
+
+### 12.2 해결 방안
+
+**A. 동심 표적 (concentric target)** — 시각 존을 판정 존과 일치
+- outer (40px tall = NEAR ±20px 매핑): 옅은 골드/빨강 글로우, 펄스 애니메이션 유지
+- inner (20px tall = PERFECT ±10px 매핑): 밝은 골드 + 중앙 점, 또렷한 시각
+
+**B. 캐치 직후 플로팅 피드백** — 즉각적 결과 통보
+- 키 입력(또는 자연 miss) 시 표적 바로 위에 0.6초간 떠올랐다 사라지는 텍스트
+- 종류와 색상:
+  - `perfect`: "PERFECT +50" / 골드 (#ffd700)
+  - `near`: "GOOD +20" / 초록 (#86efac)
+  - `fail` (사거리 안 또는 밖): "FAIL" / 회색 (#9ca3af)
+  - `miss` (자연 낙하 종료): "MISS" / 빨강 (#f87171)
+- 표적 위 약 2x 표적 높이만큼 떠오르며 fade-in/fade-out
+
+### 12.3 구현 변경
+
+**CatchGame.jsx**
+- 표적 div 구조 변경:
+  ```jsx
+  <div className="catch-circle" aria-hidden="true">
+    <div className="catch-target-inner" />
+  </div>
+  ```
+- 새 state `feedback`: `{ kind, label, id }` 또는 null
+- 새 ref `feedbackTimeoutRef`로 setTimeout 추적
+- 헬퍼 `showFeedback(kind, label)`: 기존 timeout 정리 → set state → 0.6초 후 자동 클리어
+- 키 입력 핸들러:
+  - 사거리 밖 입력 → `showFeedback('fail', 'FAIL')`
+  - judgeHit 결과 → `showFeedback(result.kind, result.kind === 'perfect' ? 'PERFECT +50' : result.kind === 'near' ? 'GOOD +20' : 'FAIL')`
+- spawnItem의 자연 miss 경로 → `showFeedback('miss', 'MISS')`
+- cleanupTimers / unmount 에 feedbackTimeout 추가
+
+**CatchGame.css**
+- `.catch-circle` 크기 56px → 40px, flex 중앙 정렬 추가, 색상 살짝 톤 다운 (옅은 빨강/골드)
+- 신규 `.catch-target-inner` (20px, 밝은 골드 radial-gradient + 작은 중앙 점)
+- 신규 `.catch-feedback` (absolute positioned, 표적 위, fade+rise 애니메이션)
+- 신규 `.catch-feedback-perfect/near/fail/miss` 색상 변형
+- 신규 `@keyframes catch-feedback-rise`
+
+**catchUtils.js** — 변경 없음 (판정 로직 그대로)
+
+### 12.4 검증
+
+- [ ] 표적 외곽 40px (옅은 글로우), 안쪽 20px (밝은 골드) 두 단계 표시
+- [ ] 키 입력 시 표적 위에 PERFECT/GOOD/FAIL 텍스트가 0.6초간 떠올랐다 사라짐
+- [ ] 자연 miss 시 MISS 텍스트 표시
+- [ ] 색상이 종류별 다름 (gold/green/gray/red)
+- [ ] 동시 다발 입력 시 마지막 피드백만 표시 (이전 timeout 정리 정상)
+- [ ] 컴포넌트 unmount/재시작 시 feedback timeout cleanup 정상 (메모리 누수 X)
+- [ ] 1/3 width로 좁혀도 표적과 피드백이 적절히 보임 (% 포지셔닝)
