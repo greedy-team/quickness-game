@@ -5,6 +5,7 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
 import ColorReactionGame from './components/ColorReactionGame/ColorReactionGame';
+import CatchGame from './components/CatchGame/CatchGame';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -126,6 +127,13 @@ function App() {
         <ColorReactionGame />
       </section>
       {/* --------------------------------------------- */}
+
+      {/* --- 세 번째 게임: 캐치 (장비 드롭) --- */}
+      <div className="ticks"></div>
+      <section style={{ padding: '40px 0', backgroundColor: '#1a1a2e' }}>
+        <CatchGame />
+      </section>
+      {/* ----------------------------------------- */}
 
       <div className="ticks"></div>
       <section id="spacer"></section>
