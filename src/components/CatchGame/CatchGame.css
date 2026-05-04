@@ -43,36 +43,16 @@
 .catch-bg {
   position: absolute;
   inset: 0;
-  background-image: url('/bg/world.png');
-  background-size: cover;
-  background-position: center bottom;
-  image-rendering: pixelated;
+  background:
+    radial-gradient(ellipse at center 30%, rgba(80, 50, 120, 0.4), transparent 60%),
+    radial-gradient(circle at center, #1a0f2e, #0a0a1f 80%);
   z-index: 1;
-}
-
-/* 무방비 그린이 sprite (8프레임 walking, 0.8s loop) */
-.catch-greenie {
-  position: absolute;
-  bottom: 151px;
-  left: 50%;
-  margin-left: -200px;
-  width: 400px;
-  height: 220px;
-  background-image: url('/sprites/unified_5_walk_no_weapon.png');
-  background-repeat: no-repeat;
-  image-rendering: pixelated;
-  animation: catch-greenie-walk 0.8s steps(8) infinite;
-  z-index: 2;
-}
-
-@keyframes catch-greenie-walk {
-  to { background-position: -3200px 0; }
 }
 
 /* 빨간 원 = 장비 거치대 */
 .catch-circle {
   position: absolute;
-  top: 420px;
+  top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 56px;
@@ -273,4 +253,64 @@
 @keyframes catch-circle-pulse {
   0%, 100% { box-shadow: 0 0 24px rgba(255, 90, 90, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.4); }
   50%      { box-shadow: 0 0 36px rgba(255, 120, 120, 0.95), inset 0 0 10px rgba(255, 255, 255, 0.5); }
+}
+
+/* === 캐치 게임 — 신전 요소 === */
+.catch-pillar {
+  position: absolute;
+  top: 0;
+  width: 8%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    #2a1a3a 0%,
+    #4a3a5a 20%,
+    #6a5a7a 50%,
+    #4a3a5a 80%,
+    #2a1a3a 100%
+  );
+  border-top: 12px solid #6a5a7a;
+  border-bottom: 12px solid #3a2a4a;
+  z-index: 2;
+}
+
+.catch-pillar-left  { left: 5%; }
+.catch-pillar-right { right: 5%; }
+
+.catch-light-beam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 70%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 215, 0, 0.35) 0%,
+    rgba(255, 215, 0, 0.15) 50%,
+    transparent 100%
+  );
+  filter: blur(4px);
+  pointer-events: none;
+  animation: catch-light-pulse 1.4s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes catch-light-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1.0; }
+}
+
+.catch-altar-platform {
+  position: absolute;
+  left: 50%;
+  top: 75%;
+  transform: translateX(-50%);
+  width: 20%;
+  height: 6%;
+  background: linear-gradient(to bottom, #5a4a6a, #2a1a3a);
+  border-top: 2px solid #7a6a8a;
+  border-radius: 4px 4px 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 2;
 }

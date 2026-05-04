@@ -19,7 +19,7 @@ export const SPAWN_MAX_GAP_MS = 1700;
 export const SPAWN_FIRST_AT_MS = 800;
 export const FALL_DURATION_MS = 2000;
 export const STAGE_HEIGHT_PX = 600;
-export const RED_CIRCLE_TOP_PX = 420;       // 그린이 가슴 높이
+export const RED_CIRCLE_TOP_RATIO = 0.7;    // stage height의 70% 지점 (제단 위치)
 
 // 거리(px)를 받아 점수와 종류 반환
 export function judgeHit(distancePx) {

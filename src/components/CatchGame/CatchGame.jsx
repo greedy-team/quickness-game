@@ -3,7 +3,7 @@ import {
   GAME_DURATION_MS,
   FALL_DURATION_MS,
   STAGE_HEIGHT_PX,
-  RED_CIRCLE_TOP_PX,
+  RED_CIRCLE_TOP_RATIO,
   HIT_RANGE_MAX,
   planSpawnTimes,
   pickRandomType,
@@ -103,11 +103,12 @@ export default function CatchGame() {
         // 빨간 원과 가장 가까운 활성 아이템 찾기
         let bestId = null;
         let bestDist = Infinity;
+        const circleTopPx = RED_CIRCLE_TOP_RATIO * STAGE_HEIGHT_PX;
         for (const it of items) {
           const elapsed = nowSinceStart - it.spawnAt;
           if (elapsed < 0) continue;
           const y = getItemY(elapsed, STAGE_HEIGHT_PX, FALL_DURATION_MS);
-          const dist = Math.abs(y - RED_CIRCLE_TOP_PX);
+          const dist = Math.abs(y - circleTopPx);
           if (dist < bestDist) {
             bestDist = dist;
             bestId = it.id;
@@ -142,7 +143,10 @@ export default function CatchGame() {
   return (
     <div className="catch-stage">
       <div className="catch-bg" aria-hidden="true" />
-      <div className="catch-greenie" aria-hidden="true" />
+      <div className="catch-light-beam" aria-hidden="true" />
+      <div className="catch-pillar catch-pillar-left" aria-hidden="true" />
+      <div className="catch-pillar catch-pillar-right" aria-hidden="true" />
+      <div className="catch-altar-platform" aria-hidden="true" />
       <div className="catch-circle" aria-hidden="true" />
 
       {phase === 'running' && activeItems.map((item) => (
@@ -154,7 +158,7 @@ export default function CatchGame() {
           <div className="catch-panel catch-panel-start">
             <h2 className="catch-title">⚔️ 장비 드롭의 시련</h2>
             <p className="catch-subtitle">"흐름을 읽고 잡아내라!"</p>
-            <p>하늘에서 떨어지는 장비를 거치대(빨간 원) 위치에서 <b>→ 키</b>로 잡아라!</p>
+            <p>신이 내려주는 장비를 제단(빨간 원) 위치에서 <b>→ 키</b>로 잡아라!</p>
             <p className="catch-hint">검 ⚔️ · 방패 🛡️ · 포션 🧪 — 정확히 거치대 안에서 잡으면 50점</p>
             <button className="catch-btn catch-btn-primary" onClick={startGame} type="button">
               ▶ 시작 (Space)
