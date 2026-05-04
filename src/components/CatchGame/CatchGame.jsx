@@ -23,6 +23,7 @@ export default function CatchGame() {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [score, setScore] = useState(0);
   const [counts, setCounts] = useState({ perfect: 0, near: 0, fail: 0, miss: 0 });
+  const [feedback, setFeedback] = useState(null);  // { kind, label, id } or null
 
   const gameStartMsRef = useRef(0);
   const spawnTimeoutsRef = useRef([]);
@@ -31,6 +32,8 @@ export default function CatchGame() {
   const tickIntervalRef = useRef(null);
   const activeItemsRef = useRef([]);
   const phaseRef = useRef('idle');
+  const feedbackTimeoutRef = useRef(null);
+  const feedbackIdRef = useRef(0);
 
   // ref 미러 동기화 (closure stale 방지)
   useEffect(() => { activeItemsRef.current = activeItems; }, [activeItems]);
@@ -38,6 +41,16 @@ export default function CatchGame() {
 
   const removeItem = useCallback((id) => {
     setActiveItems((prev) => prev.filter((it) => it.id !== id));
+  }, []);
+
+  const showFeedback = useCallback((kind, label) => {
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    const id = ++feedbackIdRef.current;
+    setFeedback({ kind, label, id });
+    feedbackTimeoutRef.current = setTimeout(() => {
+      setFeedback((prev) => (prev && prev.id === id ? null : prev));
+      feedbackTimeoutRef.current = null;
+    }, 600);
   }, []);
 
   const spawnItem = useCallback(() => {
@@ -50,12 +63,13 @@ export default function CatchGame() {
         const stillThere = prev.some((it) => it.id === id);
         if (stillThere) {
           setCounts((c) => ({ ...c, miss: c.miss + 1 }));
+          showFeedback('miss', 'MISS');
         }
         return prev.filter((it) => it.id !== id);
       });
     }, FALL_DURATION_MS + 300);
     cleanupTimeoutsRef.current.push(tid);
-  }, []);
+  }, [showFeedback]);
 
   const cleanupTimers = useCallback(() => {
     spawnTimeoutsRef.current.forEach(clearTimeout);
@@ -66,6 +80,8 @@ export default function CatchGame() {
     if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
     endTimeoutRef.current = null;
     tickIntervalRef.current = null;
+    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
+    feedbackTimeoutRef.current = null;
   }, []);
 
   const startGame = useCallback(() => {
@@ -74,6 +90,7 @@ export default function CatchGame() {
     setElapsedMs(0);
     setScore(0);
     setCounts({ perfect: 0, near: 0, fail: 0, miss: 0 });
+    setFeedback(null);
     gameStartMsRef.current = performance.now();
     setPhase('running');
 
@@ -118,11 +135,16 @@ export default function CatchGame() {
         if (bestDist > HIT_RANGE_MAX) {
           // 사거리 밖 입력 — fail 카운트만 (점수 0)
           setCounts((c) => ({ ...c, fail: c.fail + 1 }));
+          showFeedback('fail', 'FAIL');
           return;
         }
         const result = judgeHit(bestDist);
         setScore((s) => s + result.score);
         setCounts((c) => ({ ...c, [result.kind]: c[result.kind] + 1 }));
+        const label = result.kind === 'perfect' ? 'PERFECT +50'
+                    : result.kind === 'near'    ? 'GOOD +20'
+                    :                              'FAIL';
+        showFeedback(result.kind, label);
         removeItem(bestId);
       } else if (e.code === 'Space') {
         e.preventDefault();
@@ -133,7 +155,7 @@ export default function CatchGame() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [removeItem, startGame]);
+  }, [removeItem, startGame, showFeedback]);
 
   // 컴포넌트 unmount 시 cleanup
   useEffect(() => () => cleanupTimers(), [cleanupTimers]);
@@ -147,11 +169,23 @@ export default function CatchGame() {
       <div className="catch-pillar catch-pillar-left" aria-hidden="true" />
       <div className="catch-pillar catch-pillar-right" aria-hidden="true" />
       <div className="catch-altar-platform" aria-hidden="true" />
-      <div className="catch-circle" aria-hidden="true" />
+      <div className="catch-circle" aria-hidden="true">
+        <div className="catch-target-inner" />
+      </div>
 
       {phase === 'running' && activeItems.map((item) => (
         <FallingItem key={item.id} type={item.type} />
       ))}
+
+      {phase === 'running' && feedback && (
+        <div
+          key={feedback.id}
+          className={`catch-feedback catch-feedback-${feedback.kind}`}
+          aria-hidden="true"
+        >
+          {feedback.label}
+        </div>
+      )}
 
       <div className="catch-ui-overlay">
         {phase === 'idle' && (
