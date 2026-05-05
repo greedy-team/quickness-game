@@ -1,0 +1,14 @@
+@keyframes hero-play {
+  to { background-position: var(--end-pos) 0; }
+}
+
+.hero-sprite {
+  position: absolute;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.hero-sprite.paused {
+  animation-play-state: paused !important;
+}
