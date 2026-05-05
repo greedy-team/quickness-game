@@ -157,8 +157,9 @@ ParallelGame (마스터)
 
 - mount + `externalPhase="running"` + `speedMultiplier=1.5` → `startGame()` 호출
 - `FALL_DURATION_MS_EFFECTIVE = FALL_DURATION_MS / 1.5` (낙하 가속)
-- `planSpawnTimes()` 결과도 동일 비율로 단축 → 10초 내 5개 등장 유지
-- → 키 처리 그대로
+- `planSpawnTimes(...)` 호출 시 `fallMs` 인자에 effective 값을 전달해 6개 spawn이 10초 내에 빨간 원 도달하도록 보장 (랜덤 gap에 따라 실제 5~6개 spawn)
+- `FallingItem`에 `speedMultiplier` prop을 그대로 전달 (기존 컴포넌트가 이미 `animationDuration` 분할 지원)
+- → 키 입력의 거리 판정은 `FALL_DURATION_MS_EFFECTIVE`로 계산해야 정확
 
 ---
 
@@ -176,26 +177,28 @@ ParallelGame (마스터)
 
 ### 6.2 5단계 등급 임계치
 
-각 영역 max 점수: 1번 100 + 2번 100 + 3번 250 = **합산 max 450** → **× 2 보너스 max 900**
+각 영역 max 점수: 1번 100 + 2번 100 + 3번 300 (`SPAWN_COUNT=6` × 50) = **합산 max 500** → **× 2 보너스 max 1000**
 
-| 등급 | 색상 | 별 | 임계치 (max 900) | % |
+| 등급 | 색상 | 별 | 임계치 (max 1000) | % |
 |---|---|---|---|---|
-| 🌟 레전더리 | `#fbbf24` (gold) | ⭐⭐⭐⭐⭐ | ≥ 810 | ≥ 90% |
-| 💎 유니크 | `#a78bfa` (purple) | ⭐⭐⭐⭐ | ≥ 675 | ≥ 75% |
-| 🔮 에픽 | `#60a5fa` (blue) | ⭐⭐⭐ | ≥ 495 | ≥ 55% |
-| ⚔️ 레어 | `#34d399` (green) | ⭐⭐ | ≥ 270 | ≥ 30% |
-| 🛡️ 일반 | `#9ca3af` (gray) | ⭐ | < 270 | < 30% |
+| 🌟 레전더리 | `#ffd700` (gold) | ⭐⭐⭐⭐⭐ | ≥ 900 | ≥ 90% |
+| 💎 유니크 | `#ff007f` (pink) | ⭐⭐⭐⭐ | ≥ 750 | ≥ 75% |
+| 🔮 에픽 | `#a78bfa` (purple) | ⭐⭐⭐ | ≥ 550 | ≥ 55% |
+| ⚔️ 레어 | `#60a5fa` (blue) | ⭐⭐ | ≥ 300 | ≥ 30% |
+| 🛡️ 일반 | `#86efac` (green) | ⭐ | < 300 | < 30% |
+
+> 색상 토큰은 다른 미니게임의 `tier-*` 클래스와 통일 (gameUtils/reactionUtils/catchUtils의 `getResult` 색상과 일치).
 
 ### 6.3 `parallelUtils.js` 시그니처
 
 ```js
-export const PARALLEL_MAX_SCORE = 900;
+export const PARALLEL_MAX_SCORE = 1000;
 export const PARALLEL_GRADES = [
-  { grade: '레전더리', threshold: 810, stars: 5, color: '#fbbf24', title: '🌟 결전의 영웅' },
-  { grade: '유니크',   threshold: 675, stars: 4, color: '#a78bfa', title: '💎 갑옷의 수호자' },
-  { grade: '에픽',     threshold: 495, stars: 3, color: '#60a5fa', title: '🔮 결전의 전사' },
-  { grade: '레어',     threshold: 270, stars: 2, color: '#34d399', title: '⚔️ 시련의 통과자' },
-  { grade: '일반',     threshold: 0,   stars: 1, color: '#9ca3af', title: '🛡️ 새내기 전사' },
+  { grade: 'LEGENDARY', threshold: 900, stars: 5, color: '#ffd700', title: '🌟 결전의 영웅', desc: '갑옷 입은 그린이의 모든 능력이 폭발했다.' },
+  { grade: 'UNIQUE',    threshold: 750, stars: 4, color: '#ff007f', title: '💎 갑옷의 수호자', desc: '훌륭한 종합 시험. 보스 앞에서도 흔들리지 않으리라.' },
+  { grade: 'EPIC',      threshold: 550, stars: 3, color: '#a78bfa', title: '🔮 결전의 전사', desc: '준비는 충분하다. 보스를 향해 나아가자.' },
+  { grade: 'RARE',      threshold: 300, stars: 2, color: '#60a5fa', title: '⚔️ 시련의 통과자', desc: '아슬아슬하게 시련을 통과했다.' },
+  { grade: 'COMMON',    threshold: 0,   stars: 1, color: '#86efac', title: '🛡️ 새내기 전사', desc: '아직 부족하지만 보스를 향한 첫 발은 뗐다.' },
 ];
 
 export function getParallelGrade(totalBonus) {
@@ -250,12 +253,12 @@ export function getParallelGrade(totalBonus) {
    ┌─────────────────────────┐
    │ 좌 (10초 맞추기)   +80  │
    │ 중 (색상 반응)     +60  │
-   │ 우 (캐치)         +180  │
+   │ 우 (캐치)         +220  │
    ├─────────────────────────┤
-   │ 합산              +320  │
-   │ × 2 보너스        +640  │
+   │ 합산              +360  │
+   │ × 2 보너스        +720  │
    ├─────────────────────────┤
-   │ 최종 점수         +640  │  ← highlight
+   │ 최종 점수         +720  │  ← highlight
    └─────────────────────────┘
 
    [다음으로 (Enter / Space)]
@@ -283,18 +286,29 @@ export function getParallelGrade(totalBonus) {
 
 ## 9. 테스트 전략
 
-### 9.1 유닛 테스트 (`parallelUtils.test.js`)
+### 9.1 등급 함수 검증 (인라인 console.assert)
 
-- `getParallelGrade(score)` 임계치 경계: 810, 809, 675, 495, 270, 269, 0, 음수
-- 각 등급별 색상/타이틀/별 개수 매핑 검증
+테스트 인프라(vitest/jest)가 미도입 상태이므로 별도 인프라 도입 없이 `parallelUtils.js` 하단에 자체 self-test를 두거나, 개발 콘솔에서 다음 임계치를 수동 검증:
+
+- `getParallelGrade(1000).grade === 'LEGENDARY'`
+- `getParallelGrade(900).grade === 'LEGENDARY'`
+- `getParallelGrade(899).grade === 'UNIQUE'`
+- `getParallelGrade(750).grade === 'UNIQUE'`
+- `getParallelGrade(549).grade === 'RARE'`
+- `getParallelGrade(300).grade === 'RARE'`
+- `getParallelGrade(299).grade === 'COMMON'`
+- `getParallelGrade(0).grade === 'COMMON'`
+- `getParallelGrade(-100).grade === 'COMMON'` (음수 클램프)
+
+> 후속 이슈로 vitest 인프라 도입 시 정식 단위 테스트로 이관.
 
 ### 9.2 수동 / 통합 테스트 (브라우저)
 
 Vite dev 서버에서 `state.scene = 'minigame_4'` 진입 후 6개 시나리오:
 
-1. **만점**: 모든 영역 만점 → 합산 450 ×2 = 900 → 레전더리
-2. **1번 미입력**: 0+100+250=350 ×2 = 700 → 유니크
-3. **2번 일찍 누름**: 100-20+250=330 ×2 = 660 (음수 클램프 적용 확인) → 레어
+1. **만점 근접**: 모든 영역 최고 등급 → 합산 ≈ 500 ×2 = 1000 → 레전더리
+2. **1번 미입력**: 0+100+300=400 ×2 = 800 → 유니크
+3. **2번 일찍 누름**: 100-20+300=380 ×2 = 760 (음수 클램프 적용 확인) → 유니크
 4. **모두 0점**: 0 → 일반
 5. **동시 키 입력**: ←↑→ 동시 누르기 → 각 영역 분리 처리 정상
 6. **씬 전환**: result 패널에서 Enter → boss_fight 씬 정상 전환
