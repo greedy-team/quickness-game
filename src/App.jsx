@@ -1,144 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect } from 'react';
+import { useGame } from './store/gameStore.jsx';
+import IntroScene from './scenes/IntroScene.jsx';
+import WorldScene from './scenes/WorldScene.jsx';
+import PlaceholderScene from './scenes/PlaceholderScene.jsx';
+import EndingScene from './scenes/EndingScene.jsx';
 import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
 import ColorReactionGame from './components/ColorReactionGame/ColorReactionGame';
 import CatchGame from './components/CatchGame/CatchGame';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { state, dispatch } = useGame();
+
+  // armor 진입 시 갑옷 자동 장착
+  useEffect(() => {
+    if (state.scene === 'armor' && !state.hasArmor) {
+      dispatch({ type: 'EQUIP_ARMOR' });
+    }
+  }, [state.scene, state.hasArmor, dispatch]);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>이슈테스트</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-<div className="ticks"></div>
-      <section style={{ padding: '40px 0' }}>
-        <TenSecondsGame />
-      </section>
-
-      {/* --- 여기에 두 번째 게임 섹션을 추가합니다 --- */}
-      <div className="ticks"></div>
-      <section style={{ padding: '40px 0', backgroundColor: '#0f0f1a' }}>
-        <ColorReactionGame />
-      </section>
-      {/* --------------------------------------------- */}
-
-      {/* --- 세 번째 게임: 캐치 (장비 드롭) --- */}
-      <div className="ticks"></div>
-      <section style={{ padding: '40px 0', backgroundColor: '#1a1a2e' }}>
-        <CatchGame />
-      </section>
-      {/* ----------------------------------------- */}
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="app-stage" key={state.scene}>
+      {state.scene === 'intro' && <IntroScene />}
+      {state.scene === 'world' && <WorldScene />}
+      {state.scene === 'minigame_1' && (
+        <TenSecondsGame
+          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
+          onContinue={() => {
+            dispatch({ type: 'SET_WORLD_STAGE', payload: 1 });
+            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
+          }}
+        />
+      )}
+      {state.scene === 'minigame_2' && (
+        <ColorReactionGame
+          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
+          onContinue={() => {
+            dispatch({ type: 'SET_WORLD_STAGE', payload: 2 });
+            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
+          }}
+        />
+      )}
+      {state.scene === 'minigame_3' && (
+        <CatchGame
+          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
+          onContinue={() => {
+            dispatch({ type: 'SET_WORLD_STAGE', payload: 3 });
+            dispatch({ type: 'GO_TO_SCENE', payload: 'armor' });
+          }}
+        />
+      )}
+      {state.scene === 'armor' && (
+        <PlaceholderScene title="🛡 갑옷 장착" description="훈련을 마친 그린이! 갑옷과 검을 손에 넣었다!"
+          onContinue={() => {
+            dispatch({ type: 'SET_WORLD_STAGE', payload: 4 });
+            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
+          }} />
+      )}
+      {state.scene === 'minigame_4' && (
+        <PlaceholderScene title="⚔️ 미니게임 4: 병렬 진행" description="(별도 이슈에서 구현 예정)"
+          onContinue={() => {
+            dispatch({ type: 'SET_WORLD_STAGE', payload: 5 });
+            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
+          }} />
+      )}
+      {state.scene === 'boss_fight' && (
+        <PlaceholderScene title="🔥 보스전" description="(별도 이슈에서 구현 예정)"
+          onContinue={() => dispatch({ type: 'GO_TO_SCENE', payload: 'ending' })} />
+      )}
+      {state.scene === 'ending' && <EndingScene />}
+    </div>
+  );
 }
-
-export default App

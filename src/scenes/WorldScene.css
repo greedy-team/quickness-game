@@ -1,0 +1,94 @@
+/* src/scenes/WorldScene.css */
+.world-scene {
+  position: absolute;
+  inset: 0;
+  background: url('/bg/world.png') center bottom / cover no-repeat;
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+
+.world-hud {
+  position: absolute;
+  top: 12px; left: 12px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #fff;
+  z-index: 10;
+}
+
+.world-checkpoint {
+  position: absolute;
+  bottom: 180px;
+  width: 80px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 200ms;
+}
+.world-checkpoint-post {
+  width: 12px;
+  height: 80px;
+  background: linear-gradient(180deg, #6b3410 0%, #4a2308 100%);
+  border: 2px solid #2a1404;
+}
+.world-checkpoint-sign {
+  position: absolute;
+  top: 0;
+  width: 80px;
+  padding: 6px;
+  background: #d97706;
+  border: 3px solid #2a1404;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.world-checkpoint.is-active .world-checkpoint-sign {
+  animation: checkpoint-pulse 0.9s ease-in-out infinite alternate;
+}
+.world-checkpoint.is-done {
+  opacity: 0.45;
+}
+.world-checkpoint.is-done .world-checkpoint-sign {
+  background: #4b5563;
+  border-color: #1f2937;
+}
+.world-checkpoint.is-locked {
+  opacity: 0.55;
+}
+.world-checkpoint.is-locked .world-checkpoint-sign {
+  background: #6b7280;
+  border-color: #1f2937;
+}
+@keyframes checkpoint-pulse {
+  from { box-shadow: 0 0 0 rgba(251, 191, 36, 0.4); transform: translateY(0); }
+  to   { box-shadow: 0 0 24px rgba(251, 191, 36, 0.85); transform: translateY(-4px); }
+}
+
+.world-toast {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 28px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fbbf24;
+  font-size: 18px;
+  font-weight: bold;
+  border: 3px solid #fbbf24;
+  z-index: 20;
+  animation: world-toast-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes world-toast-pulse {
+  from { transform: translateX(-50%) scale(1); opacity: 0.85; }
+  to   { transform: translateX(-50%) scale(1.05); opacity: 1; }
+}
