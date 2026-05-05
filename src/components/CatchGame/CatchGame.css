@@ -30,10 +30,13 @@
 
 /* === 캐치 게임 — 스테이지/UI === */
 .catch-stage {
-  position: relative;
-  width: min(1200px, 100%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1200px;
   height: 600px;
-  margin: 0 auto;
+  transform: translate(-50%, -50%) scale(1.6);
+  transform-origin: center center;
   background: #1a1a2e;
   overflow: hidden;
   border: 2px solid #333;

@@ -5,6 +5,7 @@ import {
   STAGE_HEIGHT_PX,
   RED_CIRCLE_TOP_RATIO,
   HIT_RANGE_MAX,
+  ITEM_VISUAL_HEIGHT_PX,
   planSpawnTimes,
   pickRandomType,
   judgeHit,
@@ -17,13 +18,13 @@ import './CatchGame.css';
 
 let nextItemId = 1;
 
-export default function CatchGame() {
+export default function CatchGame({ autoStart = false, onComplete, onContinue }) {
   const [phase, setPhase] = useState('idle');
   const [activeItems, setActiveItems] = useState([]);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [score, setScore] = useState(0);
   const [counts, setCounts] = useState({ perfect: 0, near: 0, fail: 0, miss: 0 });
-  const [feedback, setFeedback] = useState(null);  // { kind, label, id } or null
+  const [feedback, setFeedback] = useState(null);
 
   const gameStartMsRef = useRef(0);
   const spawnTimeoutsRef = useRef([]);
@@ -34,10 +35,24 @@ export default function CatchGame() {
   const phaseRef = useRef('idle');
   const feedbackTimeoutRef = useRef(null);
   const feedbackIdRef = useRef(0);
+  const scoreRef = useRef(0);
+  const completedRef = useRef(false);
+  // World scene에서 → 키로 진입했을 때, 그 키 입력이 즉시 캐치로 인식되지 않도록
+  // 첫 keyup이 발생할 때까지 ArrowRight keydown 무시
+  const rightKeyArmedRef = useRef(false);
 
-  // ref 미러 동기화 (closure stale 방지)
   useEffect(() => { activeItemsRef.current = activeItems; }, [activeItems]);
   useEffect(() => { phaseRef.current = phase; }, [phase]);
+  useEffect(() => { scoreRef.current = score; }, [score]);
+
+  // ArrowRight keyup 한 번 발생할 때까지 캐치 입력 잠금 (mount 시 진입 키 잔류 방지)
+  useEffect(() => {
+    const onKeyUp = (e) => {
+      if (e.code === 'ArrowRight') rightKeyArmedRef.current = true;
+    };
+    window.addEventListener('keyup', onKeyUp);
+    return () => window.removeEventListener('keyup', onKeyUp);
+  }, []);
 
   const removeItem = useCallback((id) => {
     setActiveItems((prev) => prev.filter((it) => it.id !== id));
@@ -57,7 +72,6 @@ export default function CatchGame() {
     const id = nextItemId++;
     const spawnAt = performance.now() - gameStartMsRef.current;
     setActiveItems((prev) => [...prev, { id, type: pickRandomType(), spawnAt }]);
-    // 화면 밖으로 나가면 miss 카운트 + 제거
     const tid = setTimeout(() => {
       setActiveItems((prev) => {
         const stillThere = prev.some((it) => it.id === id);
@@ -89,8 +103,10 @@ export default function CatchGame() {
     setActiveItems([]);
     setElapsedMs(0);
     setScore(0);
+    scoreRef.current = 0;
     setCounts({ perfect: 0, near: 0, fail: 0, miss: 0 });
     setFeedback(null);
+    completedRef.current = false;
     gameStartMsRef.current = performance.now();
     setPhase('running');
 
@@ -104,36 +120,41 @@ export default function CatchGame() {
     endTimeoutRef.current = setTimeout(() => {
       cleanupTimers();
       setPhase('result');
+      if (!completedRef.current) {
+        completedRef.current = true;
+        onComplete?.(scoreRef.current);
+      }
     }, GAME_DURATION_MS);
-  }, [cleanupTimers, spawnItem]);
+  }, [cleanupTimers, spawnItem, onComplete]);
 
-  // 키보드 입력 (→ : 캐치, Space : 시작)
+  // 키보드: → 캐치, Space 시작(autoStart=false), Enter 다음으로
   useEffect(() => {
     const onKey = (e) => {
       if (e.code === 'ArrowRight') {
         e.preventDefault();
+        if (phaseRef.current === 'idle') {
+          startGame();              // → 키로 시작
+          return;
+        }
         if (phaseRef.current !== 'running') return;
+
         const nowSinceStart = performance.now() - gameStartMsRef.current;
         const items = activeItemsRef.current;
-        if (items.length === 0) return;  // 활성 아이템 없으면 무시 (페널티 X)
+        if (items.length === 0) return;
 
-        // 빨간 원과 가장 가까운 활성 아이템 찾기
         let bestId = null;
         let bestDist = Infinity;
-        const circleTopPx = RED_CIRCLE_TOP_RATIO * STAGE_HEIGHT_PX;
+        const circleCenterY = RED_CIRCLE_TOP_RATIO * STAGE_HEIGHT_PX;
         for (const it of items) {
           const elapsed = nowSinceStart - it.spawnAt;
           if (elapsed < 0) continue;
-          const y = getItemY(elapsed, STAGE_HEIGHT_PX, FALL_DURATION_MS);
-          const dist = Math.abs(y - circleTopPx);
-          if (dist < bestDist) {
-            bestDist = dist;
-            bestId = it.id;
-          }
+          // getItemY는 이모지 div의 top edge → 시각 center로 보정
+          const itemCenterY = getItemY(elapsed, STAGE_HEIGHT_PX, FALL_DURATION_MS) + ITEM_VISUAL_HEIGHT_PX / 2;
+          const dist = Math.abs(itemCenterY - circleCenterY);
+          if (dist < bestDist) { bestDist = dist; bestId = it.id; }
         }
         if (bestId === null) return;
         if (bestDist > HIT_RANGE_MAX) {
-          // 사거리 밖 입력 — fail 카운트만 (점수 0)
           setCounts((c) => ({ ...c, fail: c.fail + 1 }));
           showFeedback('fail', 'FAIL');
           return;
@@ -146,19 +167,26 @@ export default function CatchGame() {
                     :                              'FAIL';
         showFeedback(result.kind, label);
         removeItem(bestId);
-      } else if (e.code === 'Space') {
+      } else if ((e.code === 'Enter' || e.code === 'Space')
+                 && phaseRef.current === 'result'
+                 && onContinue) {
         e.preventDefault();
-        if (phaseRef.current === 'idle' || phaseRef.current === 'result') {
-          startGame();
-        }
+        onContinue();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [removeItem, startGame, showFeedback]);
+  }, [removeItem, startGame, showFeedback, autoStart, onContinue]);
 
-  // 컴포넌트 unmount 시 cleanup
   useEffect(() => () => cleanupTimers(), [cleanupTimers]);
+
+  // autoStart: mount 후 600ms grace 뒤 시작 (사용자가 진입 키 떼고 준비할 시간)
+  useEffect(() => {
+    if (!autoStart) return undefined;
+    const t = setTimeout(() => startGame(), 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart]);
 
   const remainingSec = Math.max(0, (GAME_DURATION_MS - elapsedMs) / 1000);
 
@@ -188,14 +216,26 @@ export default function CatchGame() {
       )}
 
       <div className="catch-ui-overlay">
-        {phase === 'idle' && (
+        {phase === 'idle' && !autoStart && (
           <div className="catch-panel catch-panel-start">
             <h2 className="catch-title">⚔️ 장비 드롭의 시련</h2>
             <p className="catch-subtitle">"흐름을 읽고 잡아내라!"</p>
             <p>신이 내려주는 장비를 제단(빨간 원) 위치에서 <b>→ 키</b>로 잡아라!</p>
-            <p className="catch-hint">검 ⚔️ · 방패 🛡️ · 포션 🧪 — 정확히 거치대 안에서 잡으면 50점</p>
+            <p className="catch-hint">검 ⚔️ · 방패 🛡️ · 포션 🧪 (10초 동안 5개 등장)</p>
+            <div className="score-rules">
+              <div className="score-rules-title">📊 판정 기준 (1회 캐치당)</div>
+              <div className="score-rule tier-legendary"><span>⭐⭐⭐⭐⭐ PERFECT (정중앙)</span><b>+50점</b></div>
+              <div className="score-rule tier-rare"><span>⭐⭐ NEAR (근접)</span><b>+20점</b></div>
+              <div className="score-rule score-rule-bad"><span>FAIL / MISS</span><b>0점</b></div>
+              <div className="score-rules-title" style={{ marginTop: 8 }}>🏆 누적 등급 (5개 만점 250)</div>
+              <div className="score-rule tier-legendary"><span>⭐⭐⭐⭐⭐ 레전더리</span><b>≥230점</b></div>
+              <div className="score-rule tier-unique"><span>⭐⭐⭐⭐ 유니크</span><b>≥180점</b></div>
+              <div className="score-rule tier-epic"><span>⭐⭐⭐ 에픽</span><b>≥130점</b></div>
+              <div className="score-rule tier-rare"><span>⭐⭐ 레어</span><b>≥80점</b></div>
+              <div className="score-rule tier-common"><span>⭐ 일반</span><b>&lt;80점</b></div>
+            </div>
             <button className="catch-btn catch-btn-primary" onClick={startGame} type="button">
-              ▶ 시작 (Space)
+              ▶ 시작 (→ 키)
             </button>
           </div>
         )}
@@ -227,31 +267,29 @@ export default function CatchGame() {
               <StarRating count={result.stars} />
 
               <div className="catch-stats">
-                <div className="catch-stat-row">
-                  <span>총점</span><span className="catch-stat-value">{score}</span>
-                </div>
-                <div className="catch-stat-row">
-                  <span>완벽 (50점)</span><span>{counts.perfect}</span>
-                </div>
-                <div className="catch-stat-row">
-                  <span>근접 (20점)</span><span>{counts.near}</span>
-                </div>
-                <div className="catch-stat-row">
-                  <span>실패 / 놓침</span><span>{counts.fail + counts.miss}</span>
-                </div>
-                <div className="catch-stat-row catch-stat-row-highlight">
-                  <span>판정 횟수</span><span>{totalJudged}</span>
-                </div>
+                <div className="catch-stat-row"><span>총점</span><span className="catch-stat-value">+{score}</span></div>
+                <div className="catch-stat-row"><span>완벽 (50점)</span><span>{counts.perfect}</span></div>
+                <div className="catch-stat-row"><span>근접 (20점)</span><span>{counts.near}</span></div>
+                <div className="catch-stat-row"><span>실패 / 놓침</span><span>{counts.fail + counts.miss}</span></div>
+                <div className="catch-stat-row catch-stat-row-highlight"><span>판정 횟수</span><span>{totalJudged}</span></div>
               </div>
               <p className="catch-result-desc">{result.desc}</p>
 
               <div className="catch-result-btns">
-                <button className="catch-btn catch-btn-primary" onClick={startGame} type="button">
-                  ▶ 다시 도전 (Space)
-                </button>
-                <button className="catch-btn catch-btn-ghost" onClick={() => setPhase('idle')} type="button">
-                  ↩ 처음으로
-                </button>
+                {onContinue ? (
+                  <button className="catch-btn catch-btn-primary" onClick={onContinue} type="button">
+                    다음으로 (Enter / Space)
+                  </button>
+                ) : (
+                  <>
+                    <button className="catch-btn catch-btn-primary" onClick={startGame} type="button">
+                      ▶ 다시 도전 (Space)
+                    </button>
+                    <button className="catch-btn catch-btn-ghost" onClick={() => setPhase('idle')} type="button">
+                      ↩ 처음으로
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           );

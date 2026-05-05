@@ -1,14 +1,16 @@
 /* 던전 전체 배경 (다크 블루/블랙 그라데이션) */
 .dungeon-world {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 800px;
+  width: 1200px;
   height: 600px;
-  margin: 0 auto;
+  transform: translate(-50%, -50%) scale(1.6);
+  transform-origin: center center;
   font-family: 'NeoDunggeunmo', monospace;
   background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
   overflow: hidden;

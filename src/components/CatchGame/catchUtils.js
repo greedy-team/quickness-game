@@ -8,9 +8,13 @@ export const ITEM_EMOJI = {
   potion: '🧪',
 };
 
-export const TARGET_DISTANCE_PERFECT = 15;  // px (시각 inner 30px 반지름)
-export const TARGET_DISTANCE_NEAR = 30;     // px (시각 outer 60px 반지름)
-export const HIT_RANGE_MAX = 90;            // px (이 범위 밖 입력은 fail로 카운트)
+// 시각이 transform scale 1.6 적용. 빨간 원 시각 직경 96px (좌표 60px) 기준.
+export const TARGET_DISTANCE_PERFECT = 30;  // 좌표 30px = 시각 48px (빨간 원 반지름)
+export const TARGET_DISTANCE_NEAR = 60;     // 좌표 60px = 시각 96px (빨간 원 직경)
+export const HIT_RANGE_MAX = 150;           // 이 범위 밖 입력은 fail로 카운트
+// 떨어지는 이모지의 시각 height 보정 (font-size 48px 기준 약 50px)
+// getItemY는 div의 top edge를 반환하므로 시각 center 비교 시 이 값의 절반을 더해야 함
+export const ITEM_VISUAL_HEIGHT_PX = 50;
 
 export const GAME_DURATION_MS = 10_000;
 export const SPAWN_COUNT = 6;
@@ -28,13 +32,13 @@ export function judgeHit(distancePx) {
   return { score: 0, kind: 'fail' };
 }
 
-// 총점을 받아 등급/색/별 반환
+// 5개 spawn 만점 250 기준 5단계 등급 (다른 게임과 통일)
 export function getCatchResult(totalScore) {
-  if (totalScore >= 280) return { grade: 'LEGENDARY', title: '⚔️ 전설급 장비 한 세트 완성!', desc: '하늘이 그린이를 인정했다. 완벽한 장비 보관함이다.', color: '#ffd700', stars: 5 };
-  if (totalScore >= 200) return { grade: 'RARE', title: '✨ 레어 장비 모음', desc: '훌륭한 캐치! 빛나는 장비를 충분히 모았다.', color: '#a78bfa', stars: 4 };
-  if (totalScore >= 120) return { grade: 'COMMON', title: '🛡️ 평범한 장비 보관함', desc: '쓸 만한 장비를 모았다. 보스전 준비는 가능하다.', color: '#86efac', stars: 3 };
-  if (totalScore >= 40)  return { grade: 'FAIL', title: '🔨 부족한 장비', desc: '장비가 부족하다. 다시 도전해보자.', color: '#fb923c', stars: 1 };
-  return { grade: 'DEAD', title: '💀 빈 손으로 돌아왔다', desc: '아무 장비도 챙기지 못했다.', color: '#f87171', stars: 0 };
+  if (totalScore >= 230) return { grade: 'LEGENDARY', title: '⚔️ 레전더리 장비 한 세트!', desc: '하늘이 인정한 캐치 마스터. 완벽한 장비 보관함이다.', color: '#ffd700', stars: 5 };
+  if (totalScore >= 180) return { grade: 'UNIQUE',    title: '💎 유니크 장비 보관함', desc: '훌륭한 집중력! 유니크 등급 장비를 모았다.', color: '#ff007f', stars: 4 };
+  if (totalScore >= 130) return { grade: 'EPIC',      title: '✨ 에픽 장비 모음', desc: '좋은 캐치! 에픽 등급 장비를 충분히 모았다.', color: '#a78bfa', stars: 3 };
+  if (totalScore >= 80)  return { grade: 'RARE',      title: '🔷 레어 장비 보관함', desc: '쓸 만한 장비를 모았다. 보스전 준비는 가능하다.', color: '#60a5fa', stars: 2 };
+  return { grade: 'COMMON', title: '🛡️ 일반 장비 보관함', desc: '아쉬운 결과지만 약간의 장비는 챙겼다.', color: '#86efac', stars: 1 };
 }
 
 // 게임 시작 후 아이템이 등장할 시각(ms) 배열
