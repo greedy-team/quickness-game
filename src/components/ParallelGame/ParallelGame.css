@@ -1,0 +1,262 @@
+/* 미니게임 4 — 결전의 서막 (병렬 진행) */
+
+.parallel-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+  color: #e2e8f0;
+  overflow: hidden;
+}
+
+/* ─── Idle 패널 ─────────────────────────────── */
+.parallel-idle-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 40px;
+  text-align: center;
+}
+.parallel-title {
+  font-size: 56px;
+  margin: 0;
+  color: #fbbf24;
+  text-shadow: 2px 2px 0 #000, 0 0 16px rgba(251, 191, 36, 0.5);
+}
+.parallel-subtitle {
+  font-size: 22px;
+  color: #94a3b8;
+  margin: 0 0 8px;
+}
+.parallel-area-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: min(900px, 90%);
+}
+.parallel-area-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 2px solid #475569;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.parallel-area-icon  { font-size: 40px; }
+.parallel-area-name  { font-size: 18px; font-weight: 700; }
+.parallel-area-key   { font-size: 14px; color: #fbbf24; }
+
+.parallel-bonus-note {
+  font-size: 18px;
+  color: #fbbf24;
+  margin: 0;
+}
+.parallel-grade-rules {
+  width: min(560px, 90%);
+}
+.parallel-start-btn {
+  margin-top: 12px;
+  padding: 14px 32px;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+  color: #1f2937;
+  border: 3px solid #92400e;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #78350f;
+}
+.parallel-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #78350f;
+}
+.parallel-start-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #78350f;
+}
+
+/* ─── Running phase: HUD + 3분할 grid ─────── */
+.parallel-master-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 3px solid #fbbf24;
+  z-index: 10;
+}
+.parallel-master-title  { font-size: 22px; font-weight: 700; color: #fbbf24; }
+.parallel-master-timer  { font-size: 22px; font-weight: 700; color: #f1f5f9; font-variant-numeric: tabular-nums; }
+
+.parallel-grid {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+}
+.parallel-area {
+  position: relative;
+  overflow: hidden;
+  border-right: 2px solid rgba(251, 191, 36, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.parallel-area:last-child { border-right: none; }
+
+/* sub-game stage(1920x960) wrapper — 영역 height(896px)에 맞게 비례 축소.
+   sub-game의 좌표 시스템(STAGE_HEIGHT_PX 등)과 시각 매핑을 보존.
+   주의: 자식에게 width/height 100% 강제하지 않음 — catch-stage/dungeon-world의
+   자체 1200x600 + scale(1.6) 매핑이 깨지면 좌표/animation 불일치 발생. */
+.parallel-area-inner {
+  position: relative;
+  width: 1920px;
+  height: 960px;
+  flex-shrink: 0;
+  transform-origin: center center;
+  transform: scale(0.9333);
+}
+
+/* 영역 완료 오버레이 — sub-game이 점수를 보고하면 freeze 시각화 */
+.parallel-area-done-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.88);
+  z-index: 4;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  animation: parallel-area-done-fade 0.25s ease-out;
+}
+.parallel-area-done-icon  { font-size: 64px; filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.6)); }
+.parallel-area-done-label { font-size: 22px; font-weight: 700; color: #34d399; letter-spacing: 1px; }
+.parallel-area-done-score { font-size: 32px; font-weight: 800; color: #fbbf24; }
+.parallel-area-done-wait  { font-size: 13px; color: #94a3b8; margin-top: 8px; }
+@keyframes parallel-area-done-fade {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* 키 가이드 배지 — 영역 상단 중앙에 항상 표시 */
+.parallel-area-key-badge {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: auto;
+  height: auto;
+  padding: 6px 14px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fbbf24;
+  border: 2px solid #fbbf24;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Result 패널 ─────────────────────────── */
+.parallel-result-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 20;
+}
+.parallel-result-panel {
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  border: 3px solid var(--parallel-result-color, #fbbf24);
+  border-radius: 16px;
+  padding: 32px 40px;
+  max-width: 520px;
+  text-align: center;
+  box-shadow: 0 0 40px var(--parallel-result-color, #fbbf24);
+}
+.parallel-grade-badge {
+  display: inline-block;
+  padding: 6px 18px;
+  background: var(--parallel-result-color);
+  color: #1f2937;
+  font-weight: 700;
+  border-radius: 999px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.parallel-result-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+.parallel-stats {
+  margin: 20px 0 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.parallel-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+}
+.parallel-stat-row b { color: #fbbf24; }
+.parallel-stat-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 4px 0;
+}
+.parallel-stat-row-highlight {
+  font-size: 20px;
+  font-weight: 700;
+}
+.parallel-stat-row-highlight b { color: var(--parallel-result-color); }
+.parallel-result-desc {
+  margin: 8px 0 16px;
+  color: #cbd5e1;
+}
+.parallel-continue-btn {
+  padding: 12px 28px;
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+  color: #1f2937;
+  border: 3px solid #92400e;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #78350f;
+}
+.parallel-continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #78350f;
+}
+.parallel-continue-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #78350f;
+}

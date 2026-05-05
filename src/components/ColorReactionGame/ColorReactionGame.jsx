@@ -3,7 +3,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { getReactionResult, getScore } from "./reactionUtils";
 import "./ColorReactionGame.css";
 
-export default function ColorReactionGame({ autoStart = false, onComplete, onContinue }) {
+export default function ColorReactionGame({
+  autoStart = false,
+  embedded = false,
+  externalPhase,
+  onComplete,
+  onContinue,
+}) {
   const [phase, setPhase] = useState("idle");
   const [timeLeft, setTimeLeft] = useState(10.00);
   const [reactionTime, setReactionTime] = useState(0);
@@ -34,23 +40,26 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
     setTimeLeft(10.00);
     setReactionTime(0);
 
-    gameIntervalRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 0.01) {
-          endGame("timeout");
-          return 0;
-        }
-        return prev - 0.01;
-      });
-    }, 10);
+    // embedded 모드는 자체 10초 카운트다운 비활성 (마스터 타이머가 통제)
+    if (!embedded) {
+      gameIntervalRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 0.01) {
+            endGame("timeout");
+            return 0;
+          }
+          return prev - 0.01;
+        });
+      }, 10);
+    }
 
-    // 4초 ~ 10초 사이 랜덤한 시간에 눈에 불이 들어옴 (사용자 IDE 변경 반영)
+    // 4-10초 랜덤 대기 (마스터 15초 안에 react 윈도우 5~11초 확보)
     const randomDelay = Math.random() * 6000 + 4000;
     timeoutIdRef.current = setTimeout(() => {
       setPhase("react");
       glowStartTimeRef.current = performance.now();
     }, randomDelay);
-  }, [endGame]);
+  }, [endGame, embedded]);
 
   // 키보드: ↑ 반응, Space 시작(autoStart=false), Enter 다음으로
   useEffect(() => {
@@ -84,6 +93,21 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart]);
 
+  // embedded 모드: externalPhase 'running' → 자동 시작, 'result' → 미보고 시 0점
+  useEffect(() => {
+    if (!embedded || !externalPhase) return;
+    if (externalPhase === 'running' && phase === 'idle') {
+      startGame();
+    } else if (externalPhase === 'result' && !completedRef.current) {
+      // waiting 중이거나 react 못 누른 상태에서 마스터가 종료 → 0점
+      clearInterval(gameIntervalRef.current);
+      clearTimeout(timeoutIdRef.current);
+      setPhase('timeout');
+      completedRef.current = true;
+      onComplete?.(0);
+    }
+  }, [embedded, externalPhase, phase, startGame, onComplete]);
+
   useEffect(() => {
     return () => {
       clearInterval(gameIntervalRef.current);
@@ -100,7 +124,7 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
 
   return (
     <div className={`dungeon-world ${isGlowing ? "dungeon-alert" : ""}`}>
-      {(phase === "waiting" || phase === "react") && (
+      {!embedded && (phase === "waiting" || phase === "react") && (
         <div className="dungeon-timer">
           남은 시간: {timeLeft.toFixed(2)}s
         </div>
@@ -133,7 +157,7 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
       </div>
 
       <div className="dungeon-ui-overlay">
-        {phase === "idle" && !autoStart && (
+        {!embedded && phase === "idle" && !autoStart && (
           <div className="dungeon-panel start-panel">
             <h2 className="dungeon-title">🗿 침묵의 석상</h2>
             <p>석상의 눈에 <b>붉은 안광</b>이 서리면 ⬆️키를 누르세요!</p>
@@ -154,7 +178,7 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
           </div>
         )}
 
-        {phase === "early" && (
+        {!embedded && phase === "early" && (
           <div className="dungeon-panel error-panel">
             <h2>💥 끔찍한 죽음</h2>
             <p>석상이 빛나기 전에 움직였습니다!</p>
@@ -165,7 +189,7 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
           </div>
         )}
 
-        {phase === "timeout" && (
+        {!embedded && phase === "timeout" && (
           <div className="dungeon-panel error-panel">
             <h2>⏰ 시간 초과</h2>
             <p>던전이 무너져 내렸습니다.</p>
@@ -176,7 +200,7 @@ export default function ColorReactionGame({ autoStart = false, onComplete, onCon
           </div>
         )}
 
-        {phase === "result" && resultData && (
+        {!embedded && phase === "result" && resultData && (
           <div className="dungeon-panel result-panel">
             <h2 style={{ color: resultData.color }}>{resultData.title}</h2>
             <h1 className="reaction-time-text">{reactionTime} ms</h1>

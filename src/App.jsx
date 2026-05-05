@@ -7,6 +7,7 @@ import EndingScene from './scenes/EndingScene.jsx';
 import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
 import ColorReactionGame from './components/ColorReactionGame/ColorReactionGame';
 import CatchGame from './components/CatchGame/CatchGame';
+import ParallelGame from './components/ParallelGame/ParallelGame';
 import './App.css';
 
 export default function App() {
@@ -58,11 +59,13 @@ export default function App() {
           }} />
       )}
       {state.scene === 'minigame_4' && (
-        <PlaceholderScene title="⚔️ 미니게임 4: 병렬 진행" description="(별도 이슈에서 구현 예정)"
+        <ParallelGame
+          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
           onContinue={() => {
             dispatch({ type: 'SET_WORLD_STAGE', payload: 5 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
-          }} />
+            dispatch({ type: 'GO_TO_SCENE', payload: 'boss_fight' });
+          }}
+        />
       )}
       {state.scene === 'boss_fight' && (
         <PlaceholderScene title="🔥 보스전" description="(별도 이슈에서 구현 예정)"

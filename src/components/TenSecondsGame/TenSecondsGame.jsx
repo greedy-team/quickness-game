@@ -5,7 +5,13 @@ import { Clouds, FarBg, Trees } from "./BackgroundElements";
 import StarRating from "./StarRating";
 import "./TenSecondsGame.css";
 
-export default function TenSecondsGame({ autoStart = false, onComplete, onContinue }) {
+export default function TenSecondsGame({
+  autoStart = false,
+  embedded = false,
+  externalPhase,
+  onComplete,
+  onContinue,
+}) {
   const [phase, setPhase] = useState("idle");
   const [elapsed, setElapsed] = useState(0);
   const [finalTime, setFinalTime] = useState(null);
@@ -58,6 +64,20 @@ export default function TenSecondsGame({ autoStart = false, onComplete, onContin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart]);
 
+  // embedded 모드: externalPhase 'running' → 자동 시작, 'result' → 미보고 시 0점
+  useEffect(() => {
+    if (!embedded || !externalPhase) return;
+    if (externalPhase === 'running' && phase === 'idle') {
+      startGame();
+    } else if (externalPhase === 'result' && !completedRef.current) {
+      // 사용자가 ← 안 누르고 마스터 타이머가 종료된 케이스 → 0점 보고
+      cancelAnimationFrame(rafRef.current);
+      setPhase('result');
+      completedRef.current = true;
+      onComplete?.(0);
+    }
+  }, [embedded, externalPhase, phase, startGame, onComplete]);
+
   // 키보드: ← 정지, Space 시작(autoStart=false일 때만), Enter 다음으로(result + onContinue)
   useEffect(() => {
     const onKey = (e) => {
@@ -81,7 +101,7 @@ export default function TenSecondsGame({ autoStart = false, onComplete, onContin
 
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
-  const displayTime = phase === "result" ? finalTime : elapsed;
+  const displayTime = phase === "result" ? (finalTime ?? elapsed) : elapsed;
   const diff = finalTime !== null ? Math.abs(finalTime - TARGET) : null;
   const result = diff !== null ? getResult(diff) : null;
   const score = diff !== null ? getScore(diff) : null;
@@ -117,7 +137,7 @@ export default function TenSecondsGame({ autoStart = false, onComplete, onContin
             <span className="sign-text">10초  맞추기</span>
             <span className="sign-icon">⏱</span>
           </div>
-          <p className="sign-subtitle">그린이의 시련 — 정확히 10.00초에 멈춰라!</p>
+          {!embedded && <p className="sign-subtitle">그린이의 시련 — 정확히 10.00초에 멈춰라!</p>}
 
           <div className={`timer-board ${timerUrgency}`}>
             <div className="timer-inner">
@@ -128,36 +148,38 @@ export default function TenSecondsGame({ autoStart = false, onComplete, onContin
             <div className="timer-label">ELAPSED TIME</div>
           </div>
 
-          <div className="controls-area">
-            {phase === "idle" && !autoStart && (
-              <button className="pixel-btn pixel-btn-green" onClick={startGame}>
-                <span>▶ 시작 (← 키)</span>
-              </button>
-            )}
-            {phase === "running" && (
-              <button className="pixel-btn pixel-btn-red" onClick={stopGame}>
-                <span>◼ 정지 (← 방향키)</span>
-              </button>
-            )}
-            {phase === "result" && (
-              onContinue ? (
-                <button className="pixel-btn pixel-btn-yellow" onClick={onContinue}>
-                  <span>다음으로 (Enter / Space)</span>
+          {!embedded && (
+            <div className="controls-area">
+              {phase === "idle" && !autoStart && (
+                <button className="pixel-btn pixel-btn-green" onClick={startGame}>
+                  <span>▶ 시작 (← 키)</span>
                 </button>
-              ) : (
-                <div className="result-btns">
-                  <button className="pixel-btn pixel-btn-yellow" onClick={startGame}>
-                    <span>▶ 다시하기 (Space)</span>
+              )}
+              {phase === "running" && (
+                <button className="pixel-btn pixel-btn-red" onClick={stopGame}>
+                  <span>◼ 정지 (← 방향키)</span>
+                </button>
+              )}
+              {phase === "result" && (
+                onContinue ? (
+                  <button className="pixel-btn pixel-btn-yellow" onClick={onContinue}>
+                    <span>다음으로 (Enter / Space)</span>
                   </button>
-                  <button className="pixel-btn pixel-btn-gray" onClick={resetGame}>
-                    <span>↩ 처음으로</span>
-                  </button>
-                </div>
-              )
-            )}
-          </div>
+                ) : (
+                  <div className="result-btns">
+                    <button className="pixel-btn pixel-btn-yellow" onClick={startGame}>
+                      <span>▶ 다시하기 (Space)</span>
+                    </button>
+                    <button className="pixel-btn pixel-btn-gray" onClick={resetGame}>
+                      <span>↩ 처음으로</span>
+                    </button>
+                  </div>
+                )
+              )}
+            </div>
+          )}
 
-          {phase === "idle" && !autoStart && (
+          {!embedded && phase === "idle" && !autoStart && (
             <>
               <p className="hint-text">← 키로 타이머를 시작하고,<br />다시 ← 방향키로 정확히 10.00초에 멈추세요!</p>
               <div className="score-rules">
@@ -170,13 +192,13 @@ export default function TenSecondsGame({ autoStart = false, onComplete, onContin
               </div>
             </>
           )}
-          {phase === "running" && (
+          {!embedded && phase === "running" && (
             <p className="hint-text running-hint">
               {displayTime >= 9 ? "🚨 지금이다! 멈춰!!!" : displayTime >= 7 ? "⚠️ 슬슬 준비해..." : "타이머가 흘러가고 있다..."}
             </p>
           )}
 
-          {phase === "result" && result && (
+          {!embedded && phase === "result" && result && (
             <div className="result-panel" style={{ "--result-color": result.color }}>
               <div className="result-grade-badge" data-grade={result.grade}>{result.grade}</div>
               <div className="result-title" style={{ color: result.color }}>{result.title}</div>

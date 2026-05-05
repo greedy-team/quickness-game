@@ -17,7 +17,7 @@ export const HIT_RANGE_MAX = 150;           // 이 범위 밖 입력은 fail로 
 export const ITEM_VISUAL_HEIGHT_PX = 50;
 
 export const GAME_DURATION_MS = 10_000;
-export const SPAWN_COUNT = 6;
+export const SPAWN_COUNT = 5;
 export const SPAWN_MIN_GAP_MS = 1400;
 export const SPAWN_MAX_GAP_MS = 1700;
 export const SPAWN_FIRST_AT_MS = 800;
@@ -25,11 +25,14 @@ export const FALL_DURATION_MS = 2000;
 export const STAGE_HEIGHT_PX = 600;
 export const RED_CIRCLE_TOP_RATIO = 0.7;    // stage height의 70% 지점 (제단 위치)
 
+// FAIL 시 패널티 (NEAR 범위 밖에서 → 누름 또는 HIT_RANGE_MAX 밖)
+export const FAIL_PENALTY = -10;
+
 // 거리(px)를 받아 점수와 종류 반환
 export function judgeHit(distancePx) {
   if (distancePx <= TARGET_DISTANCE_PERFECT) return { score: 50, kind: 'perfect' };
   if (distancePx <= TARGET_DISTANCE_NEAR) return { score: 20, kind: 'near' };
-  return { score: 0, kind: 'fail' };
+  return { score: FAIL_PENALTY, kind: 'fail' };
 }
 
 // 5개 spawn 만점 250 기준 5단계 등급 (다른 게임과 통일)
