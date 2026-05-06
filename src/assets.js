@@ -7,9 +7,19 @@ export const ASSETS = {
     door:            '/assets/images/door.png',
     doorClear:       '/assets/images/door_clear.png',
     cutsceneOpening: '/assets/images/cutscene_opening.png',
+    memoryReal: [
+      '/assets/images/memory_real_1.png',
+      '/assets/images/memory_real_2.png',
+      '/assets/images/memory_real_3.png',
+    ],
+    memoryFake: [
+      '/assets/images/memory_fake_1.png',
+      '/assets/images/memory_fake_2.png',
+      '/assets/images/memory_fake_3.png',
+    ],
   },
   sounds: {
-    bgm: '/assets/sounds/bgm.mp3',
+    bgm:      '/assets/sounds/bgm.mp3',
     openDoor: '/assets/sounds/open_door_sound.mp3',
   },
 };
