@@ -8,6 +8,9 @@ import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
 import ColorReactionGame from './components/ColorReactionGame/ColorReactionGame';
 import CatchGame from './components/CatchGame/CatchGame';
 import ParallelGame from './components/ParallelGame/ParallelGame';
+import BossFightScene from './components/BossFightScene/BossFightScene';
+import NicknamePromptModal from './components/NicknamePromptModal/NicknamePromptModal';
+import RankingScene from './components/RankingScene/RankingScene';
 import './App.css';
 
 export default function App() {
@@ -63,13 +66,32 @@ export default function App() {
           onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
           onContinue={() => {
             dispatch({ type: 'SET_WORLD_STAGE', payload: 5 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'boss_fight' });
+            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
           }}
         />
       )}
       {state.scene === 'boss_fight' && (
-        <PlaceholderScene title="🔥 보스전" description="(별도 이슈에서 구현 예정)"
-          onContinue={() => dispatch({ type: 'GO_TO_SCENE', payload: 'ending' })} />
+        <BossFightScene
+          totalScore={state.totalScore}
+          onCleared={() => dispatch({ type: 'GO_TO_SCENE', payload: 'nickname_input' })}
+        />
+      )}
+      {state.scene === 'nickname_input' && (
+        <NicknamePromptModal
+          score={state.totalScore}
+          onRegistered={(entryId) => {
+            dispatch({ type: 'SET_LAST_RANKING_ENTRY', payload: entryId });
+            dispatch({ type: 'GO_TO_RANKING', payload: 'after_clear' });
+          }}
+        />
+      )}
+      {state.scene === 'ranking' && (
+        <RankingScene
+          mode={state.rankingMode}
+          highlightedEntryId={state.lastRegisteredEntryId}
+          onContinue={() => dispatch({ type: 'GO_TO_SCENE', payload: 'ending' })}
+          onBack={() => dispatch({ type: 'GO_TO_SCENE', payload: 'intro' })}
+        />
       )}
       {state.scene === 'ending' && <EndingScene />}
     </div>
