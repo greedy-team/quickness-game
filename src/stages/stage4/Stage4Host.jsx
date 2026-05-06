@@ -1,7 +1,7 @@
 // Stage 4 진입점 — 통합 인트로 + 3분할 + 점수 집계 + 1초 합체 → onResult.
 // state machine: intro → running → merging → done
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Stage4Intro from './Stage4Intro.jsx';
 import Stage4Split from './Stage4Split.jsx';
 import Stage4MergeOverlay from './Stage4MergeOverlay.jsx';
@@ -27,13 +27,14 @@ export default function Stage4Host({ onResult }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [phase]);
 
-  // sub-stage 결과 수집기
-  const handleSubResult = useCallback((subId) => (metric) => {
-    setResults((prev) => {
-      if (prev[subId] !== null) return prev; // 중복 방지
-      return { ...prev, [subId]: metric };
-    });
-  }, []);
+  // sub-stage별 안정적인(reference 변하지 않는) 결과 수집 콜백.
+  // 매 렌더마다 새 함수가 만들어지면 sub-stage들의 useEffect deps가 갈리며
+  // RAF 루프가 리셋되어 게임이 진행되지 않음 → useMemo로 마운트 시 1회만 생성.
+  const subResultHandlers = useMemo(() => ({
+    1: (metric) => setResults((prev) => (prev[1] !== null ? prev : { ...prev, 1: metric })),
+    2: (metric) => setResults((prev) => (prev[2] !== null ? prev : { ...prev, 2: metric })),
+    3: (metric) => setResults((prev) => (prev[3] !== null ? prev : { ...prev, 3: metric })),
+  }), []);
 
   // 3개 모두 도착하면 평균 산출 + merging 진입
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function Stage4Host({ onResult }) {
       {(phase === 'running' || phase === 'merging') && (
         <Stage4Split
           isRunning={phase === 'running'}
-          onSubResult={handleSubResult}
+          onSubResult={subResultHandlers}
         />
       )}
       {/* 인트로는 intro phase에서만 */}

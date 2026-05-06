@@ -105,9 +105,16 @@ export default function Stage3Field({ isRunning, onResult }) {
       status: 'falling',
     })));
 
+    // 종료 조건 — 마지막 아이템의 spawnAt + fallDuration + 0.5초 마진
+    // 루프 밖에서 1회 계산 (sequence·config는 effect 동안 불변).
+    const lastEnd = sequence[sequence.length - 1].spawnAt + config.fallDurationSec + 0.5;
+
     const tick = () => {
       const now = performance.now();
       const elapsed = (now - startTimeRef.current) / 1000;
+
+      // 누적 점수 변화는 updater 밖에서 처리(StrictMode 이중 실행 시 중복 적용 방지).
+      let pointsDelta = 0;
 
       setItems((prev) => prev.map((it) => {
         if (it.status !== 'falling') return it;
@@ -115,7 +122,7 @@ export default function Stage3Field({ isRunning, onResult }) {
         if (localT < 0) return { ...it, topPercent: -10 };
         if (localT > config.fallDurationSec) {
           // 화면 밖으로 떨어짐 — 캐치 안 됨
-          if (it.kind === 'real') totalPointsRef.current += config.missScore;
+          if (it.kind === 'real') pointsDelta += config.missScore;
           // fake는 통과해도 0점 (정상)
           return { ...it, status: 'missed', topPercent: 110 };
         }
@@ -123,8 +130,8 @@ export default function Stage3Field({ isRunning, onResult }) {
         return { ...it, topPercent };
       }));
 
-      // 종료 조건 — 마지막 아이템의 spawnAt + fallDuration + 0.5초 마진
-      const lastEnd = sequence[sequence.length - 1].spawnAt + config.fallDurationSec + 0.5;
+      if (pointsDelta !== 0) totalPointsRef.current += pointsDelta;
+
       if (elapsed >= lastEnd) {
         // metric 산출
         const maxPossible = config.realCount * config.accuracyTiers[0].points;
@@ -203,7 +210,12 @@ export default function Stage3Field({ isRunning, onResult }) {
           />
         )
       ))}
-      <ResultPopup visible={popup.visible} label={popup.label} color={popup.color} />
+      <ResultPopup
+        key={popup.key}
+        visible={popup.visible}
+        label={popup.label}
+        color={popup.color}
+      />
     </div>
   );
 }
