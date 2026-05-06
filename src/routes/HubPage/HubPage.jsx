@@ -31,16 +31,21 @@ export default function HubPage() {
         );
       })}
 
-      <button
-        type="button"
-        className={`hub-page__door hub-page__door--4 ${door4Unlocked ? '' : 'is-locked'}`}
-        onClick={() => navigate('/stage/4')}
-        disabled={!door4Unlocked}
-        aria-disabled={!door4Unlocked}
-        aria-label={`문 4${door4Unlocked ? '' : ' (잠김)'}`}
-      >
-        <img src={ASSETS.images.door} alt="" />
-      </button>
+      {(() => {
+        const cleared4 = stageResults[4] !== null;
+        return (
+          <button
+            type="button"
+            className={`hub-page__door hub-page__door--4 ${door4Unlocked ? '' : 'is-locked'}`}
+            onClick={() => navigate('/stage/4')}
+            disabled={!door4Unlocked}
+            aria-disabled={!door4Unlocked}
+            aria-label={`문 4${cleared4 ? ' (클리어)' : door4Unlocked ? '' : ' (잠김)'}`}
+          >
+            <img src={cleared4 ? ASSETS.images.doorClear : ASSETS.images.door} alt="" />
+          </button>
+        );
+      })()}
     </div>
   );
 }
