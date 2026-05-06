@@ -1,0 +1,35 @@
+.catch-zone {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 25%;            /* STAGE3_CONFIG.catchZoneRatio = 0.25 와 일치 */
+  pointer-events: none;
+}
+
+.catch-zone__band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.35;
+}
+
+.catch-zone__band--perfect { opacity: 0.55; }
+.catch-zone__band--great   { opacity: 0.40; }
+.catch-zone__band--good    { opacity: 0.30; }
+.catch-zone__band--ok      { opacity: 0.22; }
+.catch-zone__band--bare    { opacity: 0.15; }
+
+.catch-zone__center-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+  transform: translateY(-50%);
+}
