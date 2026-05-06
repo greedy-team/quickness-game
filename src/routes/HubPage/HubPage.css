@@ -1,0 +1,44 @@
+.hub-page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.hub-page__door {
+  position: absolute;
+  bottom: 18%;
+  width: 18%;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.hub-page__door img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.hub-page__door--1 { left: 6%;  }
+.hub-page__door--2 { left: 28%; }
+.hub-page__door--3 { left: 50%; }
+.hub-page__door--4 { left: 72%; }
+
+.hub-page__door:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+.hub-page__door.is-locked {
+  cursor: not-allowed;
+}
+
+.hub-page__door.is-locked img {
+  filter: brightness(0.35);
+}

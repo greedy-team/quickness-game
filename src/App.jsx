@@ -1,99 +1,14 @@
-import { useEffect } from 'react';
-import { useGame } from './store/gameStore.jsx';
-import IntroScene from './scenes/IntroScene.jsx';
-import WorldScene from './scenes/WorldScene.jsx';
-import PlaceholderScene from './scenes/PlaceholderScene.jsx';
-import EndingScene from './scenes/EndingScene.jsx';
-import TenSecondsGame from './components/TenSecondsGame/TenSecondsGame';
-import ColorReactionGame from './components/ColorReactionGame/ColorReactionGame';
-import CatchGame from './components/CatchGame/CatchGame';
-import ParallelGame from './components/ParallelGame/ParallelGame';
-import BossFightScene from './components/BossFightScene/BossFightScene';
-import NicknamePromptModal from './components/NicknamePromptModal/NicknamePromptModal';
-import RankingScene from './components/RankingScene/RankingScene';
+import RouteTree from './routes/RouteTree.jsx';
+import HudOverlay from './components/HudOverlay/HudOverlay.jsx';
+import BgmController from './audio/BgmController.jsx';
 import './App.css';
 
 export default function App() {
-  const { state, dispatch } = useGame();
-
-  // armor 진입 시 갑옷 자동 장착
-  useEffect(() => {
-    if (state.scene === 'armor' && !state.hasArmor) {
-      dispatch({ type: 'EQUIP_ARMOR' });
-    }
-  }, [state.scene, state.hasArmor, dispatch]);
-
   return (
-    <div className="app-stage" key={state.scene}>
-      {state.scene === 'intro' && <IntroScene />}
-      {state.scene === 'world' && <WorldScene />}
-      {state.scene === 'minigame_1' && (
-        <TenSecondsGame
-          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
-          onContinue={() => {
-            dispatch({ type: 'SET_WORLD_STAGE', payload: 1 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
-          }}
-        />
-      )}
-      {state.scene === 'minigame_2' && (
-        <ColorReactionGame
-          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
-          onContinue={() => {
-            dispatch({ type: 'SET_WORLD_STAGE', payload: 2 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
-          }}
-        />
-      )}
-      {state.scene === 'minigame_3' && (
-        <CatchGame
-          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
-          onContinue={() => {
-            dispatch({ type: 'SET_WORLD_STAGE', payload: 3 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'armor' });
-          }}
-        />
-      )}
-      {state.scene === 'armor' && (
-        <PlaceholderScene title="🛡 갑옷 장착" description="훈련을 마친 그린이! 갑옷과 검을 손에 넣었다!"
-          onContinue={() => {
-            dispatch({ type: 'SET_WORLD_STAGE', payload: 4 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
-          }} />
-      )}
-      {state.scene === 'minigame_4' && (
-        <ParallelGame
-          onComplete={(score) => dispatch({ type: 'ADD_SCORE', payload: score })}
-          onContinue={() => {
-            dispatch({ type: 'SET_WORLD_STAGE', payload: 5 });
-            dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
-          }}
-        />
-      )}
-      {state.scene === 'boss_fight' && (
-        <BossFightScene
-          totalScore={state.totalScore}
-          onCleared={() => dispatch({ type: 'GO_TO_SCENE', payload: 'nickname_input' })}
-        />
-      )}
-      {state.scene === 'nickname_input' && (
-        <NicknamePromptModal
-          score={state.totalScore}
-          onRegistered={(entryId) => {
-            dispatch({ type: 'SET_LAST_RANKING_ENTRY', payload: entryId });
-            dispatch({ type: 'GO_TO_RANKING', payload: 'after_clear' });
-          }}
-        />
-      )}
-      {state.scene === 'ranking' && (
-        <RankingScene
-          mode={state.rankingMode}
-          highlightedEntryId={state.lastRegisteredEntryId}
-          onContinue={() => dispatch({ type: 'GO_TO_SCENE', payload: 'ending' })}
-          onBack={() => dispatch({ type: 'GO_TO_SCENE', payload: 'intro' })}
-        />
-      )}
-      {state.scene === 'ending' && <EndingScene />}
+    <div className="app-stage">
+      <RouteTree />
+      <HudOverlay />
+      <BgmController />
     </div>
   );
 }

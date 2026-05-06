@@ -1,0 +1,24 @@
+.ending-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.ending-page__title { margin: 0; font-size: 32px; }
+.ending-page__note  { margin: 0; opacity: 0.7; }
+.ending-page__score { margin: 12px 0 0; font-size: 24px; }
+
+.ending-page button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+}
