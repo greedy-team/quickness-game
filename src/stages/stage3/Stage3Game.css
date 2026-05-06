@@ -1,0 +1,10 @@
+.stage3-game {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stage3-game--split {
+  /* 3분할 칸 안에서도 동작하도록 — 부모가 사이즈 결정 */
+}

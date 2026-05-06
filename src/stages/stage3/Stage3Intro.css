@@ -1,0 +1,59 @@
+.stage3-intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 32px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 10;
+}
+
+.stage3-intro__title {
+  font-size: clamp(24px, 3vw, 40px);
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.stage3-intro__group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage3-intro__label {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stage3-intro__label--real { color: #88dd88; }
+.stage3-intro__label--fake { color: #ff8888; }
+
+.stage3-intro__row {
+  display: flex;
+  gap: 12px;
+}
+
+.stage3-intro__thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.stage3-intro__cta {
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  animation: stage3-intro-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes stage3-intro-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1.0; }
+}
