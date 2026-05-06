@@ -68,6 +68,15 @@ export default function ParallelGame({ onComplete, onContinue }) {
     };
   }, [phase]);
 
+  // 3영역 모두 완료되면 마스터 타이머 만료 전이라도 즉시 result로 전환
+  useEffect(() => {
+    if (phase !== 'running') return;
+    if (masterCompleteRef.current) return;
+    if (scoreLeft === null || scoreCenter === null || scoreRight === null) return;
+    masterCompleteRef.current = true;
+    setPhase('result');
+  }, [phase, scoreLeft, scoreCenter, scoreRight]);
+
   // result 진입 시점: 모든 영역 onComplete 보고 후 합산하여 1회 onComplete 호출
   // 각 sub-game이 externalPhase='result'를 받으면 즉시 onComplete?.(score|0)을 호출하도록
   // Tasks 2-4에서 보장됨 — null이 영구히 남는 경우는 없다.

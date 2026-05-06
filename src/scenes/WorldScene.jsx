@@ -127,7 +127,8 @@ export default function WorldScene() {
 
       <Hero
         x={heroX}
-        action="walk_no_weapon"
+        action={state.hasArmor ? 'walk_weapon' : 'walk_no_weapon'}
+        key={state.hasArmor ? 'walk_weapon' : 'walk_no_weapon'}
         playing={isMoving}
         facing={facing}
       />

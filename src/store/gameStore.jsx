@@ -1,18 +1,27 @@
+// src/store/gameStore.jsx
 import { createContext, useContext, useReducer } from 'react';
 
 const initialState = {
-  scene: 'intro',         // 'intro' | 'world' | 'minigame_1~3' | 'armor' | 'minigame_4' | 'boss_fight' | 'ending'
-  worldStage: 0,          // 0..3
+  // 'intro' | 'world' | 'minigame_1' | 'minigame_2' | 'minigame_3' | 'armor'
+  // | 'minigame_4' | 'boss_fight' | 'nickname_input' | 'ranking' | 'ending'
+  scene: 'intro',
+  worldStage: 0,
   totalScore: 0,
   hasArmor: false,
-  bossHP: 1500,           // PRD §3.2 자리만 (옵션 A에서 미사용)
   lastMiniScore: null,
+  rankingMode: null,                // 'after_clear' | 'readonly' | null
+  lastRegisteredEntryId: null,
 };
 
 function reducer(state, action) {
   switch (action.type) {
     case 'GO_TO_SCENE':
       return { ...state, scene: action.payload };
+    case 'GO_TO_RANKING':
+      // payload: 'after_clear' | 'readonly'
+      return { ...state, scene: 'ranking', rankingMode: action.payload };
+    case 'SET_LAST_RANKING_ENTRY':
+      return { ...state, lastRegisteredEntryId: action.payload };
     case 'SET_WORLD_STAGE':
       return { ...state, worldStage: action.payload };
     case 'ADD_SCORE':

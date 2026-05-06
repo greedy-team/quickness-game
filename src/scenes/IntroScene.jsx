@@ -11,6 +11,10 @@ export default function IntroScene() {
     dispatch({ type: 'GO_TO_SCENE', payload: 'world' });
   };
 
+  const openRanking = () => {
+    dispatch({ type: 'GO_TO_RANKING', payload: 'readonly' });
+  };
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.code === 'Space' || e.code === 'Enter') {
@@ -30,6 +34,7 @@ export default function IntroScene() {
         우리의 그린이는 아직 약하지만, 훈련을 통해 점점 강해질 수 있다.
       </p>
       <button type="button" className="intro-start-btn" onClick={start}>▶ 시작 (Space)</button>
+      <button type="button" className="intro-ranking-btn" onClick={openRanking}>🏆 랭킹 보기</button>
       <p className="intro-hint">← → 이동 / Space 시작·진입</p>
     </div>
   );

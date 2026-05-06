@@ -20,3 +20,14 @@
 }
 .intro-start-btn:hover { background: #86efac; }
 .intro-hint { margin-top: 24px; font-size: 14px; opacity: 0.6; }
+.intro-ranking-btn {
+  margin-top: 12px;
+  padding: 10px 24px;
+  font-size: 16px;
+  background: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+.intro-ranking-btn:hover { background: rgba(255, 255, 255, 0.1); }
