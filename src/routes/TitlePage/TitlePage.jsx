@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store.js';
+import { ASSETS } from '../../assets.js';
 import './TitlePage.css';
 
 export default function TitlePage() {
@@ -16,7 +17,10 @@ export default function TitlePage() {
   };
 
   return (
-    <div className="title-page">
+    <div
+      className="title-page"
+      style={{ backgroundImage: `url(${ASSETS.images.cutsceneOpening})` }}
+    >
       <h1 className="title-page__title">그린이는 나야, 둘이 될 수 없어</h1>
       <p className="title-page__story">
         야자 후 혼자 남은 학교에 또 다른 내가 나타났다.<br />
