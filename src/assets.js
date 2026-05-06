@@ -3,9 +3,10 @@
 
 export const ASSETS = {
   images: {
-    hubCorridor: '/assets/images/bg_hub_corridor.png',
-    door:        '/assets/images/door.png',
-    doorClear:   '/assets/images/door_clear.png',
+    hubCorridor:     '/assets/images/bg_hub_corridor.png',
+    door:            '/assets/images/door.png',
+    doorClear:       '/assets/images/door_clear.png',
+    cutsceneOpening: '/assets/images/cutscene_opening.png',
   },
   sounds: {
     bgm: '/assets/sounds/bgm.mp3',
