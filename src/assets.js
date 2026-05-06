@@ -10,5 +10,6 @@ export const ASSETS = {
   },
   sounds: {
     bgm: '/assets/sounds/bgm.mp3',
+    openDoor: '/assets/sounds/open_door_sound.mp3',
   },
 };
