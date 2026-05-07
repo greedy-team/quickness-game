@@ -38,8 +38,9 @@ export default function EndingCutscene({ outcome, phase, totalScore }) {
         alt={outcome === 'alive' ? '진짜 그린이' : '귀신이 된 그린이'}
         draggable={false}
       />
-      <p className="ending-cutscene__caption">{caption}</p>
       <p className="ending-cutscene__score">최종 점수 {totalScore}</p>
+      <p className="ending-cutscene__caption">{caption}</p>
+      <p className="ending-cutscene__hint">Space / Enter 로 다음</p>
     </div>
   );
 }
