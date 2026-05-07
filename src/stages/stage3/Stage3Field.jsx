@@ -79,12 +79,19 @@ export default function Stage3Field({ isRunning, onResult }) {
   // status: 'falling' | 'caught' | 'missed'
   const [items, setItems] = useState([]);
   const [popup, setPopup] = useState({ visible: false, label: '', points: null, color: '', key: 0 });
+  const [score, setScore] = useState(0);   // HUD 표시용 — totalPointsRef와 동기 유지
 
   const startTimeRef = useRef(null);
   const rafRef = useRef(null);
   const totalPointsRef = useRef(0);
   const itemsRef = useRef(items);
   itemsRef.current = items;
+
+  // 점수 누적 헬퍼 — ref(동기 읽기용) + state(HUD 리렌더용) 동시 업데이트.
+  const addPoints = useCallback((delta) => {
+    totalPointsRef.current += delta;
+    setScore(totalPointsRef.current);
+  }, []);
 
   const popupKeyRef = useRef(0);
   const showPopup = useCallback((label, points, color) => {
@@ -100,6 +107,7 @@ export default function Stage3Field({ isRunning, onResult }) {
     if (!isRunning) return;
     startTimeRef.current = performance.now();
     totalPointsRef.current = 0;
+    setScore(0);
     setItems(sequence.map((s, idx) => ({
       id: idx,
       ...s,
@@ -132,7 +140,7 @@ export default function Stage3Field({ isRunning, onResult }) {
         return { ...it, topPercent };
       }));
 
-      if (pointsDelta !== 0) totalPointsRef.current += pointsDelta;
+      if (pointsDelta !== 0) addPoints(pointsDelta);
 
       if (elapsed >= lastEnd) {
         // metric 산출
@@ -149,7 +157,7 @@ export default function Stage3Field({ isRunning, onResult }) {
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isRunning, sequence, config, onResult]);
+  }, [isRunning, sequence, config, onResult, addPoints]);
 
   // → 입력 처리 — 캐치 존 안의 가장 가까운 아이템 캐치
   useEffect(() => {
@@ -182,10 +190,10 @@ export default function Stage3Field({ isRunning, onResult }) {
 
       if (target.kind === 'real') {
         const { points, label, color } = pointsForOffset(absOffset, config.accuracyTiers, config.missLabel);
-        totalPointsRef.current += points;
+        addPoints(points);
         showPopup(label, points, color);
       } else {
-        totalPointsRef.current += config.fakePenalty;
+        addPoints(config.fakePenalty);
         showPopup(config.fakeLabel, config.fakePenalty, '#FF3333');
       }
 
@@ -196,7 +204,7 @@ export default function Stage3Field({ isRunning, onResult }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isRunning, config, showPopup]);
+  }, [isRunning, config, showPopup, addPoints]);
 
   // HUD — 남은 조각: 아직 falling 상태인 아이템 수 (스폰 전 + 낙하 중 모두 포함)
   const remaining = items.filter((it) => it.status === 'falling').length;
@@ -205,10 +213,16 @@ export default function Stage3Field({ isRunning, onResult }) {
   return (
     <div className="stage3-field">
       <div className="stage3-hud" aria-live="polite">
-        <span className="stage3-hud__label">남은 조각</span>
-        <span className="stage3-hud__count">
-          <strong>{remaining}</strong> / {total}
-        </span>
+        <div className="stage3-hud__row">
+          <span className="stage3-hud__label">점수</span>
+          <span className="stage3-hud__score">{score}</span>
+        </div>
+        <div className="stage3-hud__row">
+          <span className="stage3-hud__label">남은 조각</span>
+          <span className="stage3-hud__count">
+            <strong>{remaining}</strong> / {total}
+          </span>
+        </div>
       </div>
       <CatchZone />
       {items.map((it) => (

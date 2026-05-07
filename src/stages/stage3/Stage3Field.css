@@ -21,15 +21,15 @@
      그 위에 차례로 페인트됨. z-index 별도 지정 불필요. */
 }
 
-/* HUD — 좌상단 "남은 조각 N / 6" */
+/* HUD — 좌상단 점수 + 남은 조각 */
 .stage3-hud {
   position: absolute;
   top: 16px;
   left: 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 10px 16px;
+  gap: 6px;
+  padding: 12px 18px;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 215, 0, 0.4);
   border-radius: 8px;
@@ -37,6 +37,14 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   pointer-events: none;
   backdrop-filter: blur(2px);
+  min-width: 180px;
+}
+
+.stage3-hud__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .stage3-hud__label {
@@ -45,14 +53,22 @@
   opacity: 0.85;
 }
 
+.stage3-hud__score {
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 800;
+  color: #FFD700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;       /* 숫자 폭 고정 → 깜빡임 방지 */
+}
+
 .stage3-hud__count {
-  font-size: clamp(20px, 2.4vw, 28px);
+  font-size: clamp(18px, 2vw, 24px);
   font-weight: 700;
   letter-spacing: 0.04em;
 }
 
 .stage3-hud__count strong {
   color: #FFD700;
-  font-size: clamp(28px, 3.2vw, 40px);
+  font-size: clamp(24px, 2.8vw, 32px);
   margin-right: 2px;
 }
