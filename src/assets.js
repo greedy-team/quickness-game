@@ -7,6 +7,10 @@ export const ASSETS = {
     door:            '/assets/images/door.png',
     doorClear:       '/assets/images/door_clear.png',
     cutsceneOpening: '/assets/images/cutscene_opening.png',
+    stage1Bg:        '/assets/images/bg_stage1_clocktower.png',
+    stage2Bg:        '/assets/images/bg_stage2_classroom.png',
+    stage3Bg:        '/assets/images/bg_stage3_room.png',
+    stage4Bg:        '/assets/images/bg_stage4_bathroom.png',
     memoryReal: [
       '/assets/images/memory_real_1.png',
       '/assets/images/memory_real_2.png',
