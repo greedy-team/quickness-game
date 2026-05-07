@@ -18,3 +18,17 @@
     rgba(0, 0, 0, 0.85) 100%
   );
 }
+
+/* outro phase — 검정 풀스크린 페이드아웃 (#28) */
+.ending-page__outro {
+  position: absolute;
+  inset: 0;
+  z-index: 2;             /* 비네팅 + 폼 위에 덮음 */
+  background: #000;
+  animation: ending-page-outro-fadein 400ms ease both;
+}
+
+@keyframes ending-page-outro-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
