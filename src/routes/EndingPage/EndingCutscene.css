@@ -1,0 +1,41 @@
+.ending-cutscene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1000ms ease;
+}
+
+/* phase 매핑: revealMs (1000ms), leaveMs (500ms)와 정합 */
+.ending-cutscene--entered { opacity: 0; transition-duration: 0ms; }
+.ending-cutscene--visible { opacity: 1; transition-duration: 1000ms; }
+.ending-cutscene--leaving { opacity: 0; transition-duration: 500ms; }
+
+.ending-cutscene__image {
+  max-height: 60vh;
+  max-width: 80vw;
+  object-fit: contain;
+  user-select: none;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+}
+
+.ending-cutscene__caption {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #f4f4f4;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.ending-cutscene__score {
+  margin: 0;
+  font-size: 18px;
+  color: rgba(244, 244, 244, 0.7);
+}
