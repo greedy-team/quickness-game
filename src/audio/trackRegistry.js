@@ -4,7 +4,6 @@ import { ASSETS } from '../assets.js';
 // 라우트 경로 → 트랙 ID
 export const ROUTE_TO_TRACK = {
   '/':         'title',
-  '/opening':  'opening',
   '/hub':      'hub',
   '/stage/1':  'stage1',
   '/stage/2':  'stage2',
@@ -18,7 +17,6 @@ export const ROUTE_TO_TRACK = {
 // 현재 정책: /hub에서만 BGM 재생. 후속 이슈에서 라우트별 신규 파일 들어오면 본 맵만 갱신.
 export const TRACK_TO_FILE = {
   title:    null,
-  opening:  null,
   hub:      ASSETS.sounds.bgm,
   stage1:   null,
   stage2:   null,

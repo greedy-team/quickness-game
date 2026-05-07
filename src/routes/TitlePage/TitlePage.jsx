@@ -9,7 +9,7 @@ export default function TitlePage() {
 
   const handleStart = () => {
     startGame();
-    navigate('/opening');
+    navigate('/hub');
   };
 
   const handleOpenRanking = () => {
