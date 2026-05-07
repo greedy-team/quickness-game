@@ -5,9 +5,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 24px;
+  /* 본문(이미지·점수·자막)을 위쪽에 모음 — hint는 absolute로 하단 고정. */
+  justify-content: flex-start;
+  gap: 20px;
+  padding: 6vh 24px 24px;
   text-align: center;
   opacity: 0;
   transition: opacity 1000ms ease;
@@ -37,6 +38,18 @@
 
 .ending-cutscene__score {
   margin: 0;
-  font-size: 18px;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #f4f4f4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.ending-cutscene__hint {
+  /* 본문 바로 아래(flex 흐름)로 합류 — 이미지·점수·자막과 함께 상단 클러스터 형성. */
+  margin: 16px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: rgba(244, 244, 244, 0.7);
 }
