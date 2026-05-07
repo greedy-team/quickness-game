@@ -8,8 +8,12 @@ export const ENDING_CONFIG = {
   revealMs: 1000,
   // hold (정지 노출, PRD §5 "엔딩 10초"의 대부분 차지)
   holdMs:   8000,
-  // 페이드아웃 후 /ranking 이동
+  // 페이드아웃 후 register phase 진입
   leaveMs:   500,
+  // EndingNicknameForm 페이드인 (#28)
+  formRevealMs: 500,
+  // register 제출 후 검정 페이드아웃 → /ranking (#28)
+  outroMs:      400,
 
   // 한국어 자막 1줄 — PRD §10 자막 가이드 (큰 글씨, 가독성 우선)
   captions: {
