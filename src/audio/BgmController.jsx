@@ -27,16 +27,20 @@ export default function BgmController() {
 
     // ② 현재 라우트의 트랙 파일 결정
     const targetId = trackIdForPath(pathname);
-    if (!targetId) return;
-    const targetFile = TRACK_TO_FILE[targetId];
+    const targetFile = targetId ? TRACK_TO_FILE[targetId] : null;
 
-    // ③ 파일 URL 기준 동일성 검사 → 같은 파일이면 건드리지 않음
-    //    (뼈대 단계: 모든 라우트가 동일 파일이므로 끊김 없이 유지)
-    //    (정식 단계: 라우트마다 다른 파일이면 자동 전환)
+    // ③ 트랙 파일 없는 라우트 → 정지 + src 제거 (현재 정책: /hub에서만 재생)
+    if (!targetFile) {
+      audio.pause();
+      audio.removeAttribute('src');
+      return;
+    }
+
+    // ④ 파일 URL 기준 동일성 검사 → 같은 파일이면 건드리지 않음
     const targetSrc = new URL(targetFile, window.location.origin).href;
-    if (audio.currentSrc === targetSrc) return;
+    if (audio.currentSrc === targetSrc && !audio.paused) return;
 
-    // ④ hard cut 교체
+    // ⑤ hard cut 교체
     audio.src = targetFile;
     audio.volume = BGM_DEFAULTS.volume;
     audio.loop = BGM_DEFAULTS.loop;
