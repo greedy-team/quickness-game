@@ -11,8 +11,9 @@ export default function RouteTree() {
       <Route path="/"          element={<TitlePage />} />
       <Route path="/hub"       element={<HubPage />} />
       <Route path="/stage/:id" element={<StagePage />} />
-      <Route path="/ending"    element={<EndingPage />} />
-      <Route path="/ranking"   element={<RankingPage />} />
+      <Route path="/ending/alive"      element={<EndingPage outcome="alive" />} />
+      <Route path="/ending/silhouette" element={<EndingPage outcome="silhouette" />} />
+      <Route path="/ranking"           element={<RankingPage />} />
       <Route path="*"          element={<Navigate to="/" replace />} />
     </Routes>
   );

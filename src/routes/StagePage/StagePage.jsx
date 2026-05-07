@@ -1,5 +1,5 @@
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { useGameStore } from '../../store.js';
+import { useGameStore, selectEndingOutcome } from '../../store.js';
 import { ASSETS } from '../../assets.js';
 import Stage3Game from '../../stages/stage3/Stage3Game.jsx';
 import Stage4Host from '../../stages/stage4/Stage4Host.jsx';
@@ -23,7 +23,10 @@ export default function StagePage() {
   if (!VALID_IDS.includes(id)) return <Navigate to="/hub" replace />;
 
   const stageId = Number(id);
-  const nextRoute = id === '4' ? '/ending' : '/hub';
+  // Stage 4 종료 직후 누적 점수로 엔딩 분기 URL 계산. recordResult가 동기라
+  // getState로 즉시 합산된 totalScore 기준 outcome을 평가할 수 있다.
+  const endingRouteFromCurrentScore = () =>
+    `/ending/${selectEndingOutcome(useGameStore.getState())}`;
 
   // Stage 3 — 실 구현
   if (id === '3') {
@@ -44,7 +47,7 @@ export default function StagePage() {
       <Stage4Host
         onResult={(metric) => {
           recordResult(4, metric);
-          navigate('/ending');
+          navigate(endingRouteFromCurrentScore());
         }}
       />
     );
@@ -55,11 +58,11 @@ export default function StagePage() {
   //                       여기서 import + 마운트 추가.
   const simulatePerfect = () => {
     recordResult(stageId, 0.05);
-    navigate(nextRoute);
+    navigate('/hub');
   };
   const simulateLow = () => {
     recordResult(stageId, 0.4);
-    navigate(nextRoute);
+    navigate('/hub');
   };
   const simulateClear = () => {
     clearStageResult(stageId);
@@ -77,10 +80,10 @@ export default function StagePage() {
         <p className="stage-page__note">TODO: Stage {stageId} 게임 메커닉 (팀원 이슈)</p>
         <div className="stage-page__actions">
           <button type="button" onClick={simulatePerfect}>
-            모의 PERFECT (metric 0.05) → {nextRoute}
+            모의 PERFECT (metric 0.05) → /hub
           </button>
           <button type="button" onClick={simulateLow}>
-            모의 낮은 점수 (metric 0.4) → {nextRoute}
+            모의 낮은 점수 (metric 0.4) → /hub
           </button>
           <button type="button" onClick={simulateClear}>
             결과 무효화 (clearStageResult)

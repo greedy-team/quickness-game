@@ -1,26 +1,22 @@
-// /ending — Stage 4 종료 후 누적 점수 기반 성공/실패 컷씬 분기.
+// /ending/:outcome — Stage 4 종료 직후 StagePage가 누적 점수로 outcome을 결정해
+// /ending/alive 또는 /ending/silhouette로 navigate. EndingPage는 outcome을 prop으로 받아
+// 그에 맞는 컷씬을 렌더한다 (라우트 자체가 분기 — URL이 결말의 단일 진실 공급원).
 // state machine: entered → reveal → hold → leaving → /ranking
 //
 // timing 파라미터는 ENDING_CONFIG에서 조정.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGameStore, selectTotalScore, selectEndingOutcome } from '../../store.js';
+import { useGameStore, selectTotalScore } from '../../store.js';
 import { ENDING_CONFIG } from './ending.config.js';
 import EndingCutscene from './EndingCutscene.jsx';
 import './EndingPage.css';
 
 const ADVANCE_KEYS = new Set(['Space', 'Enter']);
 
-export default function EndingPage() {
+export default function EndingPage({ outcome }) {
   const navigate = useNavigate();
   const totalScore = useGameStore(selectTotalScore);
-
-  // outcome은 마운트 시 한 번만 평가 — 진행 중 store가 바뀌어도 결말은 고정.
-  const outcomeAtMount = useMemo(
-    () => selectEndingOutcome(useGameStore.getState()),
-    [],
-  );
 
   const [phase, setPhase] = useState('entered'); // entered | reveal | hold | leaving
 
@@ -68,7 +64,7 @@ export default function EndingPage() {
   return (
     <div className="ending-page">
       <EndingCutscene
-        outcome={outcomeAtMount}
+        outcome={outcome}
         phase={phase}
         totalScore={totalScore}
       />

@@ -31,11 +31,14 @@ export const BGM_DEFAULTS = {
   loop: true,
 };
 
-// /stage/:id 같은 동적 경로 처리
+// /stage/:id, /ending/:outcome 같은 동적 경로 처리
 export function trackIdForPath(pathname) {
   if (pathname.startsWith('/stage/')) {
     const id = pathname.split('/')[2];
     return ROUTE_TO_TRACK[`/stage/${id}`] ?? null;
+  }
+  if (pathname.startsWith('/ending/') || pathname === '/ending') {
+    return ROUTE_TO_TRACK['/ending'] ?? null;
   }
   return ROUTE_TO_TRACK[pathname] ?? null;
 }
