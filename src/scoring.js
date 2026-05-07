@@ -35,3 +35,26 @@ export function scoreFromMetric(stageId, metric) {
   const tier = tiers.find((t) => absError <= t.maxAbsError);
   return tier?.points ?? 0;
 }
+
+// ───── 엔딩 분기 (PRD §6 등급 컷오프와 별개의 단일 컷오프) ─────
+
+/**
+ * 누적 점수가 이 값 이상이면 성공 엔딩, 미만이면 실패 엔딩.
+ * Tunable — 부스 플레이테스트 후 조정. 등급 시스템(S/A/B/F) 확정 시
+ * S/A 경계 점수와 정합시킨다.
+ */
+export const ENDING_SUCCESS_CUTOFF = 600;
+
+/**
+ * 누적 점수 → 엔딩 outcome 결정.
+ * - totalScore >= ENDING_SUCCESS_CUTOFF → 'alive' (성공)
+ * - totalScore <  ENDING_SUCCESS_CUTOFF → 'silhouette' (실패)
+ *
+ * 음수/NaN/비숫자 입력은 'silhouette'로 안전 분기.
+ */
+export function endingOutcomeFromTotal(totalScore) {
+  if (typeof totalScore !== 'number' || Number.isNaN(totalScore)) {
+    return 'silhouette';
+  }
+  return totalScore >= ENDING_SUCCESS_CUTOFF ? 'alive' : 'silhouette';
+}
