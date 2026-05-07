@@ -5,12 +5,14 @@ import Stage3Game from '../../stages/stage3/Stage3Game.jsx';
 import Stage4Host from '../../stages/stage4/Stage4Host.jsx';
 import './StagePage.css';
 
-const STAGE_BACKGROUNDS = {
-  1: ASSETS.images.stage1Bg,
-  2: ASSETS.images.stage2Bg,
-};
-
 const VALID_IDS = ['1', '2', '3', '4'];
+
+// Stage 1·2는 mock 버튼 화면이 배경 이미지를 깔고 보여줌.
+// Stage 3·4는 실 컴포넌트가 자체 배경을 그리므로 이 맵은 1·2만 사용.
+const STAGE_BACKGROUNDS = {
+  1: ASSETS.images.stage1,
+  2: ASSETS.images.stage2,
+};
 
 export default function StagePage() {
   const { id } = useParams();
