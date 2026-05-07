@@ -1,7 +1,7 @@
 .falling-item {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: clamp(140px, 14vw, 200px);
+  height: clamp(140px, 14vw, 200px);
   transform: translate(-50%, -50%);
   pointer-events: none;
   user-select: none;
