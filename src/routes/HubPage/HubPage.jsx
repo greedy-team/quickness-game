@@ -8,6 +8,12 @@ export default function HubPage() {
   const stageResults = useGameStore((s) => s.stageResults);
   const door4Unlocked = useGameStore(selectIsDoor4Unlocked);
 
+  const openDoor = (n) => {
+    const sfx = new Audio(ASSETS.sounds.openDoor);
+    sfx.play().catch(() => {});
+    navigate(`/stage/${n}`);
+  };
+
   return (
     <div
       className="hub-page"
@@ -20,7 +26,7 @@ export default function HubPage() {
             key={n}
             type="button"
             className={`hub-page__door hub-page__door--${n}`}
-            onClick={() => navigate(`/stage/${n}`)}
+            onClick={() => openDoor(n)}
             aria-label={`문 ${n}${cleared ? ' (클리어)' : ''}`}
           >
             <img
@@ -37,7 +43,7 @@ export default function HubPage() {
           <button
             type="button"
             className={`hub-page__door hub-page__door--4 ${door4Unlocked ? '' : 'is-locked'}`}
-            onClick={() => navigate('/stage/4')}
+            onClick={() => openDoor(4)}
             disabled={!door4Unlocked}
             aria-disabled={!door4Unlocked}
             aria-label={`문 4${cleared4 ? ' (클리어)' : door4Unlocked ? '' : ' (잠김)'}`}

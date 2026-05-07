@@ -26,33 +26,35 @@
 .title-page > * { position: relative; z-index: 1; }
 
 .title-page__title {
-  font-size: clamp(28px, 4vw, 56px);
+  font-size: clamp(44px, 6.5vw, 88px);
   margin: 0;
   letter-spacing: 0.04em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
 }
 
 .title-page__story {
-  font-size: 16px;
+  font-size: clamp(18px, 1.8vw, 24px);
   line-height: 1.6;
-  opacity: 0.9;
+  opacity: 0.95;
   margin: 0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
 }
 
 .title-page__actions {
   display: flex;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 24px;
+  margin-top: 28px;
 }
 
 .title-page__btn {
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 18px 40px;
+  font-size: clamp(18px, 1.6vw, 22px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
   background: rgba(0, 0, 0, 0.4);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
   backdrop-filter: blur(4px);
 }
 

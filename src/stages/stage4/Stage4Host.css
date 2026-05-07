@@ -1,0 +1,11 @@
+.stage4-host {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0a0a14;
+  background-image: url('/assets/images/bg_stage4_bathroom.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}

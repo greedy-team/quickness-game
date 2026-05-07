@@ -1,15 +1,17 @@
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useGameStore } from '../../store.js';
 import { ASSETS } from '../../assets.js';
+import Stage3Game from '../../stages/stage3/Stage3Game.jsx';
+import Stage4Host from '../../stages/stage4/Stage4Host.jsx';
 import './StagePage.css';
 
 const VALID_IDS = ['1', '2', '3', '4'];
 
+// Stage 1·2는 mock 버튼 화면이 배경 이미지를 깔고 보여줌.
+// Stage 3·4는 실 컴포넌트가 자체 배경을 그리므로 이 맵은 1·2만 사용.
 const STAGE_BACKGROUNDS = {
   1: ASSETS.images.stage1,
   2: ASSETS.images.stage2,
-  3: ASSETS.images.stage3,
-  4: ASSETS.images.stage4,
 };
 
 export default function StagePage() {
@@ -22,17 +24,35 @@ export default function StagePage() {
 
   const stageId = Number(id);
   const nextRoute = id === '4' ? '/ending' : '/hub';
-  const backgroundImage = STAGE_BACKGROUNDS[stageId];
 
-  // TODO(post-skeleton): Stage ${stageId} 게임 로직 구현
-  //   - Stage 1 (괘종시계): 종소리 9회 + 정적 1초 + 10초째 ← 입력
-  //   - Stage 2 (반응속도): 빨간 눈 트리거 + 페이크 2~3회
-  //   - Stage 3 (캐치): 진짜/가짜 기억 받기·피하기, 받은 위치 정확도
-  //   - Stage 4 (3분할): Stage 1·2·3 동시 진행 + 합산
-  //   결과 기록은 recordResult(stageId, metric) 호출.
-  //   재도전 시 clearStageResult(stageId) 호출 후 재진입.
-  //   재도전 UI(언제 노출/횟수 제한)는 후속 결정.
+  // Stage 3 — 실 구현
+  if (id === '3') {
+    return (
+      <Stage3Game
+        mode="standalone"
+        onResult={(metric) => {
+          recordResult(3, metric);
+          navigate('/hub');
+        }}
+      />
+    );
+  }
 
+  // Stage 4 — 3분할 호스트
+  if (id === '4') {
+    return (
+      <Stage4Host
+        onResult={(metric) => {
+          recordResult(4, metric);
+          navigate('/ending');
+        }}
+      />
+    );
+  }
+
+  // Stage 1·2 — 팀원 작업 대기, 기존 mock 버튼 유지
+  // TODO(post-skeleton): 팀원이 Stage1Game/Stage2Game을 contract에 맞게 구현하면
+  //                       여기서 import + 마운트 추가.
   const simulatePerfect = () => {
     recordResult(stageId, 0.05);
     navigate(nextRoute);
@@ -45,14 +65,16 @@ export default function StagePage() {
     clearStageResult(stageId);
   };
 
+  const bg = STAGE_BACKGROUNDS[stageId];
+
   return (
     <div
       className="stage-page"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={bg ? { backgroundImage: `url(${bg})` } : undefined}
     >
       <div className="stage-page__content">
         <h1 className="stage-page__title">[Stage {stageId}]</h1>
-        <p className="stage-page__note">TODO: Stage {stageId} 게임 메커닉</p>
+        <p className="stage-page__note">TODO: Stage {stageId} 게임 메커닉 (팀원 이슈)</p>
         <div className="stage-page__actions">
           <button type="button" onClick={simulatePerfect}>
             모의 PERFECT (metric 0.05) → {nextRoute}

@@ -1,0 +1,18 @@
+.falling-item {
+  position: absolute;
+  width: clamp(140px, 14vw, 200px);
+  height: clamp(140px, 14vw, 200px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+  will-change: top, left;
+}
+
+.falling-item--real {
+  filter: drop-shadow(0 0 8px rgba(255, 220, 150, 0.7));
+}
+
+.falling-item--fake {
+  filter: drop-shadow(0 0 8px rgba(255, 60, 60, 0.7));
+}
