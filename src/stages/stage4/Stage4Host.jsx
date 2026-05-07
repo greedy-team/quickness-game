@@ -1,18 +1,26 @@
-// Stage 4 진입점 — 통합 인트로 + 3분할 + 점수 집계 + 1초 합체 → onResult.
-// state machine: intro → running → merging → done
+// Stage 4 진입점 — 통합 인트로 + 3분할 + 점수 집계 + 합체 + 점프스케어 → onResult.
+// state machine: intro → running → merging → jumpscare → done
+// 사운드 전체 길이 6초에 맞춰 merging(4s) 동안 SFX pre-roll → jumpscare(2s) 클라이맥스에 이미지 표시.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Stage4Intro from './Stage4Intro.jsx';
 import Stage4Split from './Stage4Split.jsx';
 import Stage4MergeOverlay from './Stage4MergeOverlay.jsx';
+import Stage4JumpscareOverlay from './Stage4JumpscareOverlay.jsx';
+import { ASSETS } from '../../assets.js';
+import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import './Stage4Host.css';
 
-const MERGE_DURATION_MS = 1000;
+const MERGE_DURATION_MS = 4000;
+const JUMPSCARE_DURATION_MS = 2000;
+const SFX_VOLUME = 1.0;
 
 export default function Stage4Host({ onResult }) {
-  const [phase, setPhase] = useState('intro'); // intro | running | merging | done
+  const [phase, setPhase] = useState('intro'); // intro | running | merging | jumpscare | done
   const [results, setResults] = useState({ 1: null, 2: null, 3: null });
   const aggregateRef = useRef(null);
+  const sfxAudioRef = useRef(null);
+  const bgmAudioRef = useRef(null);
 
   // intro 단계: Space 누르면 running 진입
   useEffect(() => {
@@ -36,6 +44,22 @@ export default function Stage4Host({ onResult }) {
     3: (metric) => setResults((prev) => (prev[3] !== null ? prev : { ...prev, 3: metric })),
   }), []);
 
+  // BGM: running phase에서만 재생. merging 진입 시 정지(점프스케어 SFX와 충돌 방지).
+  // Stage 3와 동일 패턴 — 라우트 기반 BgmController 대신 phase 기반 로컬 제어.
+  useEffect(() => {
+    const audio = bgmAudioRef.current;
+    if (!audio) return;
+
+    if (phase === 'running') {
+      audio.volume = BGM_DEFAULTS.volume;
+      audio.loop = BGM_DEFAULTS.loop;
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  }, [phase]);
+
   // 3개 모두 도착하면 평균 산출 + merging 진입
   useEffect(() => {
     if (phase !== 'running') return;
@@ -46,15 +70,42 @@ export default function Stage4Host({ onResult }) {
     }
   }, [phase, results]);
 
-  // merging 진입 1초 후 done 전이 + onResult
+  // merging 진입: SFX pre-roll 시작 (jumpscare 이미지보다 먼저 들리도록) + 4초 후 jumpscare 전이
   useEffect(() => {
     if (phase !== 'merging') return;
+
+    const sfxSrc = ASSETS.sounds.cutsceneJumpscareSfx;
+    if (sfxSrc) {
+      const audio = new Audio(sfxSrc);
+      audio.volume = SFX_VOLUME;
+      audio.play().catch(() => {});
+      sfxAudioRef.current = audio;
+    }
+
+    const id = setTimeout(() => setPhase('jumpscare'), MERGE_DURATION_MS);
+    return () => clearTimeout(id);
+  }, [phase]);
+
+  // jumpscare 진입 후 정해진 시간만큼 보여주고 done + onResult.
+  // SFX는 merging부터 이어져 자연스럽게 종료됨 (총 6초).
+  useEffect(() => {
+    if (phase !== 'jumpscare') return;
     const id = setTimeout(() => {
       setPhase('done');
       onResult(aggregateRef.current);
-    }, MERGE_DURATION_MS);
+    }, JUMPSCARE_DURATION_MS);
     return () => clearTimeout(id);
   }, [phase, onResult]);
+
+  // 언마운트 시 SFX 정리 (navigate로 unmount되어도 audio 누수 방지)
+  useEffect(() => () => {
+    const audio = sfxAudioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      sfxAudioRef.current = null;
+    }
+  }, []);
 
   return (
     <div className="stage4-host">
@@ -69,6 +120,9 @@ export default function Stage4Host({ onResult }) {
       {phase === 'intro' && <Stage4Intro />}
       {/* 합체 오버레이는 merging phase에서만 */}
       {phase === 'merging' && <Stage4MergeOverlay />}
+      {/* 점프스케어는 jumpscare phase에서만 */}
+      {phase === 'jumpscare' && <Stage4JumpscareOverlay />}
+      <audio ref={bgmAudioRef} src={ASSETS.sounds.bgmStage4} preload="auto" />
     </div>
   );
 }

@@ -12,7 +12,8 @@ const initialState = {
     3: null,
     4: null,
   },
-  // 사용자가 타이틀에서 "시작"을 눌렀는가 (BGM autoplay 게이트 + 게임 진행 여부)
+  // 사용자가 타이틀에서 "시작"을 눌렀는가 (게임 진행 여부 마커).
+  // BGM 게이팅은 BgmController가 자체적으로 처리 — 본 플래그와 무관.
   hasUserStarted: false,
 };
 
