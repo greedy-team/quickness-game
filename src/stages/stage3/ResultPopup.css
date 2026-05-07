@@ -3,7 +3,10 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: clamp(56px, 7vw, 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   font-weight: 900;
   letter-spacing: 0.02em;
   text-shadow:
@@ -13,6 +16,18 @@
   pointer-events: none;
   animation: result-popup-fade 0.4s ease-out forwards;
   white-space: nowrap;
+}
+
+.result-popup__label {
+  font-size: clamp(56px, 7vw, 96px);
+  line-height: 1;
+}
+
+.result-popup__points {
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1;
+  font-weight: 800;
+  opacity: 0.95;
 }
 
 @keyframes result-popup-fade {

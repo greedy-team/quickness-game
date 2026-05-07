@@ -78,7 +78,7 @@ export default function Stage3Field({ isRunning, onResult }) {
   // 활성 아이템 상태 — { id, kind, imgSrc, spawnAt, horizontalPct, topPercent, status }
   // status: 'falling' | 'caught' | 'missed'
   const [items, setItems] = useState([]);
-  const [popup, setPopup] = useState({ visible: false, label: '', color: '', key: 0 });
+  const [popup, setPopup] = useState({ visible: false, label: '', points: null, color: '', key: 0 });
 
   const startTimeRef = useRef(null);
   const rafRef = useRef(null);
@@ -87,9 +87,9 @@ export default function Stage3Field({ isRunning, onResult }) {
   itemsRef.current = items;
 
   const popupKeyRef = useRef(0);
-  const showPopup = useCallback((label, color) => {
+  const showPopup = useCallback((label, points, color) => {
     popupKeyRef.current += 1;
-    setPopup({ visible: true, label, color, key: popupKeyRef.current });
+    setPopup({ visible: true, label, points, color, key: popupKeyRef.current });
     setTimeout(() => {
       setPopup((prev) => prev.key === popupKeyRef.current ? { ...prev, visible: false } : prev);
     }, 400);
@@ -183,10 +183,10 @@ export default function Stage3Field({ isRunning, onResult }) {
       if (target.kind === 'real') {
         const { points, label, color } = pointsForOffset(absOffset, config.accuracyTiers, config.missLabel);
         totalPointsRef.current += points;
-        showPopup(label, color);
+        showPopup(label, points, color);
       } else {
         totalPointsRef.current += config.fakePenalty;
-        showPopup(config.fakeLabel, '#FF3333');
+        showPopup(config.fakeLabel, config.fakePenalty, '#FF3333');
       }
 
       setItems((prev) => prev.map(
@@ -226,6 +226,7 @@ export default function Stage3Field({ isRunning, onResult }) {
         key={popup.key}
         visible={popup.visible}
         label={popup.label}
+        points={popup.points}
         color={popup.color}
       />
     </div>
