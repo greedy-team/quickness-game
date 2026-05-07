@@ -20,3 +20,39 @@
      실제 자식들(CatchZone, FallingItem, ResultPopup — 모두 position:absolute)이
      그 위에 차례로 페인트됨. z-index 별도 지정 불필요. */
 }
+
+/* HUD — 좌상단 "남은 조각 N / 6" */
+.stage3-hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 8px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}
+
+.stage3-hud__label {
+  font-size: clamp(13px, 1.4vw, 16px);
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.stage3-hud__count {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.stage3-hud__count strong {
+  color: #FFD700;
+  font-size: clamp(28px, 3.2vw, 40px);
+  margin-right: 2px;
+}

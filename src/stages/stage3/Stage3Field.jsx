@@ -64,9 +64,11 @@ function buildSequence(config) {
 }
 
 // 정확도 offset → tier 매칭 → per-item 점수
-function pointsForOffset(absOffset, tiers) {
+function pointsForOffset(absOffset, tiers, missLabel) {
   const tier = tiers.find((t) => absOffset <= t.maxOffset);
-  return tier ? { points: tier.points, label: tier.label, color: tier.color } : { points: 0, label: 'MISS', color: '#888' };
+  return tier
+    ? { points: tier.points, label: tier.label, color: tier.color }
+    : { points: 0, label: missLabel, color: '#888' };
 }
 
 export default function Stage3Field({ isRunning, onResult }) {
@@ -179,12 +181,12 @@ export default function Stage3Field({ isRunning, onResult }) {
       const absOffset = Math.abs(target.topPercent - zoneCenter) / zoneHalf;
 
       if (target.kind === 'real') {
-        const { points, label, color } = pointsForOffset(absOffset, config.accuracyTiers);
+        const { points, label, color } = pointsForOffset(absOffset, config.accuracyTiers, config.missLabel);
         totalPointsRef.current += points;
         showPopup(label, color);
       } else {
         totalPointsRef.current += config.fakePenalty;
-        showPopup('INCORRECT', '#FF3333');
+        showPopup(config.fakeLabel, '#FF3333');
       }
 
       setItems((prev) => prev.map(
@@ -196,8 +198,18 @@ export default function Stage3Field({ isRunning, onResult }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isRunning, config, showPopup]);
 
+  // HUD — 남은 조각: 아직 falling 상태인 아이템 수 (스폰 전 + 낙하 중 모두 포함)
+  const remaining = items.filter((it) => it.status === 'falling').length;
+  const total = config.itemCount;
+
   return (
     <div className="stage3-field">
+      <div className="stage3-hud" aria-live="polite">
+        <span className="stage3-hud__label">남은 조각</span>
+        <span className="stage3-hud__count">
+          <strong>{remaining}</strong> / {total}
+        </span>
+      </div>
       <CatchZone />
       {items.map((it) => (
         it.status === 'falling' && (

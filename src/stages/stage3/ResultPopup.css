@@ -3,12 +3,16 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 48px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.6);
+  font-size: clamp(56px, 7vw, 96px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 16px rgba(0, 0, 0, 0.95),
+    0 0 32px rgba(0, 0, 0, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.85);
   pointer-events: none;
   animation: result-popup-fade 0.4s ease-out forwards;
+  white-space: nowrap;
 }
 
 @keyframes result-popup-fade {

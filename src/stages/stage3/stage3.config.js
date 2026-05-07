@@ -13,14 +13,19 @@ export const STAGE3_CONFIG = {
 
   // 캐치 존 내 정확도 tier (per-item points)
   // maxOffset: 0=중심, 1=캐치 존 가장자리
+  // id: CSS 클래스용 영문 식별자 / label: 화면 표시용 한국어
   accuracyTiers: [
-    { maxOffset: 0.05, points: 100, label: 'PERFECT', color: '#FFD700' },
-    { maxOffset: 0.15, points: 80,  label: 'GREAT',   color: '#FF4444' },
-    { maxOffset: 0.30, points: 60,  label: 'GOOD',    color: '#FFCC00' },
-    { maxOffset: 0.50, points: 40,  label: 'OK',      color: '#FFEE88' },
-    { maxOffset: 1.00, points: 20,  label: 'BARE',    color: '#AAAAAA' },
+    { id: 'perfect', maxOffset: 0.05, points: 100, label: '완벽!',  color: '#FFD700' },
+    { id: 'great',   maxOffset: 0.15, points: 80,  label: '훌륭!',  color: '#FF8855' },
+    { id: 'good',    maxOffset: 0.30, points: 60,  label: '좋아!',  color: '#FFCC00' },
+    { id: 'ok',      maxOffset: 0.50, points: 40,  label: '통과',   color: '#FFEE88' },
+    { id: 'bare',    maxOffset: 1.00, points: 20,  label: '아슬',   color: '#CCCCCC' },
   ],
 
-  fakePenalty: -50,   // fake 캐치 시
-  missScore:    0,    // real 미입력 / 캐치 존 밖 입력
+  fakePenalty: -50,    // fake 캐치 시
+  missScore:    0,     // real 미입력 / 캐치 존 밖 입력
+
+  // 표시용 라벨 (popup)
+  fakeLabel:    '가짜!',
+  missLabel:    '놓침',
 };
