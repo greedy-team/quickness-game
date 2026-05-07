@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Stage4Intro from './Stage4Intro.jsx';
 import Stage4Split from './Stage4Split.jsx';
 import Stage4MergeOverlay from './Stage4MergeOverlay.jsx';
+import { ASSETS } from '../../assets.js';
+import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import './Stage4Host.css';
 
 const MERGE_DURATION_MS = 1000;
@@ -13,6 +15,7 @@ export default function Stage4Host({ onResult }) {
   const [phase, setPhase] = useState('intro'); // intro | running | merging | done
   const [results, setResults] = useState({ 1: null, 2: null, 3: null });
   const aggregateRef = useRef(null);
+  const bgmAudioRef = useRef(null);
 
   // intro 단계: Space 누르면 running 진입
   useEffect(() => {
@@ -35,6 +38,22 @@ export default function Stage4Host({ onResult }) {
     2: (metric) => setResults((prev) => (prev[2] !== null ? prev : { ...prev, 2: metric })),
     3: (metric) => setResults((prev) => (prev[3] !== null ? prev : { ...prev, 3: metric })),
   }), []);
+
+  // BGM: running phase에서만 재생. merging 진입 시 정지.
+  // Stage 3와 동일 패턴 — 라우트 기반 BgmController 대신 phase 기반 로컬 제어.
+  useEffect(() => {
+    const audio = bgmAudioRef.current;
+    if (!audio) return;
+
+    if (phase === 'running') {
+      audio.volume = BGM_DEFAULTS.volume;
+      audio.loop = BGM_DEFAULTS.loop;
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  }, [phase]);
 
   // 3개 모두 도착하면 평균 산출 + merging 진입
   useEffect(() => {
@@ -69,6 +88,7 @@ export default function Stage4Host({ onResult }) {
       {phase === 'intro' && <Stage4Intro />}
       {/* 합체 오버레이는 merging phase에서만 */}
       {phase === 'merging' && <Stage4MergeOverlay />}
+      <audio ref={bgmAudioRef} src={ASSETS.sounds.bgmStage4} preload="auto" />
     </div>
   );
 }
