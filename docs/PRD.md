@@ -108,6 +108,8 @@
 | `door.png` | 기본 문 |
 | `door_clear.png` | 클리어된 문 |
 | `bgm.mp3` | 기본 배경음 |
+| `greenie_alive.png` | 엔딩 — 성공 (귀신을 떨친 진짜 그린이) |
+| `greenie_silhouette.png` | 엔딩 — 실패 (귀신이 된 그린이) |
 
 ### 🎨 생성 필요 이미지 에셋 (프롬프트 포함)
 
@@ -209,6 +211,8 @@ Distorted Korean school items as corrupted memories:
 
 ### **`cutscene_ending_true.png`** — 엔딩 (성공)
 
+> ⚠️ 대체됨 — `greenie_alive.png`로 대체 운영 (#26 참고)
+
 ```
 Cute giraffe character looking into cracked mirror showing 
 only one reflection, dawn light, hopeful yet eerie, soft 
@@ -216,6 +220,8 @@ warm glow --ar 16:9
 ```
 
 ### **`cutscene_ending_bad.png`** — 엔딩 (실패)
+
+> ⚠️ 대체됨 — `greenie_silhouette.png`로 대체 운영 (#26 참고)
 
 ```
 Cute giraffe character's reflection in mirror smiling 

@@ -21,9 +21,16 @@ export const ASSETS = {
       '/assets/images/memory_fake_2.png',
       '/assets/images/memory_fake_3.png',
     ],
+    // 엔딩 컷씬 (#26)
+    endingAlive:      '/assets/images/greenie_alive.png',
+    endingSilhouette: '/assets/images/greenie_silhouette.png',
   },
   sounds: {
     bgm:      '/assets/sounds/bgm.mp3',
     openDoor: '/assets/sounds/open_door_sound.mp3',
+    // 엔딩 SFX 슬롯 — 본 이슈 범위에서는 음원 미존재. null이면 EndingCutscene에서 재생 skip.
+    // images.endingAlive와 이름 겹치지 않도록 'Sfx' 접미사 사용.
+    endingAliveSfx:      null,
+    endingSilhouetteSfx: null,
   },
 };

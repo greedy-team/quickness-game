@@ -1,7 +1,7 @@
 // src/store.js
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { scoreFromMetric } from './scoring.js';
+import { scoreFromMetric, endingOutcomeFromTotal } from './scoring.js';
 
 const initialState = {
   // 4개 스테이지 결과 — 단일 진실 공급원
@@ -71,3 +71,10 @@ export const selectIsDoor4Unlocked = (s) =>
 
 export const selectClearedCount = (s) =>
   [1, 2, 3, 4].reduce((acc, n) => acc + (s.stageResults[n] !== null ? 1 : 0), 0);
+
+/**
+ * 누적 점수 → 엔딩 outcome ('alive' | 'silhouette') selector.
+ * EndingPage가 진입 시 한 번 평가하여 컷씬을 결정한다.
+ */
+export const selectEndingOutcome = (s) =>
+  endingOutcomeFromTotal(selectTotalScore(s));
