@@ -2,43 +2,102 @@
   position: relative;
   width: 100%;
   height: 100%;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.doors-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 50px;
+  width: 95%;
+  height: 65%; /* 문의 세로 위치 조절 */
 }
 
 .hub-page__door {
-  position: absolute;
-  bottom: 18%;
-  width: 18%;
-  aspect-ratio: 9 / 16;
-  padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20%;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 0;
 }
 
-.hub-page__door img {
+/* STAGE 명판 스타일 */
+.door-plate {
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid #444;
+  padding: 15px 25px;
+  margin-bottom: 30px;
+  min-width: 180px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
+}
+
+.plate-label-big {
+  color: #ff2222;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px #ff0000;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* 문 이미지 및 효과 */
+.door-view {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  position: relative;
+  transition: filter 0.4s ease;
+}
+
+.door-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  pointer-events: none;
+  filter: brightness(0.65) grayscale(0.1); 
+  transition: all 0.4s ease;
 }
 
-.hub-page__door--1 { left: 6%;  }
-.hub-page__door--2 { left: 28%; }
-.hub-page__door--3 { left: 50%; }
-.hub-page__door--4 { left: 72%; }
-
-.hub-page__door:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 4px;
+/* 호버 연출 */
+.hub-page__door:not(.is-locked):hover {
+  transform: translateY(-15px) scale(1.05);
 }
 
+.hub-page__door:not(.is-locked):hover .door-img {
+  filter: brightness(1.2) grayscale(0);
+}
+
+.hub-page__door:not(.is-locked):hover .door-view {
+  filter: drop-shadow(0 0 25px rgba(255, 0, 0, 0.8))
+          drop-shadow(0 0 50px rgba(255, 0, 0, 0.4));
+}
+
+.hub-page__door:not(.is-locked):hover .door-plate {
+  border-color: #ff2222;
+}
+
+/* 잠긴 문 스타일 */
 .hub-page__door.is-locked {
   cursor: not-allowed;
 }
 
-.hub-page__door.is-locked img {
-  filter: brightness(0.35);
+.hub-page__door.is-locked .door-img {
+  filter: brightness(0.2) grayscale(1);
+}
+
+.hub-page__door.is-locked .plate-label-big {
+  color: #222;
+  text-shadow: none;
+}
+
+.hub-page__door.is-locked .door-plate {
+  border-color: #222;
 }

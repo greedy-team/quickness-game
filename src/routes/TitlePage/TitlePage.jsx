@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store.js';
-import { ASSETS } from '../../assets.js';
+// 💡 ASSETS 가져오기는 이제 필요하지 않으므로 주석 처리하거나 제거합니다.
+// import { ASSETS } from '../../assets.js'; 
 import './TitlePage.css';
 
 export default function TitlePage() {
@@ -19,17 +20,18 @@ export default function TitlePage() {
   return (
     <div
       className="title-page"
-      style={{ backgroundImage: `url(${ASSETS.images.cutsceneOpening})` }}
+      /* 💡 public 폴더 아래 이미지를 가리키는 올바른 경로 설정 */
+      style={{ backgroundImage: 'url(/assets/images/bg_chalkboard.png)' }}
     >
-      <h1 className="title-page__title">그린이는 나야, 둘이 될 수 없어</h1>
-      <p className="title-page__story">
-        야자 후 혼자 남은 학교에 또 다른 내가 나타났다.<br />
-        가짜를 없애러 4개의 문을 연다.
-      </p>
-      <div className="title-page__actions">
+      {/* 시작 버튼: 화살표 방향 수정(▶) 및 텍스트 뒤 배치 */}
+      <div className="title-page__action title-page__action--start">
         <button type="button" className="title-page__btn" onClick={handleStart}>
-          ▶ 시작
+          시작 ▶
         </button>
+      </div>
+      
+      {/* 랭킹 보기 버튼 */}
+      <div className="title-page__action title-page__action--ranking">
         <button type="button" className="title-page__btn" onClick={handleOpenRanking}>
           🏆 랭킹 보기
         </button>

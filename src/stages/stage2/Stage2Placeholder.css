@@ -1,45 +1,99 @@
-.stage2-placeholder {
-  position: relative;
+.stage2-wrapper { width: 100%; height: 100%; position: relative; overflow: hidden; background: #000; cursor: crosshair; }
+
+.camera-sway { animation: sway 6s ease-in-out infinite; }
+@keyframes sway {
+  0%, 100% { transform: scale(1.05) translate(0, 0); }
+  50% { transform: scale(1.08) translate(5px, -5px); }
+}
+
+.stage2-content {
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+  z-index: 1; 
+  /* 💡 요청하신 대로 밝게 조정 */
+  filter: brightness(1.2) contrast(1.15); 
+}
+
+.stage2-content.flicker-bright { filter: brightness(1.8) contrast(1.2); }
+
+.camera-viewfinder {
+  position: absolute; inset: 0; 
+  /* 💡 하단 흐릿한 영역을 없애기 위해 box-shadow 범위를 대폭 축소 */
+  box-shadow: inset 0 0 60px 10px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05); z-index: 5; pointer-events: none;
+}
+
+/* 💡 심플한 시작 문구 스타일 */
+.start-minimal {
+  position: absolute;
+  bottom: 12%;
   width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 24px;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   text-align: center;
 }
 
-.stage2-placeholder__icon {
-  font-size: 48px;
-  font-weight: 800;
-  color: #ffd700;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+.start-btn-simple {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Malgun Gothic', sans-serif;
+  letter-spacing: 1px;
+  animation: rec-blink 1.5s infinite;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
-.stage2-placeholder__title {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+@keyframes shake-anim { 0% { transform: translate(10px, -10px); } 100% { transform: translate(-10px, 10px); } }
+.screen-shake { animation: shake-anim 0.1s infinite; }
+
+.attack-flash-overlay {
+  position: absolute; inset: 0; background: rgba(255, 0, 0, 0.3); opacity: 0;
+  z-index: 100; pointer-events: none;
+}
+.attack-flash-overlay.active { animation: red-flash 0.4s ease-out forwards; }
+@keyframes red-flash { 0% { opacity: 1; filter: saturate(2); } 100% { opacity: 0; } }
+
+.camera-flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 150; pointer-events: none; }
+.camera-flash.active { animation: flash-burst 0.3s ease-out forwards; }
+@keyframes flash-burst { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+.camera-hud { position: absolute; inset: 0; padding: 40px; z-index: 100; display: flex; flex-direction: column; pointer-events: none; }
+.hud-top { display: flex; justify-content: space-between; width: 100%; }
+.rec-info { color: #ff3333; display: flex; align-items: center; gap: 10px; font-family: monospace; font-size: 1.8rem; font-weight: bold; }
+.rec-dot { width: 15px; height: 15px; background: #ff3333; border-radius: 50%; animation: rec-blink 1s infinite; }
+
+.battery-box { display: flex; align-items: center; }
+.battery-body { width: 35px; height: 18px; border: 2px solid #fff; padding: 2px; }
+.battery-level { width: 80%; height: 100%; background: #fff; }
+.battery-tip { width: 4px; height: 8px; background: #fff; }
+
+.focus-cross { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; }
+.cross-h { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.7); margin-top: -1px; }
+.cross-v { position: absolute; left: 50%; top: 0; height: 100%; width: 2px; background: rgba(255,255,255,0.7); margin-left: -1px; }
+
+.stage2-ui-layer { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 200; pointer-events: none; }
+
+.final-message-overlay { 
+  background: rgba(0,0,0,0.85); 
+  padding: 40px; 
+  border: 1px solid #444; 
+  color: #fff; 
+  text-align: center; 
+  pointer-events: auto; 
+  max-width: 80%;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 1);
 }
 
-.stage2-placeholder__note {
-  font-size: 14px;
-  opacity: 0.7;
-}
+.main-msg { font-size: 3.5rem; letter-spacing: 8px; margin-bottom: 20px; }
+.msg-success .main-msg { color: #00ffcc; text-shadow: 0 0 20px #00ffcc; }
+.msg-failed .main-msg { color: #ff3333; text-shadow: 0 0 20px #ff3333; }
+.sub-msg { font-size: 1.2rem; color: #aaa; }
+.reaction-time { font-family: 'Courier New', Courier, monospace; font-size: 1.8rem; color: #ffcc00; margin-top: 15px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); animation: pop-in 0.5s ease-out; }
 
-.stage2-placeholder__bar {
-  width: 70%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
-  overflow: hidden;
-}
+@keyframes pop-in { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes rec-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-.stage2-placeholder__bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #88dd88, #ffd700);
-  transition: width 0.1s linear;
-}
+/* 스플릿 모드 (스테이지 4) */
+.stage2-wrapper.split-mode .stage2-content { background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #000; }
+.stage2-wrapper.split-mode .camera-hud { padding: 20px; justify-content: space-between; }
+.stage2-wrapper.split-mode .hud-top { margin-top: 10px; align-items: center; }
+.stage2-wrapper.split-mode .camera-viewfinder { Box-shadow: inset 0 0 40px 5px rgba(0, 0, 0, 0.7); }
+.stage2-wrapper.split-mode .rec-info { font-size: 1.2rem; }
+.stage2-wrapper.split-mode .battery-body { width: 25px; height: 14px; }
+.stage2-wrapper.split-mode .start-btn-simple { font-size: 0.9rem; }

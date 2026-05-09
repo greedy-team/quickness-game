@@ -1,6 +1,8 @@
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useGameStore, selectEndingOutcome } from '../../store.js';
 import { ASSETS } from '../../assets.js';
+import Stage1Placeholder from '../../stages/stage1/Stage1Placeholder.jsx';
+import Stage2Placeholder from '../../stages/stage2/Stage2Placeholder.jsx';
 import Stage3Game from '../../stages/stage3/Stage3Game.jsx';
 import Stage4Host from '../../stages/stage4/Stage4Host.jsx';
 import './StagePage.css';
@@ -28,6 +30,34 @@ export default function StagePage() {
   const endingRouteFromCurrentScore = () =>
     `/ending/${selectEndingOutcome(useGameStore.getState())}`;
 
+  // Stage 1 — 괘종시계 실 구현 연결
+  if (id === '1') {
+    return (
+      <Stage1Placeholder
+        mode="standalone"
+        isRunning={true}
+        onResult={(metric) => {
+          recordResult(1, metric);
+          navigate('/hub');
+        }}
+      />
+    );
+  }
+
+  // Stage 2 — 반응속도 실 구현 연결
+  if (id === '2') {
+    return (
+      <Stage2Placeholder
+        mode="standalone"
+        isRunning={true}
+        onResult={(metric) => {
+          recordResult(2, metric);
+          navigate('/hub');
+        }}
+      />
+    );
+  }
+
   // Stage 3 — 실 구현
   if (id === '3') {
     return (
@@ -53,9 +83,14 @@ export default function StagePage() {
     );
   }
 
+  // =========================================================================
+  // 🚨 아래 코드는 ESLint의 '도달할 수 없는 코드(no-unreachable)' 에러를 방지하기 위해 
+  // 블록 주석 처리해 두었습니다. 기존 모의 테스트 로직과 메모를 보존하는 용도입니다.
+  // =========================================================================
+  /*
   // Stage 1·2 — 팀원 작업 대기, 기존 mock 버튼 유지
   // TODO(post-skeleton): 팀원이 Stage1Game/Stage2Game을 contract에 맞게 구현하면
-  //                       여기서 import + 마운트 추가.
+  //                      여기서 import + 마운트 추가.
   const simulatePerfect = () => {
     recordResult(stageId, 0.05);
     navigate('/hub');
@@ -92,4 +127,7 @@ export default function StagePage() {
       </div>
     </div>
   );
+  */
+
+  return null;
 }
