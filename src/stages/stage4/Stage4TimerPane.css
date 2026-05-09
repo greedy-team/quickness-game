@@ -1,0 +1,65 @@
+/* src/routes/stage4/Stage4TimerPane.css */
+
+.s4-timer-pane {
+  position: relative; /* 레이어 겹치기를 위해 필수 */
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+/* ── 🛠️ 배경 이미지 스타일 ── */
+.s4-timer-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/images/bg_stage1_clock.png'); 
+  /* ── 🛠️ 수정한 부분 ── */
+  background-size: contain; /* 이미지 전체가 다 보이도록 */
+  background-position: center; 
+  background-repeat: no-repeat;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.s4-timer-content {
+  position: relative;
+  z-index: 2; /* 배경보다 위에 표시 */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 전광판 배경 내의 시계 칸 위치에 따라 top이나 padding으로 미세 조정하세요 */
+  padding-top: 2%; 
+}
+
+.s4-timer-display {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 5.5vw; /* 분할 화면에서 꽉 차게 보이도록 조절 */
+  color: #ff0000;
+  font-weight: bold;
+  text-shadow: 0 0 20px #ff0000, 0 0 10px rgba(255, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.s4-hour-min {
+  font-size: 0.45em;
+  opacity: 0.7;
+  margin-right: 0.8vw;
+}
+
+/* 7초 깜빡임 */
+.s4-timer-display.flicker {
+  animation: s4-aggressive-flicker 0.1s infinite;
+}
+
+/* 8초 꺼짐 */
+.s4-timer-display.off {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes s4-aggressive-flicker {
+  0%, 100% { opacity: 0.1; filter: blur(2px); }
+  50% { opacity: 0.9; filter: blur(0px); }
+}

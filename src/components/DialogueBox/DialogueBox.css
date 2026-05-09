@@ -1,0 +1,48 @@
+/* DialogueBox 전체 레이어 */
+.dialogue-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* ── 🛠️ 핵심: 뒤 배경이 보이도록 투명 설정 ── */
+  background: transparent; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; 
+  align-items: center;
+  padding-bottom: 6vh;
+  z-index: 50; /* 배경(1)보다는 위, 매뉴얼(110)보다는 아래 */
+}
+
+/* 텍스트 박스 자체 */
+.dialogue-box {
+  width: 85%;
+  max-width: 1100px;
+  background: rgba(10, 10, 10, 0.85); /* 박스 내부만 반투명 검정 */
+  border: 1px solid #333;
+  padding: 35px 50px;
+  min-height: 160px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.dialogue-text {
+  color: #eee;
+  font-size: 1.5rem;
+  line-height: 1.8;
+  word-break: keep-all;
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* "Next" 안내 문구 */
+.next-indicator {
+  position: absolute;
+  right: 40px;
+  bottom: 25px;
+  color: #666;
+  font-size: 1rem;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }

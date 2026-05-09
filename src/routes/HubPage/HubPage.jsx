@@ -3,55 +3,59 @@ import { useGameStore, selectIsDoor4Unlocked } from '../../store.js';
 import { ASSETS } from '../../assets.js';
 import './HubPage.css';
 
+const STAGE_LABELS = {
+  1: 'STAGE 1',
+  2: 'STAGE 2',
+  3: 'STAGE 3',
+  4: 'FINAL STAGE'
+};
+
 export default function HubPage() {
   const navigate = useNavigate();
   const stageResults = useGameStore((s) => s.stageResults);
   const door4Unlocked = useGameStore(selectIsDoor4Unlocked);
 
   const openDoor = (n) => {
+    if (n === 4 && !door4Unlocked) return;
+    
     const sfx = new Audio(ASSETS.sounds.openDoor);
     sfx.play().catch(() => {});
     navigate(`/stage/${n}`);
   };
 
   return (
-    <div
-      className="hub-page"
-      style={{ backgroundImage: `url(${ASSETS.images.hubCorridor})` }}
-    >
-      {[1, 2, 3].map((n) => {
-        const cleared = stageResults[n] !== null;
-        return (
-          <button
-            key={n}
-            type="button"
-            className={`hub-page__door hub-page__door--${n}`}
-            onClick={() => openDoor(n)}
-            aria-label={`문 ${n}${cleared ? ' (클리어)' : ''}`}
-          >
-            <img
-              src={cleared ? ASSETS.images.doorClear : ASSETS.images.door}
-              alt=""
-            />
-          </button>
-        );
-      })}
+    <div className="hub-page">
+      <div className="doors-container">
+        {[1, 2, 3, 4].map((n) => {
+          const locked = n === 4 && !door4Unlocked;
+          const cleared = stageResults[n] !== null;
+          const label = STAGE_LABELS[n];
 
-      {(() => {
-        const cleared4 = stageResults[4] !== null;
-        return (
-          <button
-            type="button"
-            className={`hub-page__door hub-page__door--4 ${door4Unlocked ? '' : 'is-locked'}`}
-            onClick={() => openDoor(4)}
-            disabled={!door4Unlocked}
-            aria-disabled={!door4Unlocked}
-            aria-label={`문 4${cleared4 ? ' (클리어)' : door4Unlocked ? '' : ' (잠김)'}`}
-          >
-            <img src={cleared4 ? ASSETS.images.doorClear : ASSETS.images.door} alt="" />
-          </button>
-        );
-      })()}
+          return (
+            <button
+              key={n}
+              type="button"
+              className={`hub-page__door ${locked ? 'is-locked' : ''} ${cleared ? 'is-cleared' : ''}`}
+              onClick={() => openDoor(n)}
+              disabled={locked}
+            >
+              {/* STAGE 라벨 명판 */}
+              <div className="door-plate">
+                <span className="plate-label-big">{label}</span>
+              </div>
+
+              {/* 문 이미지 */}
+              <div className="door-view">
+                <img
+                  src={cleared ? ASSETS.images.doorClear : ASSETS.images.door}
+                  alt=""
+                  className="door-img"
+                />
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

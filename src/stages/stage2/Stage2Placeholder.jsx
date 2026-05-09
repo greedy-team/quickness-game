@@ -1,40 +1,224 @@
-// src/stages/stage2/Stage2Placeholder.jsx
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Stage2Placeholder.css';
 
-const PLACEHOLDER_DURATION_SEC = 10;
+const BGS = {
+  INFO: '/assets/images/bg_stage2_info.png',
+  BASE: '/assets/images/bg_stage2_library.png',
+  G1: '/assets/images/bg_stage2_library_greenie1.png', 
+  G2: '/assets/images/bg_stage2_library_greenie2.png', 
+  G3: '/assets/images/bg_stage2_library_greenie3.png', 
+  REAL: '/assets/images/greenie_real.png',             
+};
 
-export default function Stage2Placeholder({ mode = 'split', isRunning, onResult }) {
-  const [progress, setProgress] = useState(0);
+export default function Stage2Placeholder({ onResult, isRunning, mode }) {
+  const [phase, setPhase] = useState('MANUAL'); 
+  const [gameState, setGameState] = useState('IDLE');
+  const [currentBG, setCurrentBG] = useState(BGS.INFO); 
+  const [timer, setTimer] = useState(10);
+  const [isFlash, setIsFlash] = useState(false);
+  const [isAttackFlash, setIsAttackFlash] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
+  
+  const [reaction, setReaction] = useState({ time: null, comment: "" });
+
+  const stateRef = useRef({
+    phase: 'MANUAL',
+    gameState: 'IDLE',
+    isFinished: false,
+    attackStartTime: 0 
+  });
+
+  const syncPhase = (p) => { stateRef.current.phase = p; setPhase(p); };
+  const syncGameState = (g) => { stateRef.current.gameState = g; setGameState(g); };
 
   useEffect(() => {
-    if (!isRunning) return;
-    const start = performance.now();
-    let raf;
-    const tick = () => {
-      const elapsed = (performance.now() - start) / 1000;
-      const p = Math.min(1, elapsed / PLACEHOLDER_DURATION_SEC);
-      setProgress(p);
-      if (p >= 1) {
-        onResult(0.5);
-        return;
-      }
-      raf = requestAnimationFrame(tick);
+    Object.values(BGS).forEach(src => { const img = new Image(); img.src = src; });
+  }, []);
+
+  useEffect(() => {
+    if (mode === 'split' && isRunning && stateRef.current.phase === 'MANUAL') {
+      startGame();
+    }
+  }, [isRunning, mode]);
+
+  const startGame = () => {
+    if (stateRef.current.phase !== 'MANUAL') return;
+    
+    stateRef.current.isFinished = false;
+    syncPhase('PLAY');
+    syncGameState('LURKING');
+    setCurrentBG(BGS.BASE);
+    setTimer(10);
+    setIsShaking(false);
+    setIsAttackFlash(false);
+    setIsFlash(false);
+    setReaction({ time: null, comment: "" });
+  };
+
+  const handleFinish = useCallback((score, endState, rTime = null, rComment = "") => {
+    stateRef.current.isFinished = true;
+    syncGameState(endState);
+    setIsShaking(false);
+    
+    setReaction({ time: rTime, comment: rComment });
+    syncPhase('END');
+    
+    setTimeout(() => {
+      if (onResult) onResult(score);
+    }, 2000);
+  }, [onResult]);
+
+  const handleShutter = useCallback(() => {
+    if (stateRef.current.phase !== 'PLAY' || stateRef.current.isFinished) return;
+    
+    stateRef.current.isFinished = true;
+    setIsFlash(true);
+    setIsShaking(false);
+
+    const isSuccess = stateRef.current.gameState === 'JUMPING';
+    let finalScore = 20;
+    let finalState = 'FAILED';
+    let rTime = null;
+    let comment = "너무 성급했습니다. 훼이크에 속았습니다.";
+
+    if (isSuccess) {
+      finalScore = 100;
+      finalState = 'SUCCESS';
+      const endTime = performance.now();
+      const timeDiff = (endTime - stateRef.current.attackStartTime) / 1000;
+      rTime = timeDiff.toFixed(3); 
+
+      if (rTime <= 0.200) comment = "인간을 초월한 속도입니다!";
+      else if (rTime <= 0.400) comment = "완벽한 타이밍입니다!";
+      else if (rTime <= 0.600) comment = "훌륭한 반응속도입니다.";
+      else comment = "아슬아슬하게 살아남았습니다...";
+    }
+
+    syncGameState(finalState);
+    setTimeout(() => {
+      setIsFlash(false);
+      handleFinish(finalScore, finalState, rTime, comment);
+    }, 300);
+  }, [handleFinish]);
+
+  useEffect(() => {
+    if (phase !== 'PLAY') return;
+
+    const timeouts = [];
+    const countdown = setInterval(() => {
+      setTimer(prev => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    const attackTime = Math.floor(Math.random() * 3000) + 5000;
+    const pool = [BGS.G1, BGS.G2, BGS.G3];
+    let selectedFakes = [];
+    const fakeCount = Math.random() > 0.5 ? 3 : 2;
+
+    if (fakeCount === 3) {
+      selectedFakes = [BGS.G1, BGS.G2, BGS.G3];
+    } else {
+      const skipIndex = Math.floor(Math.random() * 3);
+      selectedFakes = pool.filter((_, index) => index !== skipIndex); 
+    }
+
+    const windowStart = 1000; 
+    const windowEnd = attackTime - 800; 
+    const slice = (windowEnd - windowStart) / selectedFakes.length;
+
+    selectedFakes.forEach((bg, index) => {
+      const minTime = windowStart + (slice * index);
+      const maxTime = minTime + slice - 300;
+      const fakeTime = minTime + Math.random() * (maxTime - minTime);
+
+      const tFake = setTimeout(() => {
+        if (stateRef.current.isFinished) return;
+        syncGameState('FLICKERING');
+        setCurrentBG(bg);
+        const tRevert = setTimeout(() => {
+          if (!stateRef.current.isFinished && stateRef.current.gameState !== 'JUMPING') {
+            setCurrentBG(BGS.BASE);
+            syncGameState('LURKING');
+          }
+        }, 250);
+        timeouts.push(tRevert);
+      }, fakeTime);
+      timeouts.push(tFake);
+    });
+
+    const tAttack = setTimeout(() => {
+      if (stateRef.current.isFinished) return;
+      stateRef.current.attackStartTime = performance.now();
+      syncGameState('JUMPING');
+      setCurrentBG(BGS.REAL);
+      setIsShaking(true);
+      setIsAttackFlash(true);
+
+      const tFail = setTimeout(() => {
+        if (!stateRef.current.isFinished) {
+          handleFinish(0, 'FAILED', null, "반응이 너무 늦었습니다. 놈에게 잡혔습니다.");
+        }
+      }, 700);
+      timeouts.push(tFail);
+    }, attackTime);
+    
+    timeouts.push(tAttack);
+
+    return () => {
+      clearInterval(countdown);
+      timeouts.forEach(clearTimeout);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [isRunning, onResult]);
+  }, [phase, handleFinish]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (stateRef.current.phase === 'MANUAL' && (e.code === 'Space' || e.code === 'Enter')) startGame();
+      else if (stateRef.current.phase === 'PLAY' && e.key === 'ArrowUp') handleShutter();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleShutter]);
 
   return (
-    <div className={`stage2-placeholder stage2-placeholder--${mode}`}>
-      <div className="stage2-placeholder__icon">↑</div>
-      <div className="stage2-placeholder__title">Stage 2</div>
-      <div className="stage2-placeholder__note">팀원 작업 대기 중</div>
-      <div className="stage2-placeholder__bar">
-        <div
-          className="stage2-placeholder__bar-fill"
-          style={{ width: `${progress * 100}%` }}
-        />
+    <div className={`stage2-wrapper ${isShaking ? 'screen-shake' : ''} ${mode === 'split' ? 'split-mode' : ''}`}>
+      
+      <div 
+        className={`stage2-content ${phase === 'PLAY' ? 'camera-sway' : ''} ${gameState === 'FLICKERING' ? 'flicker-bright' : ''}`} 
+        style={{ backgroundImage: `url(${currentBG})` }} 
+      />
+      
+      <div className="camera-viewfinder" />
+      <div className={`attack-flash-overlay ${isAttackFlash ? 'active' : ''}`} />
+      <div className={`camera-flash ${isFlash ? 'active' : ''}`} />
+
+      <div className="stage2-ui-layer">
+        
+        {/* 💡 요청하신 첫 번째 이미지의 깔끔한 시작 문구만 복구 */}
+        {phase === 'MANUAL' && (
+          <div className="start-minimal">
+            <p className="start-btn-simple">Space / Enter를 눌러 시험을 시작합니다.</p>
+          </div>
+        )}
+
+        {phase === 'PLAY' && (
+          <div className="camera-hud">
+            <div className="hud-top">
+              <div className="rec-info"><div className="rec-dot" /><span>REC 00:00:{timer.toString().padStart(2, '0')}</span></div>
+              <div className="battery-box"><div className="battery-body"><div className="battery-level" /></div><div className="battery-tip" /></div>
+            </div>
+            <div className="focus-cross"><div className="cross-h" /><div className="cross-v" /></div>
+          </div>
+        )}
+
+        {phase === 'END' && (
+          <div className="final-message-overlay">
+            <div className={gameState === 'SUCCESS' ? 'msg-success' : 'msg-failed'}>
+              <h1 className="main-msg">{gameState === 'SUCCESS' ? "EVIDENCE CAPTURED" : "LOST IN DARKNESS"}</h1>
+              <p className="sub-msg">{reaction.comment}</p>
+              {reaction.time && <p className="reaction-time">REACTION TIME: {reaction.time}s</p>}
+            </div>
+            <p className="start-btn" style={{ marginTop: '40px' }}>메인 화면으로 돌아갑니다...</p>
+          </div>
+        )}
       </div>
     </div>
   );
