@@ -5,6 +5,14 @@ import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
+// 💡 1. 사운드 파일 경로 정의
+const SOUNDS = {
+  BGM: '/assets/sounds/stage2_bgm_static.mp3',         // 사아아 (루프)
+  FAKE: '/assets/sounds/stage2_sfx_glitch.mp3',        // 치지직 (훼이크)
+  REAL: '/assets/sounds/stage2_sfx_jumpscare.mp3',     // 콰아아앙 (진짜)
+  SHUTTER: '/assets/sounds/stage2_sfx_shutter.mp3',    // 찰칵
+};
+
 const BGS = {
   INFO: '/assets/images/bg_stage2_info.png',
   BASE: '/assets/images/bg_stage2_library.png',
@@ -42,12 +50,73 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     attackStartTime: 0 
   });
 
+  // 💡 2. 오디오 객체들을 담아둘 Ref
+  const audioRefs = useRef({
+    bgm: null,
+    fake: null,
+    real: null,
+    shutter: null,
+  });
+
+  // 🚀 [추가] 0.2초 딜레이 소리를 취소하기 위한 전용 Ref
+  const jumpscareAudioTimeoutRef = useRef(null);
+
   const syncPhase = (p) => { stateRef.current.phase = p; setPhase(p); };
   const syncGameState = (g) => { stateRef.current.gameState = g; setGameState(g); };
 
+  // 💡 3. 컴포넌트 마운트 시 오디오 객체 및 이미지 프리로드
   useEffect(() => {
     Object.values(BGS).forEach(src => { const img = new Image(); img.src = src; });
+
+    audioRefs.current.bgm = new Audio(SOUNDS.BGM);
+    audioRefs.current.bgm.loop = true; 
+    audioRefs.current.fake = new Audio(SOUNDS.FAKE);
+    audioRefs.current.real = new Audio(SOUNDS.REAL);
+    audioRefs.current.shutter = new Audio(SOUNDS.SHUTTER);
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        if (audio) { audio.pause(); audio.currentTime = 0; }
+      });
+      // 🚀 [추가] 언마운트 시 예약된 점프스케어 타이머도 취소
+      if (jumpscareAudioTimeoutRef.current) {
+        clearTimeout(jumpscareAudioTimeoutRef.current);
+      }
+    };
   }, []);
+
+  // 💡 4. 안전하게 소리를 재생하는 헬퍼 함수 
+  const playSound = useCallback((type, volume = 1.0, durationMs = null) => {
+    const audio = audioRefs.current[type];
+    if (audio) {
+      audio.currentTime = 0; 
+      audio.volume = volume;
+      audio.play().catch(() => {}); 
+
+      if (durationMs) {
+        setTimeout(() => {
+          if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+        }, durationMs);
+      }
+    }
+  }, []);
+
+  // 💡 5. 페이즈에 따른 BGM(사아아) 제어
+  useEffect(() => {
+    const bgm = audioRefs.current.bgm;
+    if (!bgm) return;
+
+    if (phase === 'PLAY' && isRunning) {
+      bgm.volume = 0.5; 
+      bgm.currentTime = 86; // 1분 26초부터 재생 시작
+      bgm.play().catch(() => {});
+    } else {
+      bgm.pause();
+    }
+  }, [phase, isRunning]);
 
   useEffect(() => {
     if (mode === 'split' && isRunning && stateRef.current.phase === 'MANUAL') {
@@ -79,6 +148,12 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     setResultScore(scoreFromMetric(2, metric));
     syncPhase('END');
 
+    // 🚀 [추가] 게임 종료 시 몬스터 소리 완전 정지
+    if (audioRefs.current.real) {
+      audioRefs.current.real.pause();
+      audioRefs.current.real.currentTime = 0;
+    }
+
     setTimeout(() => {
       if (onResult) onResult(metric);
     }, 2000);
@@ -86,6 +161,19 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
   const handleShutter = useCallback(() => {
     if (stateRef.current.phase !== 'PLAY' || stateRef.current.isFinished) return;
+
+    // 🚀 [추가] 1. 셔터 누르는 순간 몬스터 소리가 재생 중이면 즉시 정지
+    if (audioRefs.current.real) {
+      audioRefs.current.real.pause();
+      audioRefs.current.real.currentTime = 0;
+    }
+    // 🚀 [추가] 2. 아직 0.2초가 안 지나서 소리가 나기 전이라면, 예약된 재생 취소
+    if (jumpscareAudioTimeoutRef.current) {
+      clearTimeout(jumpscareAudioTimeoutRef.current);
+    }
+
+    // 💡 셔터음 재생 (찰칵!)
+    playSound('shutter', 1.0,500);
 
     stateRef.current.isFinished = true;
     setIsFlash(true);
@@ -107,7 +195,6 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       rTime = reactionSec.toFixed(3);
       comment = TIER_COMMENT[tier.id] ?? tier.label;
     } else {
-      // fake 캐치 — reaction time 정의 안 됨, bare tier 직행
       const bareTier = STAGE2_CONFIG.accuracyTiers.find((t) => t.id === 'bare');
       finalMetric = metricFromPoints(bareTier.points, STAGE2_CONFIG);
       finalState = 'FAILED';
@@ -120,7 +207,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       setIsFlash(false);
       handleFinish(finalMetric, finalState, finalTier, rTime, comment);
     }, 300);
-  }, [handleFinish]);
+  }, [handleFinish, playSound]);
 
   useEffect(() => {
     if (phase !== 'PLAY') return;
@@ -155,6 +242,10 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
         if (stateRef.current.isFinished) return;
         syncGameState('FLICKERING');
         setCurrentBG(bg);
+        
+        // 💡 훼이크 이미지 등장 시 효과음 재생 (치지직! 0.4초간)
+        playSound('fake', 0.8, 400);
+
         const tRevert = setTimeout(() => {
           if (!stateRef.current.isFinished && stateRef.current.gameState !== 'JUMPING') {
             setCurrentBG(BGS.BASE);
@@ -173,6 +264,18 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       setCurrentBG(BGS.REAL);
       setIsShaking(true);
       setIsAttackFlash(true);
+      
+      jumpscareAudioTimeoutRef.current = setTimeout(() => {
+        if (!stateRef.current.isFinished) {
+          const realAudio = audioRefs.current.real;
+          if (realAudio) {
+            // 🚀 파일의 0.5초(공백이 끝나는 지점)부터 바로 쾅! 터지게 설정
+            realAudio.currentTime = 0.5; 
+            realAudio.volume = 1.0;
+            realAudio.play().catch(() => {});
+          }
+        }
+      }, );
 
       const tFail = setTimeout(() => {
         if (!stateRef.current.isFinished) {
@@ -190,7 +293,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       clearInterval(countdown);
       timeouts.forEach(clearTimeout);
     };
-  }, [phase, handleFinish]);
+  }, [phase, handleFinish, playSound]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -215,7 +318,6 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
       <div className="stage2-ui-layer">
         
-        {/* 💡 요청하신 첫 번째 이미지의 깔끔한 시작 문구만 복구 */}
         {phase === 'MANUAL' && (
           <div className="start-minimal">
             <p className="start-btn-simple">Space / Enter를 눌러 시험을 시작합니다.</p>

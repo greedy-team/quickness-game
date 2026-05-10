@@ -5,6 +5,9 @@ import { STAGE1_CONFIG } from './stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
 
+// 💡 경로 앞에 /를 붙여서 public 폴더 기준임을 명시
+const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
+
 const STAGE1_STORY = [
   "평화롭던 일상이 무너졌습니다. 나와 똑같은 얼굴을 한 '가짜'가 내 삶을 훔치려 합니다.",
   "당황하는 순간 주도권은 도플갱어에게 넘어갑니다. 평정심을 유지하며 놈의 주파수를 차단해야 합니다."
@@ -26,10 +29,24 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
   const [resultTier, setResultTier] = useState(null);
   const [resultScore, setResultScore] = useState(0);
+  
   const startTimeRef = useRef(0);
   const requestRef = useRef();
+  
+  // 💡 오디오 객체를 안전하게 한 번만 생성
+  const bgmRef = useRef(null);
+  useEffect(() => {
+    bgmRef.current = new Audio(BGM_PATH);
+    bgmRef.current.loop = true;
+    
+    return () => {
+      if (bgmRef.current) {
+        bgmRef.current.pause();
+        bgmRef.current = null;
+      }
+    };
+  }, []);
 
-  // ── 배경 이미지 결정 로직 ──
   const getBackgroundImage = () => {
     if (phase === 'END') return null; 
     if (phase === 'MANUAL') return '/assets/images/bg_stage1_info.png';
@@ -43,11 +60,9 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   const bgImage = getBackgroundImage();
   const bgStyle = bgImage ? { backgroundImage: `url(${bgImage})` } : {};
 
-  // ── 시간 포맷 변환 ──
   const formatTime = (elapsed) => {
     const totalSec = 50 + elapsed; 
     let hourMin, secMs;
-    
     if (totalSec < 60) {
       hourMin = "11:59:";
       secMs = `${Math.floor(totalSec).toString().padStart(2, '0')}${(totalSec % 1).toFixed(2).substring(1)}`;
@@ -56,13 +71,18 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
       hourMin = "12:00:";
       secMs = `${Math.floor(overSec).toString().padStart(2, '0')}${(overSec % 1).toFixed(2).substring(1)}`;
     }
-    
-    return (
-      <>
-        <span className="hour-min-text">{hourMin}</span>{secMs}
-      </>
-    );
+    return <><span className="hour-min-text">{hourMin}</span>{secMs}</>;
   };
+
+  // 💡 BGM 제어 로직 최적화 (상태 변화 시 정지만 담당)
+  useEffect(() => {
+    if (phase !== 'CHIMING' || !isRunning) {
+      if (bgmRef.current) {
+        bgmRef.current.pause();
+        bgmRef.current.currentTime = 0;
+      }
+    }
+  }, [phase, isRunning]);
 
   const animate = () => {
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
@@ -96,9 +116,18 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
     return () => cancelAnimationFrame(requestRef.current);
   }, [phase, isRunning]);
 
+  // 💡 입력 처리: 0.1초 딜레이 제거 및 재생 안정화
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (phase === 'MANUAL' && (e.code === 'Space' || e.code === 'Enter')) {
+        const bgm = bgmRef.current;
+        if (bgm) {
+          bgm.currentTime = 0.1;
+          bgm.volume = 0.7;
+          // play() 성공 여부를 확인하지 않고 그냥 실행하여 지연 최소화
+          bgm.playbackRate = 1.15;
+          bgm.play().catch(() => {}); 
+        }
         setPhase('CHIMING');
       }
       if (e.key === 'ArrowLeft' && phase === 'CHIMING') {
@@ -112,7 +141,6 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   return (
     <div className="stage-wrapper">
       <div className="stage1-bg" style={bgStyle} />
-      
       <div className={`eye-lid top ${isEyesClosed ? 'closed' : ''}`} />
       <div className={`eye-lid bottom ${isEyesClosed ? 'closed' : ''}`} />
 
@@ -124,7 +152,6 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
         />
       )}
 
-      {/* ── 🛠️ MANUAL 단계: 위치 및 배경 수정 반영 ── */}
       {phase === 'MANUAL' && (
         <div className="manual-overlay">
           <p className="start-instruction">Space / Enter를 눌러 시험을 시작합니다.</p>
@@ -133,10 +160,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
       {phase === 'CHIMING' && (
         <div className="led-clock-view">
-          <h1 className={`led-timer ${
-            currentTime > 8.00 ? 'off' : 
-            currentTime > 7.00 ? 'flicker' : ''
-          }`}>
+          <h1 className={`led-timer ${currentTime > 8.00 ? 'off' : currentTime > 7.00 ? 'flicker' : ''}`}>
             {formatTime(currentTime)}
           </h1>
           <p className={`target-hint ${currentTime > 8.00 ? 'off' : ''}`}>TARGET : 12:00:00.00</p>
@@ -150,9 +174,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
               <h1 className="result-val">{formatTime(finalResultTime)}</h1>
               <span className="result-label">MEASURED TIME</span>
             </div>
-            <p className="result-story-text">
-              {resultTier ? TIER_COMMENT[resultTier.id] : ''}
-            </p>
+            <p className="result-story-text">{resultTier ? TIER_COMMENT[resultTier.id] : ''}</p>
             <p className="result-score">+{resultScore}점</p>
             <div className="loading-bar-wrap"><div className="loading-bar-inner" /></div>
           </div>
