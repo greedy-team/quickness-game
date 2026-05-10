@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import './WarningModal.css';
 
 const WARNING_ITEMS = [
   '점프스케어와 갑작스러운 큰 효과음이 나옵니다',
@@ -15,16 +16,30 @@ export default function WarningModal({ onAgree }) {
   }, []);
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="warning-modal-title">
-      <div>
-        <h2 id="warning-modal-title">⚠ 시작 전 안내</h2>
-        <p>본 게임은 공포 콘텐츠를 포함합니다.</p>
-        <ul>
+    <div
+      className="warning-modal__backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="warning-modal-title"
+    >
+      <div className="warning-modal__card">
+        <h2 id="warning-modal-title" className="warning-modal__title">
+          ⚠ 시작 전 안내
+        </h2>
+        <p className="warning-modal__intro">본 게임은 공포 콘텐츠를 포함합니다.</p>
+        <ul className="warning-modal__list">
           {WARNING_ITEMS.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <button ref={buttonRef} type="button" onClick={onAgree}>동의하고 시작</button>
+        <button
+          ref={buttonRef}
+          type="button"
+          className="warning-modal__agree-btn"
+          onClick={onAgree}
+        >
+          동의하고 시작
+        </button>
       </div>
     </div>
   );
