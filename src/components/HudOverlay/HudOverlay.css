@@ -8,13 +8,60 @@
 .hud-overlay__score,
 .hud-overlay__progress {
   position: absolute;
-  bottom: 16px;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
+  bottom: 22px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
 }
 
-.hud-overlay__score    { left: 24px; }
-.hud-overlay__progress { right: 24px; }
+.hud-overlay__score {
+  left: 28px;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 204, 0, 0.08);
+  border: 1px solid rgba(255, 204, 0, 0.45);
+  color: #ffcc00;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 4px;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.12);
+}
+
+.hud-overlay__score::after {
+  content: "▾";
+  font-size: 0.85em;
+  color: rgba(255, 204, 0, 0.85);
+  letter-spacing: 0;
+  margin-left: 2px;
+  transform: translateY(-1px);
+}
+
+.hud-overlay__score:hover {
+  background: rgba(255, 204, 0, 0.18);
+  border-color: rgba(255, 204, 0, 0.8);
+  box-shadow: 0 0 18px rgba(255, 204, 0, 0.28);
+  transform: translateY(-1px);
+}
+
+.hud-overlay__score:active {
+  transform: translateY(0);
+}
+
+.hud-overlay__score:focus-visible {
+  outline: 2px solid rgba(255, 204, 0, 0.85);
+  outline-offset: 3px;
+}
+
+.hud-overlay__progress {
+  right: 28px;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.92);
+}
