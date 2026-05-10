@@ -63,3 +63,59 @@
   0%, 100% { opacity: 0.1; filter: blur(2px); }
   50% { opacity: 0.9; filter: blur(0px); }
 }
+
+/* ── 결과 오버레이 (병렬 모드 종료 후 결과 표시) ── */
+/* 결과 표시 중 pane 전체 backdrop — 배경 이미지/시계 가림 */
+.s4-timer-pane:has(.s4-result-overlay)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.s4-result-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  padding: 22px 28px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #444;
+  text-align: center;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+}
+
+.s4-result-tier {
+  font-size: 1.35rem;
+  color: #ddd;
+  margin: 0 0 14px 0;
+  word-break: keep-all;
+  line-height: 1.4;
+}
+
+.s4-result-time {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.6rem;
+  color: #ffcc00;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.s4-result-time .s4-hour-min {
+  font-size: 0.7em;
+  opacity: 0.8;
+  margin-right: 4px;
+}
+
+.s4-result-score {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.2rem;
+  color: #ffcc00;
+  font-weight: bold;
+  margin: 10px 0 0 0;
+  text-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
+}
