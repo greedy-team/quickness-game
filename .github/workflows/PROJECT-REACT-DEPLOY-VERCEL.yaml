@@ -1,0 +1,56 @@
+name: 🚀 Deploy to Vercel
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  push:
+    branches: [deploy]
+  workflow_dispatch:
+
+jobs:
+  Deploy-Production:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔨 Build (Vite)
+        run: npm run build
+
+      - name: ☁️ Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: 🚀 Deploy to Vercel Production
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | grep -oE "https://[^[:space:]]*\.vercel\.app" | tail -1)
+          echo "deployment_url=${URL}" >> $GITHUB_OUTPUT
+
+      - name: 📋 Deployment Summary
+        if: always()
+        run: |
+          echo "## 🚀 quickness-game 배포 결과" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ **배포 성공**" >> $GITHUB_STEP_SUMMARY
+            echo "- 🌐 **URL**: ${{ steps.deploy.outputs.deployment_url }}" >> $GITHUB_STEP_SUMMARY
+            echo "- 📅 **시간**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **빌드 또는 배포 실패**" >> $GITHUB_STEP_SUMMARY
+            echo "- 커밋: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- 브랜치: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Actions 탭에서 'Build (Vite)' 스텝 로그를 확인하세요." >> $GITHUB_STEP_SUMMARY
+          fi
