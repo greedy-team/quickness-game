@@ -147,8 +147,16 @@ export default function Stage3Field({ isRunning, onResult }) {
         const maxPossible = config.realCount * config.accuracyTiers[0].points;
         const ratio = Math.max(0, Math.min(1, totalPointsRef.current / maxPossible));
         const metric = 1 - ratio;
+        const caughtCount = itemsRef.current.filter(
+          (it) => it.kind === 'real' && it.status === 'caught'
+        ).length;
         cancelAnimationFrame(rafRef.current);
-        onResult(metric);
+        onResult({
+          metric,
+          caughtCount,
+          realCount: config.realCount,
+          totalScore: totalPointsRef.current,
+        });
         return;
       }
 

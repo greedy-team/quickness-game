@@ -1,0 +1,13 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - button "STAGE 1" [ref=e6] [cursor=pointer]:
+      - generic [ref=e7]: STAGE 1
+    - button "STAGE 2" [ref=e9] [cursor=pointer]:
+      - generic [ref=e10]: STAGE 2
+    - button "STAGE 3" [ref=e12] [cursor=pointer]:
+      - generic [ref=e13]: STAGE 3
+    - button "FINAL STAGE" [disabled] [ref=e15]:
+      - generic [ref=e16]: FINAL STAGE
+  - generic:
+    - button "점수 기준 보기" [ref=e18] [cursor=pointer]: SCORE 0 ▾
+    - generic: 0 / 4

@@ -85,6 +85,7 @@
 .msg-failed .main-msg { color: #ff3333; text-shadow: 0 0 20px #ff3333; }
 .sub-msg { font-size: 1.2rem; color: #aaa; }
 .reaction-time { font-family: 'Courier New', Courier, monospace; font-size: 1.8rem; color: #ffcc00; margin-top: 15px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); animation: pop-in 0.5s ease-out; }
+.result-score { font-family: 'Courier New', Courier, monospace; font-size: 2rem; color: #ffcc00; margin-top: 12px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 12px rgba(255, 204, 0, 0.6); animation: pop-in 0.6s ease-out; }
 
 @keyframes pop-in { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes rec-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -97,3 +98,8 @@
 .stage2-wrapper.split-mode .rec-info { font-size: 1.2rem; }
 .stage2-wrapper.split-mode .battery-body { width: 25px; height: 14px; }
 .stage2-wrapper.split-mode .start-btn-simple { font-size: 0.9rem; }
+
+.stage2-wrapper.split-mode .stage2-ui-layer {
+  padding: 8px;
+  box-sizing: border-box;
+}

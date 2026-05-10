@@ -1,13 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Stage2Placeholder.css';
+import { STAGE2_CONFIG } from './stage2.config.js';
+import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
+import { scoreFromMetric } from '../../scoring.js';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 const BGS = {
   INFO: '/assets/images/bg_stage2_info.png',
   BASE: '/assets/images/bg_stage2_library.png',
-  G1: '/assets/images/bg_stage2_library_greenie1.png', 
-  G2: '/assets/images/bg_stage2_library_greenie2.png', 
-  G3: '/assets/images/bg_stage2_library_greenie3.png', 
-  REAL: '/assets/images/greenie_real.png',             
+  G1: '/assets/images/bg_stage2_library_greenie1.png',
+  G2: '/assets/images/bg_stage2_library_greenie2.png',
+  G3: '/assets/images/bg_stage2_library_greenie3.png',
+  REAL: '/assets/images/greenie_real.png',
+};
+
+const TIER_COMMENT = {
+  perfect: '인간을 초월한 속도입니다!',
+  great:   '완벽한 타이밍입니다.',
+  good:    '훌륭한 반응속도입니다.',
+  ok:      '간신히 셔터를 눌렀습니다.',
+  bare:    '간발의 차이로 놓쳤습니다.',
 };
 
 export default function Stage2Placeholder({ onResult, isRunning, mode }) {
@@ -20,6 +32,8 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   const [isShaking, setIsShaking] = useState(false);
   
   const [reaction, setReaction] = useState({ time: null, comment: "" });
+  const [resultTier, setResultTier] = useState(null);
+  const [resultScore, setResultScore] = useState(0);
 
   const stateRef = useRef({
     phase: 'MANUAL',
@@ -55,49 +69,56 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     setReaction({ time: null, comment: "" });
   };
 
-  const handleFinish = useCallback((score, endState, rTime = null, rComment = "") => {
+  const handleFinish = useCallback((metric, endState, tier, rTime = null, rComment = "") => {
     stateRef.current.isFinished = true;
     syncGameState(endState);
     setIsShaking(false);
-    
+
     setReaction({ time: rTime, comment: rComment });
+    setResultTier(tier);
+    setResultScore(scoreFromMetric(2, metric));
     syncPhase('END');
-    
+
     setTimeout(() => {
-      if (onResult) onResult(score);
+      if (onResult) onResult(metric);
     }, 2000);
   }, [onResult]);
 
   const handleShutter = useCallback(() => {
     if (stateRef.current.phase !== 'PLAY' || stateRef.current.isFinished) return;
-    
+
     stateRef.current.isFinished = true;
     setIsFlash(true);
     setIsShaking(false);
 
     const isSuccess = stateRef.current.gameState === 'JUMPING';
-    let finalScore = 20;
-    let finalState = 'FAILED';
+    let finalMetric;
+    let finalState;
+    let finalTier;
     let rTime = null;
-    let comment = "너무 성급했습니다. 훼이크에 속았습니다.";
+    let comment;
 
     if (isSuccess) {
-      finalScore = 100;
+      const reactionSec = (performance.now() - stateRef.current.attackStartTime) / 1000;
+      const { tier, points } = pointsForError(reactionSec, STAGE2_CONFIG);
+      finalMetric = metricFromPoints(points, STAGE2_CONFIG);
       finalState = 'SUCCESS';
-      const endTime = performance.now();
-      const timeDiff = (endTime - stateRef.current.attackStartTime) / 1000;
-      rTime = timeDiff.toFixed(3); 
-
-      if (rTime <= 0.200) comment = "인간을 초월한 속도입니다!";
-      else if (rTime <= 0.400) comment = "완벽한 타이밍입니다!";
-      else if (rTime <= 0.600) comment = "훌륭한 반응속도입니다.";
-      else comment = "아슬아슬하게 살아남았습니다...";
+      finalTier = tier;
+      rTime = reactionSec.toFixed(3);
+      comment = TIER_COMMENT[tier.id] ?? tier.label;
+    } else {
+      // fake 캐치 — reaction time 정의 안 됨, bare tier 직행
+      const bareTier = STAGE2_CONFIG.accuracyTiers.find((t) => t.id === 'bare');
+      finalMetric = metricFromPoints(bareTier.points, STAGE2_CONFIG);
+      finalState = 'FAILED';
+      finalTier = bareTier;
+      comment = '너무 성급했습니다. 훼이크에 속았습니다.';
     }
 
     syncGameState(finalState);
     setTimeout(() => {
       setIsFlash(false);
-      handleFinish(finalScore, finalState, rTime, comment);
+      handleFinish(finalMetric, finalState, finalTier, rTime, comment);
     }, 300);
   }, [handleFinish]);
 
@@ -155,9 +176,11 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
       const tFail = setTimeout(() => {
         if (!stateRef.current.isFinished) {
-          handleFinish(0, 'FAILED', null, "반응이 너무 늦었습니다. 놈에게 잡혔습니다.");
+          const bareTier = STAGE2_CONFIG.accuracyTiers.find((t) => t.id === 'bare');
+          const metric = metricFromPoints(bareTier.points, STAGE2_CONFIG);
+          handleFinish(metric, 'FAILED', bareTier, null, "반응이 너무 늦었습니다. 놈에게 잡혔습니다.");
         }
-      }, 700);
+      }, STAGE2_CONFIG.attackWindowMs);
       timeouts.push(tFail);
     }, attackTime);
     
@@ -209,17 +232,29 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
         )}
 
-        {phase === 'END' && (
+        {phase === 'END' && mode !== 'split' && (
           <div className="final-message-overlay">
-            <div className={gameState === 'SUCCESS' ? 'msg-success' : 'msg-failed'}>
-              <h1 className="main-msg">{gameState === 'SUCCESS' ? "EVIDENCE CAPTURED" : "LOST IN DARKNESS"}</h1>
+            <div className={resultTier && resultTier.id !== 'bare' ? 'msg-success' : 'msg-failed'}>
+              <h1 className="main-msg">{resultTier && resultTier.id !== 'bare' ? "EVIDENCE CAPTURED" : "LOST IN DARKNESS"}</h1>
               <p className="sub-msg">{reaction.comment}</p>
               {reaction.time && <p className="reaction-time">REACTION TIME: {reaction.time}s</p>}
+              <p className="result-score">+{resultScore}점</p>
             </div>
             <p className="start-btn" style={{ marginTop: '40px' }}>메인 화면으로 돌아갑니다...</p>
           </div>
         )}
       </div>
+
+      {phase === 'END' && mode === 'split' && resultTier && (
+        <ResultModal
+          headline={resultTier.id !== 'bare' ? 'EVIDENCE CAPTURED' : 'LOST IN DARKNESS'}
+          tierComment={reaction.comment}
+          metricLabel={reaction.time ? 'REACTION TIME' : null}
+          metricValue={reaction.time ? `${reaction.time}s` : null}
+          score={resultScore}
+          tone={resultTier.id !== 'bare' ? 'success' : 'failed'}
+        />
+      )}
     </div>
   );
 }

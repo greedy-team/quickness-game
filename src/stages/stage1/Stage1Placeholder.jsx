@@ -1,18 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Stage1Placeholder.css';
 import DialogueBox from '../../components/DialogueBox/DialogueBox';
+import { STAGE1_CONFIG } from './stage1.config.js';
+import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
+import { scoreFromMetric } from '../../scoring.js';
 
 const STAGE1_STORY = [
   "평화롭던 일상이 무너졌습니다. 나와 똑같은 얼굴을 한 '가짜'가 내 삶을 훔치려 합니다.",
   "당황하는 순간 주도권은 도플갱어에게 넘어갑니다. 평정심을 유지하며 놈의 주파수를 차단해야 합니다."
 ];
 
+const TIER_COMMENT = {
+  perfect: '완벽한 정각. 도플갱어의 주파수가 끊어졌습니다.',
+  great:   '거의 정확한 타이밍. 가짜의 형체가 흐려집니다.',
+  good:    '준수한 타이밍. 도플갱어를 잠시 밀어냈습니다.',
+  ok:      '간발의 차이로 도플갱어를 막아냈습니다.',
+  bare:    '타이밍이 어긋났습니다. 도플갱어와 눈이 마주쳤습니다.',
+};
+
 export default function Stage1Placeholder({ mode = 'standalone', isRunning = true, onResult }) {
-  const [phase, setPhase] = useState('STORY'); 
-  const [currentTime, setCurrentTime] = useState(0.00); 
+  const [phase, setPhase] = useState('STORY');
+  const [currentTime, setCurrentTime] = useState(0.00);
   const [finalResultTime, setFinalResultTime] = useState(0.00);
   const [isEyesClosed, setIsEyesClosed] = useState(false);
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
+  const [resultTier, setResultTier] = useState(null);
+  const [resultScore, setResultScore] = useState(0);
   const startTimeRef = useRef(0);
   const requestRef = useRef();
 
@@ -53,7 +66,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
   const animate = () => {
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
-    if (elapsed <= 11.5) {
+    if (elapsed <= STAGE1_CONFIG.timeoutSec) {
       setCurrentTime(elapsed);
       requestRef.current = requestAnimationFrame(animate);
     } else {
@@ -64,12 +77,15 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   const handleFinish = (time) => {
     cancelAnimationFrame(requestRef.current);
     setFinalResultTime(time);
-    setIsEyesClosed(true); 
+    setIsEyesClosed(true);
     setPhase('END');
-    
-    const diff = Math.abs(time - 10.00);
-    let score = (diff <= 0.05) ? 100 : (diff <= 0.1) ? 80 : (diff <= 0.2) ? 60 : 20;
-    setTimeout(() => { if (onResult) onResult(score); }, 4500);
+
+    const error = Math.abs(time - STAGE1_CONFIG.targetSec);
+    const { tier, points } = pointsForError(error, STAGE1_CONFIG);
+    setResultTier(tier);
+    const metric = metricFromPoints(points, STAGE1_CONFIG);
+    setResultScore(scoreFromMetric(1, metric));
+    setTimeout(() => { if (onResult) onResult(metric); }, 4500);
   };
 
   useEffect(() => {
@@ -135,10 +151,9 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
               <span className="result-label">MEASURED TIME</span>
             </div>
             <p className="result-story-text">
-              {Math.abs(finalResultTime - 10.00) <= 0.1 
-                ? `정확히 12시 정각. 도플갱어의 주파수를 완벽히 차단했습니다. 가짜의 형체가 일그러집니다.` 
-                : `타이밍이 어긋났습니다. 도플갱어와 눈이 마주쳤습니다.`}
+              {resultTier ? TIER_COMMENT[resultTier.id] : ''}
             </p>
+            <p className="result-score">+{resultScore}점</p>
             <div className="loading-bar-wrap"><div className="loading-bar-inner" /></div>
           </div>
         </div>

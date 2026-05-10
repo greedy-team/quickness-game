@@ -48,6 +48,13 @@
   margin-right: 0.8vw;
 }
 
+/* ResultModal 안의 MEASURED TIME 표시에서는 시·분 prefix(11:59:)를 더 크게 */
+.result-modal__metric .s4-hour-min {
+  font-size: 0.85em;
+  opacity: 0.9;
+  margin-right: 6px;
+}
+
 /* 7초 깜빡임 */
 .s4-timer-display.flicker {
   animation: s4-aggressive-flicker 0.1s infinite;
@@ -63,3 +70,4 @@
   0%, 100% { opacity: 0.1; filter: blur(2px); }
   50% { opacity: 0.9; filter: blur(0px); }
 }
+
