@@ -1,6 +1,8 @@
 // src/routes/stage4/Stage4TimerPane.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import './Stage4TimerPane.css';
+import { STAGE1_CONFIG } from '../stage1/stage1.config.js';
+import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 
 export default function Stage4TimerPane({ isRunning, onResult }) {
   const [currentTime, setCurrentTime] = useState(0.00);
@@ -26,7 +28,7 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
 
   const animate = () => {
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
-    if (elapsed <= 11.5) {
+    if (elapsed <= STAGE1_CONFIG.timeoutSec) {
       setCurrentTime(elapsed);
       requestRef.current = requestAnimationFrame(animate);
     } else {
@@ -36,9 +38,10 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
 
   const handleFinish = (time) => {
     cancelAnimationFrame(requestRef.current);
-    const diff = Math.abs(time - 10.00);
-    let score = (diff <= 0.05) ? 100 : (diff <= 0.1) ? 80 : (diff <= 0.2) ? 60 : 20;
-    if (onResult) onResult(score);
+    const error = Math.abs(time - STAGE1_CONFIG.targetSec);
+    const { points } = pointsForError(error, STAGE1_CONFIG);
+    const metric = metricFromPoints(points, STAGE1_CONFIG);
+    if (onResult) onResult(metric);
   };
 
   useEffect(() => {
