@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const WARNING_ITEMS = [
   '점프스케어와 갑작스러운 큰 효과음이 나옵니다',
@@ -8,6 +8,12 @@ const WARNING_ITEMS = [
 ];
 
 export default function WarningModal({ onAgree }) {
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    buttonRef.current?.focus();
+  }, []);
+
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="warning-modal-title">
       <div>
@@ -18,7 +24,7 @@ export default function WarningModal({ onAgree }) {
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <button type="button" onClick={onAgree}>동의하고 시작</button>
+        <button ref={buttonRef} type="button" onClick={onAgree}>동의하고 시작</button>
       </div>
     </div>
   );

@@ -20,4 +20,9 @@ describe('WarningModal', () => {
     await user.click(screen.getByRole('button', { name: /동의하고 시작/ }));
     expect(onAgree).toHaveBeenCalledTimes(1);
   });
+
+  it('마운트 시 동의 버튼에 자동 포커스된다', () => {
+    render(<WarningModal onAgree={() => {}} />);
+    expect(screen.getByRole('button', { name: /동의하고 시작/ })).toHaveFocus();
+  });
 });
