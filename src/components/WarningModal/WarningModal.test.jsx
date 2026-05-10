@@ -25,4 +25,12 @@ describe('WarningModal', () => {
     render(<WarningModal onAgree={() => {}} />);
     expect(screen.getByRole('button', { name: /동의하고 시작/ })).toHaveFocus();
   });
+
+  it('ESC 키를 눌러도 onAgree가 호출되지 않는다', async () => {
+    const onAgree = vi.fn();
+    const user = userEvent.setup();
+    render(<WarningModal onAgree={onAgree} />);
+    await user.keyboard('{Escape}');
+    expect(onAgree).not.toHaveBeenCalled();
+  });
 });
