@@ -102,6 +102,15 @@
 
 .result-val { font-size: 8rem; color: #ff0000; font-weight: bold; text-shadow: 0 0 30px #ff0000; }
 .result-story-text { font-size: 1.6rem; color: #ddd; margin-top: 25px; max-width: 800px; line-height: 1.6; word-break: keep-all; }
+.result-score {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.4rem;
+  color: #ffcc00;
+  text-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
+  margin-top: 18px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
 
 .loading-bar-wrap { width: 100%; height: 3px; background: #222; margin-top: 45px; }
 .loading-bar-inner { width: 0; height: 100%; background: #ff0000; animation: load 4.5s linear forwards; }
