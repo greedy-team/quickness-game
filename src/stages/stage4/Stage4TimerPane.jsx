@@ -4,6 +4,7 @@ import './Stage4TimerPane.css';
 import { STAGE1_CONFIG } from '../stage1/stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 const TIER_COMMENT = {
   perfect: '완벽한 정각. 도플갱어의 주파수가 끊어졌습니다.',
@@ -110,11 +111,13 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
       </div>
 
       {phase === 'end' && resultTier && (
-        <div className="s4-result-overlay">
-          <p className="s4-result-tier">{TIER_COMMENT[resultTier.id]}</p>
-          <p className="s4-result-time">MEASURED TIME: {formatTime(finalTime)}</p>
-          <p className="s4-result-score">+{resultScore}점</p>
-        </div>
+        <ResultModal
+          tierComment={TIER_COMMENT[resultTier.id]}
+          metricLabel="MEASURED TIME"
+          metricValue={formatTime(finalTime)}
+          score={resultScore}
+          tone={resultTier.id === 'bare' ? 'failed' : 'success'}
+        />
       )}
     </div>
   );

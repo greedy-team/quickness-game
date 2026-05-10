@@ -99,41 +99,7 @@
 .stage2-wrapper.split-mode .battery-body { width: 25px; height: 14px; }
 .stage2-wrapper.split-mode .start-btn-simple { font-size: 0.9rem; }
 
-/* ── split 모드: 결과 모달이 pane 경계 안에 머무르도록 스케일/클리핑 ── */
 .stage2-wrapper.split-mode .stage2-ui-layer {
   padding: 8px;
   box-sizing: border-box;
-}
-/* 결과 모달이 떠 있을 때 pane 전체를 완전히 검게 가림 (stage1 좌측 pane과 동일 처리) */
-.stage2-wrapper.split-mode .stage2-ui-layer:has(.final-message-overlay) {
-  background: #000;
-}
-.stage2-wrapper.split-mode .final-message-overlay {
-  padding: 22px 28px;
-  max-width: calc(100% - 16px);
-  box-sizing: border-box;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.6);
-}
-.stage2-wrapper.split-mode .main-msg {
-  font-size: 1.7rem;
-  letter-spacing: 3px;
-  margin-bottom: 14px;
-  word-break: keep-all;
-}
-.stage2-wrapper.split-mode .sub-msg {
-  font-size: 1rem;
-  line-height: 1.4;
-}
-.stage2-wrapper.split-mode .reaction-time {
-  font-size: 1.3rem;
-  margin-top: 12px;
-}
-.stage2-wrapper.split-mode .result-score {
-  font-size: 2rem;
-  margin-top: 10px;
-}
-/* "메인 화면으로 돌아갑니다…" 메시지는 병렬 진행 중에는 부정확하므로 숨김 */
-.stage2-wrapper.split-mode .final-message-overlay .start-btn {
-  display: none;
 }

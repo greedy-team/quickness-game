@@ -2,7 +2,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 20;
+  /* ResultModal의 backdrop(z-index 200)보다 위로 올려야 머징 단계에서 모달도 함께 어두워짐 */
+  z-index: 300;
   background-color: rgba(0, 0, 0, 0);
   background-image: radial-gradient(
     circle at center,

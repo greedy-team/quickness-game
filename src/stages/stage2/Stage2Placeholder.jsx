@@ -3,6 +3,7 @@ import './Stage2Placeholder.css';
 import { STAGE2_CONFIG } from './stage2.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 const BGS = {
   INFO: '/assets/images/bg_stage2_info.png',
@@ -231,7 +232,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
         )}
 
-        {phase === 'END' && (
+        {phase === 'END' && mode !== 'split' && (
           <div className="final-message-overlay">
             <div className={resultTier && resultTier.id !== 'bare' ? 'msg-success' : 'msg-failed'}>
               <h1 className="main-msg">{resultTier && resultTier.id !== 'bare' ? "EVIDENCE CAPTURED" : "LOST IN DARKNESS"}</h1>
@@ -243,6 +244,17 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
         )}
       </div>
+
+      {phase === 'END' && mode === 'split' && resultTier && (
+        <ResultModal
+          headline={resultTier.id !== 'bare' ? 'EVIDENCE CAPTURED' : 'LOST IN DARKNESS'}
+          tierComment={reaction.comment}
+          metricLabel={reaction.time ? 'REACTION TIME' : null}
+          metricValue={reaction.time ? `${reaction.time}s` : null}
+          score={resultScore}
+          tone={resultTier.id !== 'bare' ? 'success' : 'failed'}
+        />
+      )}
     </div>
   );
 }

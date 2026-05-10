@@ -5,14 +5,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Stage3Intro from './Stage3Intro.jsx';
 import Stage3Field from './Stage3Field.jsx';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import './Stage3Game.css';
 
 export default function Stage3Game({ mode = 'standalone', isRunning, onResult }) {
-  // local phase: 'idle' | 'running' | 'done'
+  // local phase: 'idle' | 'running' | 'result' | 'done'
   const [phase, setPhase] = useState('idle');
+  const [resultData, setResultData] = useState(null);
   const audioRef = useRef(null);
+  const finishTimeoutRef = useRef(null);
 
   // standalone: Space 키로 self-trigger
   useEffect(() => {
@@ -54,19 +57,58 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
 
   // useCallback으로 안정화 — Stage3Field의 useEffect deps에 들어가기 때문.
   // onResult가 안정적이라면 handleFieldDone도 안정적이어야 RAF 루프가 리셋되지 않음.
-  const handleFieldDone = useCallback((metric) => {
-    setPhase('done');
-    onResult(metric);
-  }, [onResult]);
+  const handleFieldDone = useCallback((data) => {
+    if (mode === 'split') {
+      setResultData(data);
+      setPhase('result');
+      finishTimeoutRef.current = setTimeout(() => {
+        onResult(data.metric);
+        finishTimeoutRef.current = null;
+      }, 1500);
+    } else {
+      setPhase('done');
+      onResult(data.metric);
+    }
+  }, [mode, onResult]);
+
+  // finishTimeoutRef cleanup on unmount
+  useEffect(() => () => {
+    if (finishTimeoutRef.current) {
+      clearTimeout(finishTimeoutRef.current);
+      finishTimeoutRef.current = null;
+    }
+  }, []);
+
+  const modalProps = (() => {
+    if (!resultData) return null;
+    const { caughtCount, realCount, totalScore } = resultData;
+    const ratio = realCount > 0 ? caughtCount / realCount : 0;
+    const isSuccess = ratio >= 0.5;
+    let comment;
+    if (ratio >= 0.85) comment = '기억의 조각을 모두 모았습니다.';
+    else if (ratio >= 0.5) comment = '대부분의 조각을 회수했습니다.';
+    else comment = '기억이 흩어져버렸습니다.';
+    return {
+      headline: isSuccess ? 'MEMORY RECOVERED' : 'PIECES LOST',
+      tierComment: comment,
+      metricLabel: 'PIECES',
+      metricValue: `${caughtCount}/${realCount}`,
+      score: totalScore,
+      tone: isSuccess ? 'success' : 'failed',
+    };
+  })();
 
   return (
     <div className={`stage3-game stage3-game--${mode}`}>
       {phase === 'idle' && mode === 'standalone' && <Stage3Intro />}
-      {(phase === 'running' || phase === 'done') && (
+      {(phase === 'running' || phase === 'result' || phase === 'done') && (
         <Stage3Field
           isRunning={phase === 'running'}
           onResult={handleFieldDone}
         />
+      )}
+      {phase === 'result' && mode === 'split' && modalProps && (
+        <ResultModal {...modalProps} />
       )}
       {mode === 'standalone' && (
         <audio ref={audioRef} src={ASSETS.sounds.bgmStage3} preload="auto" />
