@@ -25,12 +25,19 @@ export const useGameStore = create(
       startGame: () =>
         set({ hasUserStarted: true }, false, 'startGame'),
 
-      recordResult: (stageId, metric) =>
+      // scoreOverride: 스테이지 자체 점수 체계가 metric-tier 매핑과 다를 때 사용
+      // (예: Stage 3는 누적식이라 가짜 캐치 페널티로 음수가 될 수 있음 → tier floor 60 우회).
+      recordResult: (stageId, metric, options = {}) =>
         set(
           (s) => ({
             stageResults: {
               ...s.stageResults,
-              [stageId]: { metric, score: scoreFromMetric(stageId, metric) },
+              [stageId]: {
+                metric,
+                score: typeof options.scoreOverride === 'number'
+                  ? options.scoreOverride
+                  : scoreFromMetric(stageId, metric),
+              },
             },
           }),
           false,

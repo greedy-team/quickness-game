@@ -59,12 +59,14 @@ export default function StagePage() {
   }
 
   // Stage 3 — 실 구현
+  // raw totalScore를 그대로 누적 점수로 사용. 가짜 캐치 페널티로 음수가 될 수 있고,
+  // 이는 의도된 동작 (Stage 1·2·4의 metric-tier 매핑과는 다른 점수 체계).
   if (id === '3') {
     return (
       <Stage3Game
         mode="standalone"
-        onResult={(metric) => {
-          recordResult(3, metric);
+        onResult={(metric, extras) => {
+          recordResult(3, metric, { scoreOverride: extras?.score });
           navigate('/hub');
         }}
       />

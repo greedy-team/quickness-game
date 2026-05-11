@@ -67,8 +67,8 @@ function buildSequence(config) {
 function pointsForOffset(absOffset, tiers, missLabel) {
   const tier = tiers.find((t) => absOffset <= t.maxOffset);
   return tier
-    ? { points: tier.points, label: tier.label, color: tier.color }
-    : { points: 0, label: missLabel, color: '#888' };
+    ? { id: tier.id, points: tier.points, label: tier.label, color: tier.color }
+    : { id: null, points: 0, label: missLabel, color: '#888' };
 }
 
 export default function Stage3Field({ isRunning, onResult }) {
@@ -86,6 +86,13 @@ export default function Stage3Field({ isRunning, onResult }) {
   const totalPointsRef = useRef(0);
   const itemsRef = useRef(items);
   itemsRef.current = items;
+
+  // 집계용 ref — tier 적중 횟수 + 가짜 캐치 + 진짜 놓침.
+  const statsRef = useRef({
+    tierCounts: {},
+    fakeCaught: 0,
+    realMissed: 0,
+  });
 
   // 점수 누적 헬퍼 — ref(동기 읽기용) + state(HUD 리렌더용) 동시 업데이트.
   const addPoints = useCallback((delta) => {
@@ -107,6 +114,7 @@ export default function Stage3Field({ isRunning, onResult }) {
     if (!isRunning) return;
     startTimeRef.current = performance.now();
     totalPointsRef.current = 0;
+    statsRef.current = { tierCounts: {}, fakeCaught: 0, realMissed: 0 };
     setScore(0);
     setItems(sequence.map((s, idx) => ({
       id: idx,
@@ -132,7 +140,10 @@ export default function Stage3Field({ isRunning, onResult }) {
         if (localT < 0) return { ...it, topPercent: -10 };
         if (localT > config.fallDurationSec) {
           // 화면 밖으로 떨어짐 — 캐치 안 됨
-          if (it.kind === 'real') pointsDelta += config.missScore;
+          if (it.kind === 'real') {
+            pointsDelta += config.missScore;
+            statsRef.current.realMissed += 1;
+          }
           // fake는 통과해도 0점 (정상)
           return { ...it, status: 'missed', topPercent: 110 };
         }
@@ -156,6 +167,9 @@ export default function Stage3Field({ isRunning, onResult }) {
           caughtCount,
           realCount: config.realCount,
           totalScore: totalPointsRef.current,
+          tierCounts: { ...statsRef.current.tierCounts },
+          fakeCaught: statsRef.current.fakeCaught,
+          realMissed: statsRef.current.realMissed,
         });
         return;
       }
@@ -197,12 +211,17 @@ export default function Stage3Field({ isRunning, onResult }) {
       const absOffset = Math.abs(target.topPercent - zoneCenter) / zoneHalf;
 
       if (target.kind === 'real') {
-        const { points, label, color } = pointsForOffset(absOffset, config.accuracyTiers, config.missLabel);
+        const { id, points, label, color } = pointsForOffset(absOffset, config.accuracyTiers, config.missLabel);
         addPoints(points);
         showPopup(label, points, color);
+        if (id) {
+          const counts = statsRef.current.tierCounts;
+          counts[id] = (counts[id] ?? 0) + 1;
+        }
       } else {
         addPoints(config.fakePenalty);
         showPopup(config.fakeLabel, config.fakePenalty, '#FF3333');
+        statsRef.current.fakeCaught += 1;
       }
 
       setItems((prev) => prev.map(
