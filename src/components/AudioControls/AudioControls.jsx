@@ -57,7 +57,6 @@ export default function AudioControls() {
         onClick={() => setOpen((v) => !v)}
         aria-label="사운드 설정"
         aria-expanded={open}
-        aria-pressed={isMuted}
       >
         <MuteIcon muted={isMuted} />
       </button>
