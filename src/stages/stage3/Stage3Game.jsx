@@ -8,6 +8,7 @@ import Stage3Field from './Stage3Field.jsx';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
+import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import './Stage3Game.css';
 
 export default function Stage3Game({ mode = 'standalone', isRunning, onResult }) {
@@ -16,6 +17,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
   const [resultData, setResultData] = useState(null);
   const audioRef = useRef(null);
   const finishTimeoutRef = useRef(null);
+  const bgmVolume = useAudioVolume('bgm');
 
   // standalone: Space 키로 self-trigger
   useEffect(() => {
@@ -46,14 +48,20 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     if (!audio) return;
 
     if (mode === 'standalone' && phase === 'running') {
-      audio.volume = BGM_DEFAULTS.volume;
+      audio.volume = bgmVolume;
       audio.loop = BGM_DEFAULTS.loop;
       audio.play().catch(() => {});
     } else {
       audio.pause();
       audio.currentTime = 0;
     }
-  }, [mode, phase]);
+  }, [mode, phase, bgmVolume]);
+
+  // useAudioStore 의 bgmVolume 변경 시 현재 재생 중인 BGM 에 즉시 반영
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) audio.volume = bgmVolume;
+  }, [bgmVolume]);
 
   // useCallback으로 안정화 — Stage3Field의 useEffect deps에 들어가기 때문.
   // onResult가 안정적이라면 handleFieldDone도 안정적이어야 RAF 루프가 리셋되지 않음.
