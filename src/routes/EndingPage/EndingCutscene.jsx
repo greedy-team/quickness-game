@@ -3,9 +3,8 @@
 
 import { useEffect } from 'react';
 import { ENDING_CONFIG } from './ending.config.js';
+import { useAudioStore } from '../../audio/useAudioStore.js';
 import './EndingCutscene.css';
-
-const VOLUME = 0.8;
 
 export default function EndingCutscene({ outcome, phase, totalScore }) {
   const { image, sfxSrc } = ENDING_CONFIG.assetsByOutcome[outcome];
@@ -16,7 +15,8 @@ export default function EndingCutscene({ outcome, phase, totalScore }) {
     if (phase !== 'reveal') return undefined;
     if (!sfxSrc) return undefined;
     const audio = new Audio(sfxSrc);
-    audio.volume = VOLUME;
+    const { sfxVolume, isMuted } = useAudioStore.getState();
+    audio.volume = (isMuted ? 0 : sfxVolume) * 0.8; // 기존 VOLUME 0.8 톤 유지
     audio.play().catch(() => {});  // 자동재생 정책 실패 시 silent
     return () => {
       audio.pause();
