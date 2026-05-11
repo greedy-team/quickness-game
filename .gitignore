@@ -35,3 +35,6 @@ dist-ssr
 # PR drafts
 .pr/
 .vercel
+
+# Superpowers brainstorm mockups
+.superpowers/
