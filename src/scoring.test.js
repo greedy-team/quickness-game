@@ -21,8 +21,8 @@ describe('STAGE_SCORE_TIERS', () => {
     expect(PERFECT_HEADROOM).toBe(60);
   });
 
-  it('ENDING_SUCCESS_CUTOFF 700', () => {
-    expect(ENDING_SUCCESS_CUTOFF).toBe(700);
+  it('ENDING_SUCCESS_CUTOFF 1000', () => {
+    expect(ENDING_SUCCESS_CUTOFF).toBe(1000);
   });
 
   it('TOTAL_MAX_SCORE = 360+360+400+1120(Stage 4 = sub-pane 합) = 2240', () => {
@@ -136,12 +136,12 @@ describe('scoreFromMetric — 알 수 없는 stage', () => {
 });
 
 describe('endingOutcomeFromTotal', () => {
-  it('totalScore 700 정확 → alive', () => {
-    expect(endingOutcomeFromTotal(700)).toBe('alive');
+  it('totalScore 1000 정확 → alive', () => {
+    expect(endingOutcomeFromTotal(1000)).toBe('alive');
   });
 
-  it('totalScore 699 → silhouette', () => {
-    expect(endingOutcomeFromTotal(699)).toBe('silhouette');
+  it('totalScore 999 → silhouette', () => {
+    expect(endingOutcomeFromTotal(999)).toBe('silhouette');
   });
 
   it('NaN → silhouette', () => {

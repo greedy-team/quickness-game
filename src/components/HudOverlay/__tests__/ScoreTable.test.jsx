@@ -11,6 +11,6 @@ describe('ScoreTable', () => {
   it('헤더 아래에 만점·생존선 요약 라인이 노출된다', () => {
     render(<ScoreTable onClose={() => {}} />);
     expect(screen.getByText(/만점\s*2240/)).toBeInTheDocument();
-    expect(screen.getByText(/생존선\s*700/)).toBeInTheDocument();
+    expect(screen.getByText(/생존선\s*1000/)).toBeInTheDocument();
   });
 });

@@ -100,9 +100,10 @@ export const TOTAL_MAX_SCORE = [1, 2, 3, 4].reduce(
 /**
  * 누적 점수가 이 값 이상이면 성공 엔딩, 미만이면 실패 엔딩.
  * Tunable — 부스 플레이테스트 후 조정.
- * 만점 변화: 기존 1300 → 신규 1540 (Stage 1·2·3 = 360, Stage 4 = 460).
+ * 만점 변화: 1300 → 1540 → 1580 → 2240 (Stage 4 = sub-pane 합).
+ * 비율: 1000/2240 ≈ 44.6% — "꾸준히 good 근처로 가야 통과" 의도.
  */
-export const ENDING_SUCCESS_CUTOFF = 700;
+export const ENDING_SUCCESS_CUTOFF = 1000;
 
 /**
  * 누적 점수 → 엔딩 outcome 결정.

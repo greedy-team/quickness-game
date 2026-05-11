@@ -40,23 +40,23 @@ describe('HudOverlay 점수 막대', () => {
     expect(fill.className).not.toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('total=699 → 채움 폭 ≈ 31.2%, alive 클래스 없음', () => {
-    setTotalScore(699);
+  it('total=999 → 채움 폭 ≈ 44.6%, alive 클래스 없음', () => {
+    setTotalScore(999);
     const { container } = renderHud();
     const fill = container.querySelector('.hud-overlay__bar-fill');
     const pct = parseFloat(fill.style.width);
-    expect(pct).toBeGreaterThan(31);
-    expect(pct).toBeLessThan(31.3);
+    expect(pct).toBeGreaterThan(44.5);
+    expect(pct).toBeLessThan(44.7);
     expect(fill.className).not.toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('total=700 → 채움 폭 ≈ 31.25%, alive 클래스 있음 (생존선 정확 통과)', () => {
-    setTotalScore(700);
+  it('total=1000 → 채움 폭 ≈ 44.6%, alive 클래스 있음 (생존선 정확 통과)', () => {
+    setTotalScore(1000);
     const { container } = renderHud();
     const fill = container.querySelector('.hud-overlay__bar-fill');
     const pct = parseFloat(fill.style.width);
-    expect(pct).toBeGreaterThanOrEqual(31.2);
-    expect(pct).toBeLessThanOrEqual(31.3);
+    expect(pct).toBeGreaterThanOrEqual(44.6);
+    expect(pct).toBeLessThanOrEqual(44.7);
     expect(fill.className).toContain('hud-overlay__bar-fill--alive');
   });
 
@@ -68,11 +68,11 @@ describe('HudOverlay 점수 막대', () => {
     expect(fill.className).toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('만점 텍스트(/ 2240)와 생존선 라벨(700)이 노출된다', () => {
+  it('만점 텍스트(/ 2240)와 생존선 라벨(1000)이 노출된다', () => {
     setTotalScore(0);
     renderHud();
     expect(screen.getByText(/\/\s*2240/)).toBeInTheDocument();
-    expect(screen.getByText(/생존선 700/)).toBeInTheDocument();
+    expect(screen.getByText(/생존선 1000/)).toBeInTheDocument();
   });
 
   it('점수 블록 클릭 시 ScoreTable 모달이 열린다 (회귀 보호)', async () => {
