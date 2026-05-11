@@ -4,6 +4,7 @@ import {
   PERFECT_HEADROOM,
   ENDING_SUCCESS_CUTOFF,
   TOTAL_MAX_SCORE,
+  maxScoreForStage,
   scoreFromMetric,
   endingOutcomeFromTotal,
 } from './scoring.js';
@@ -24,12 +25,23 @@ describe('STAGE_SCORE_TIERS', () => {
     expect(ENDING_SUCCESS_CUTOFF).toBe(700);
   });
 
-  it('TOTAL_MAX_SCORE 는 모든 스테이지 perfect tier + PERFECT_HEADROOM 의 합 (1540)', () => {
-    expect(TOTAL_MAX_SCORE).toBe(1540);
+  it('TOTAL_MAX_SCORE = 360+360+400+1120(Stage 4 = sub-pane 합) = 2240', () => {
+    expect(TOTAL_MAX_SCORE).toBe(2240);
   });
 
   it('TOTAL_MAX_SCORE 는 ENDING_SUCCESS_CUTOFF 보다 크다', () => {
     expect(TOTAL_MAX_SCORE).toBeGreaterThan(ENDING_SUCCESS_CUTOFF);
+  });
+
+  it('maxScoreForStage: 1·2 = 360, 3 = 400(raw), 4 = 1120(sub-pane 합)', () => {
+    expect(maxScoreForStage(1)).toBe(360);
+    expect(maxScoreForStage(2)).toBe(360);
+    expect(maxScoreForStage(3)).toBe(400);
+    expect(maxScoreForStage(4)).toBe(1120);
+  });
+
+  it('maxScoreForStage: 알 수 없는 stage → 0', () => {
+    expect(maxScoreForStage(99)).toBe(0);
   });
 });
 

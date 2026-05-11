@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { RANKING_CONFIG } from '../../ranking/ranking.config.js';
 import { ENDING_CONFIG } from './ending.config.js';
+import { TOTAL_MAX_SCORE } from '../../scoring.js';
 import './EndingNicknameForm.css';
 
 export default function EndingNicknameForm({ outcome, totalScore, onSubmit }) {
@@ -40,7 +41,7 @@ export default function EndingNicknameForm({ outcome, totalScore, onSubmit }) {
         결말 <span className="ending-nickname__outcome-label">{outcomeLabel}</span>
       </p>
       <p className="ending-nickname__caption">{captionByOutcome}</p>
-      <p className="ending-nickname__score">점수 {totalScore}</p>
+      <p className="ending-nickname__score">점수 {totalScore} / {TOTAL_MAX_SCORE}</p>
 
       <input
         ref={inputRef}

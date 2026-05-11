@@ -74,11 +74,12 @@ export default function StagePage() {
   }
 
   // Stage 4 — 3분할 호스트
+  // Stage 4 누적 점수 = 3 sub-pane 점수의 합. 사용자가 모달로 본 점수와 정확히 일치.
   if (id === '4') {
     return (
       <Stage4Host
-        onResult={(metric) => {
-          recordResult(4, metric);
+        onResult={(metric, extras) => {
+          recordResult(4, metric, { scoreOverride: extras?.score });
           navigate(endingRouteFromCurrentScore());
         }}
       />

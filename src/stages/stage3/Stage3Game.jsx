@@ -9,6 +9,7 @@ import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
+import { maxScoreForStage } from '../../scoring.js';
 import { STAGE3_CONFIG } from './stage3.config.js';
 import './Stage3Game.css';
 
@@ -171,6 +172,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
       metricValue: `${caughtCount}/${realCount}`,
       breakdown,
       score: totalScore,
+      maxScore: maxScoreForStage(3),
       tone: isSuccess ? 'success' : 'failed',
       hint: mode === 'standalone' ? '아무 키나 눌러 계속...' : null,
     };

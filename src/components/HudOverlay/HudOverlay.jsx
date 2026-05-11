@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGameStore, selectTotalScore, selectClearedCount } from '../../store.js';
-import { TOTAL_MAX_SCORE, ENDING_SUCCESS_CUTOFF } from '../../scoring.js';
+import { TOTAL_MAX_SCORE, ENDING_SUCCESS_CUTOFF, maxScoreForStage } from '../../scoring.js';
 import ScoreTable from './ScoreTable.jsx';
 import './HudOverlay.css';
 
@@ -23,6 +23,14 @@ export default function HudOverlay() {
   }, [tableOpen]);
 
   if (HIDDEN_ROUTES.has(pathname)) return null;
+
+  if (pathname.startsWith('/stage/')) {
+    return (
+      <div className="hud-overlay" aria-hidden="false">
+        <div className="hud-overlay__score-simple">SCORE {total}</div>
+      </div>
+    );
+  }
 
   const fillPct = Math.min(100, (total / TOTAL_MAX_SCORE) * 100);
   const isAlive = total >= ENDING_SUCCESS_CUTOFF;
@@ -48,6 +56,12 @@ export default function HudOverlay() {
           <span className="hud-overlay__bar-tick-label" style={{ left: `${CUTOFF_PCT}%` }}>
             생존선 {ENDING_SUCCESS_CUTOFF}
           </span>
+        </span>
+        <span className="hud-overlay__weights" aria-label="스테이지별 만점 가중치">
+          S1·2 {maxScoreForStage(1)}
+          {' · '}S3 {maxScoreForStage(3)}
+          {' · '}S4 {maxScoreForStage(4)}
+          <span className="hud-overlay__weights-boost"> ⚡</span>
         </span>
       </button>
       <div className="hud-overlay__progress">{cleared} / 4</div>

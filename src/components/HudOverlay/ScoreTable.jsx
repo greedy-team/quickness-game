@@ -3,7 +3,7 @@ import { STAGE1_CONFIG } from '../../stages/stage1/stage1.config.js';
 import { STAGE2_CONFIG } from '../../stages/stage2/stage2.config.js';
 import { STAGE3_CONFIG } from '../../stages/stage3/stage3.config.js';
 import { metricFromPoints } from '../../stages/common/reactionScoring.js';
-import { scoreFromMetric, TOTAL_MAX_SCORE, ENDING_SUCCESS_CUTOFF } from '../../scoring.js';
+import { scoreFromMetric, TOTAL_MAX_SCORE, ENDING_SUCCESS_CUTOFF, maxScoreForStage } from '../../scoring.js';
 import './ScoreTable.css';
 
 // stage 별 tier 의 최종 점수 산출.
@@ -93,17 +93,17 @@ export default function ScoreTable({ onClose }) {
 
           <section className="score-table__section score-table__section--stage4">
             <h3>Stage 4 · 병렬게임</h3>
-            <p className="score-table__desc">Stage 1·2·3 을 동시에 진행. 평균 정확도로 산출.</p>
+            <p className="score-table__desc">Stage 1·2·3 을 동시에 진행. 세 sub-pane 점수의 합으로 누적.</p>
             <div className="score-table__stage4-summary">
               <div className="score-table__stage4-row">
                 <span className="score-table__stage4-label">최대 점수</span>
-                <span className="score-table__stage4-value">460</span>
+                <span className="score-table__stage4-value">{maxScoreForStage(4)}</span>
               </div>
               <div className="score-table__stage4-row">
                 <span className="score-table__stage4-label">키 입력</span>
                 <span className="score-table__stage4-value">← / ↑ / →</span>
               </div>
-              <p className="score-table__hint">완벽 영역에서는 정밀도 보너스가 붙어 동점이 거의 발생하지 않습니다.</p>
+              <p className="score-table__hint">각 sub-pane 모달 점수가 그대로 합산됩니다 (3개 점수 합 = Stage 4 기여).</p>
             </div>
           </section>
         </div>

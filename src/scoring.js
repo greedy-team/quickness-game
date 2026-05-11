@@ -66,13 +66,34 @@ export function scoreFromMetric(stageId, metric) {
 
 // ───── 엔딩 분기 ─────
 
+// Stage 3은 누적식(가짜 캐치 페널티 포함)이라 tier 시스템과 별개의 raw max를 사용.
+// stage3.config.js: realCount(4) × accuracyTiers[0].points(100) = 400.
+// 순환 의존 회피를 위해 여기에 동기화된 상수로 둠.
+const STAGE3_RAW_MAX = 400;
+
 /**
- * 가능한 최대 누적 점수 (모든 스테이지 metric=0 가정).
- * STAGE_SCORE_TIERS / PERFECT_HEADROOM 에서 파생되는 단일 진실 공급원.
- * 현재 값: Stage 1·2·3 = 360, Stage 4 = 460 → 합 1540.
+ * 스테이지별 최대 점수.
+ * - Stage 1·2: tiers[0].points + PERFECT_HEADROOM (perfect + 동점방지 헤드룸)
+ * - Stage 3: raw 누적 최대 (가짜 무시 + 진짜 perfect)
+ * - Stage 4: sub-pane(Stage 1·2·3) 점수의 합. 사용자가 sub-pane 모달에서 본 값과 합치.
  */
-export const TOTAL_MAX_SCORE = Object.values(STAGE_SCORE_TIERS).reduce(
-  (sum, tiers) => sum + tiers[0].points + PERFECT_HEADROOM,
+export function maxScoreForStage(stageId) {
+  if (stageId === 3) return STAGE3_RAW_MAX;
+  if (stageId === 4) {
+    // Stage 4는 Stage 1·2·3 sub-pane 점수 합으로 정의 — STAGE_SCORE_TIERS[4]는 표시·통계용으로 유지.
+    return maxScoreForStage(1) + maxScoreForStage(2) + maxScoreForStage(3);
+  }
+  const tiers = STAGE_SCORE_TIERS[stageId];
+  if (!tiers || tiers.length === 0) return 0;
+  return tiers[0].points + PERFECT_HEADROOM;
+}
+
+/**
+ * 가능한 최대 누적 점수.
+ * Stage 1·2 = 360, Stage 3 = 400 (raw), Stage 4 = 1120 (sub-pane 합) → 합 2240.
+ */
+export const TOTAL_MAX_SCORE = [1, 2, 3, 4].reduce(
+  (sum, n) => sum + maxScoreForStage(n),
   0,
 );
 

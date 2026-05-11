@@ -3,7 +3,7 @@ import './Stage1Placeholder.css';
 import DialogueBox from '../../components/DialogueBox/DialogueBox';
 import { STAGE1_CONFIG } from './stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
-import { scoreFromMetric } from '../../scoring.js';
+import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
 
 // 💡 경로 앞에 /를 붙여서 public 폴더 기준임을 명시
@@ -184,7 +184,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
               <span className="result-label">MEASURED TIME</span>
             </div>
             <p className="result-story-text">{resultTier ? TIER_COMMENT[resultTier.id] : ''}</p>
-            <p className="result-score">+{resultScore}점</p>
+            <p className="result-score">{resultScore} / {maxScoreForStage(1)}점</p>
             <div className="loading-bar-wrap"><div className="loading-bar-inner" /></div>
           </div>
         </div>

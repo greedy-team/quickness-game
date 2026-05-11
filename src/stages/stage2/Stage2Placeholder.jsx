@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Stage2Placeholder.css';
 import { STAGE2_CONFIG } from './stage2.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
-import { scoreFromMetric } from '../../scoring.js';
+import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import { useAudioStore } from '../../audio/useAudioStore.js';
@@ -133,9 +133,10 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     syncGameState(endState);
     setIsShaking(false);
 
+    const score = scoreFromMetric(2, metric);
     setReaction({ time: rTime, comment: rComment });
     setResultTier(tier);
-    setResultScore(scoreFromMetric(2, metric));
+    setResultScore(score);
     syncPhase('END');
 
     // 🚀 [추가] 게임 종료 시 점프스케어 타이머 취소
@@ -151,7 +152,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     }
 
     setTimeout(() => {
-      if (onResult) onResult(metric);
+      if (onResult) onResult(metric, { score });
     }, 2000);
   }, [onResult]);
 
@@ -338,7 +339,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
               <h1 className="main-msg">{resultTier && resultTier.id !== 'bare' ? "EVIDENCE CAPTURED" : "LOST IN DARKNESS"}</h1>
               <p className="sub-msg">{reaction.comment}</p>
               {reaction.time && <p className="reaction-time">REACTION TIME: {reaction.time}s</p>}
-              <p className="result-score">+{resultScore}점</p>
+              <p className="result-score">{resultScore} / {maxScoreForStage(2)}점</p>
             </div>
             <p className="start-btn" style={{ marginTop: '40px' }}>메인 화면으로 돌아갑니다...</p>
           </div>
@@ -352,6 +353,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           metricLabel={reaction.time ? 'REACTION TIME' : null}
           metricValue={reaction.time ? `${reaction.time}s` : null}
           score={resultScore}
+          maxScore={maxScoreForStage(2)}
           tone={resultTier.id !== 'bare' ? 'success' : 'failed'}
         />
       )}

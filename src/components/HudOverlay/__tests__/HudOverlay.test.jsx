@@ -40,38 +40,38 @@ describe('HudOverlay 점수 막대', () => {
     expect(fill.className).not.toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('total=699 → 채움 폭 ≈ 45.4%, alive 클래스 없음', () => {
+  it('total=699 → 채움 폭 ≈ 31.2%, alive 클래스 없음', () => {
     setTotalScore(699);
     const { container } = renderHud();
     const fill = container.querySelector('.hud-overlay__bar-fill');
     const pct = parseFloat(fill.style.width);
-    expect(pct).toBeGreaterThan(45);
-    expect(pct).toBeLessThan(45.5);
+    expect(pct).toBeGreaterThan(31);
+    expect(pct).toBeLessThan(31.3);
     expect(fill.className).not.toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('total=700 → 채움 폭 ≈ 45.5%, alive 클래스 있음 (생존선 정확 통과)', () => {
+  it('total=700 → 채움 폭 ≈ 31.25%, alive 클래스 있음 (생존선 정확 통과)', () => {
     setTotalScore(700);
     const { container } = renderHud();
     const fill = container.querySelector('.hud-overlay__bar-fill');
     const pct = parseFloat(fill.style.width);
-    expect(pct).toBeGreaterThanOrEqual(45.4);
-    expect(pct).toBeLessThanOrEqual(45.6);
+    expect(pct).toBeGreaterThanOrEqual(31.2);
+    expect(pct).toBeLessThanOrEqual(31.3);
     expect(fill.className).toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('total=1540 → 채움 폭 100%, alive 클래스 있음', () => {
-    setTotalScore(1540);
+  it('total=2240 → 채움 폭 100%, alive 클래스 있음', () => {
+    setTotalScore(2240);
     const { container } = renderHud();
     const fill = container.querySelector('.hud-overlay__bar-fill');
     expect(fill.style.width).toBe('100%');
     expect(fill.className).toContain('hud-overlay__bar-fill--alive');
   });
 
-  it('만점 텍스트(/ 1540)와 생존선 라벨(700)이 노출된다', () => {
+  it('만점 텍스트(/ 2240)와 생존선 라벨(700)이 노출된다', () => {
     setTotalScore(0);
     renderHud();
-    expect(screen.getByText(/\/\s*1540/)).toBeInTheDocument();
+    expect(screen.getByText(/\/\s*2240/)).toBeInTheDocument();
     expect(screen.getByText(/생존선 700/)).toBeInTheDocument();
   });
 
