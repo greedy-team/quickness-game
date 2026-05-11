@@ -19,8 +19,9 @@
   left: 28px;
   pointer-events: auto;
   display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   background: rgba(255, 204, 0, 0.08);
   border: 1px solid rgba(255, 204, 0, 0.45);
   color: #ffcc00;
@@ -29,19 +30,11 @@
   letter-spacing: 0.08em;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
   cursor: pointer;
-  padding: 8px 18px;
+  /* 26px bottom: 8px bar + 14px tick-label top offset 위에 여유 — 18px 이면 라벨이 클리핑됨 */
+  padding: 10px 18px 26px;
   border-radius: 4px;
   transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
   box-shadow: 0 0 12px rgba(255, 204, 0, 0.12);
-}
-
-.hud-overlay__score::after {
-  content: "▾";
-  font-size: 0.85em;
-  color: rgba(255, 204, 0, 0.85);
-  letter-spacing: 0;
-  margin-left: 2px;
-  transform: translateY(-1px);
 }
 
 .hud-overlay__score:hover {
@@ -58,6 +51,72 @@
 .hud-overlay__score:focus-visible {
   outline: 2px solid rgba(255, 204, 0, 0.85);
   outline-offset: 3px;
+}
+
+.hud-overlay__score-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hud-overlay__score-line::after {
+  content: "▾";
+  font-size: 0.85em;
+  color: rgba(255, 204, 0, 0.85);
+  letter-spacing: 0;
+  margin-left: 4px;
+  transform: translateY(-1px);
+}
+
+.hud-overlay__score-max {
+  color: rgba(255, 204, 0, 0.55);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.hud-overlay__bar {
+  position: relative;
+  display: block;
+  width: 280px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 204, 0, 0.25);
+  border-radius: 2px;
+  overflow: visible;
+}
+
+.hud-overlay__bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #7a1818, #c43232);
+  transition: width 0.25s ease, background 0.3s ease;
+}
+
+.hud-overlay__bar-fill--alive {
+  background: linear-gradient(90deg, #ffae00, #ffcc00);
+}
+
+.hud-overlay__bar-tick {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  background: #ff4444;
+  box-shadow: 0 0 6px rgba(255, 68, 68, 0.8);
+  transform: translateX(-50%);
+}
+
+.hud-overlay__bar-tick-label {
+  position: absolute;
+  top: 14px;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: #ff6666;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+  font-weight: 600;
+  pointer-events: none;
 }
 
 .hud-overlay__progress {

@@ -1,3 +1,4 @@
+import React from 'react';
 import { STAGE1_CONFIG } from '../../stages/stage1/stage1.config.js';
 import { STAGE2_CONFIG } from '../../stages/stage2/stage2.config.js';
 import { STAGE3_CONFIG } from '../../stages/stage3/stage3.config.js';
