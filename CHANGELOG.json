@@ -1,11 +1,72 @@
 {
   "metadata": {
-    "lastUpdated": "2026-05-10T16:01:44Z",
-    "currentVersion": "0.0.26",
+    "lastUpdated": "2026-05-11T11:57:41Z",
+    "currentVersion": "0.0.27",
     "projectType": "react",
-    "totalReleases": 1
+    "totalReleases": 2
   },
   "releases": [
+    {
+      "version": "0.0.27",
+      "project_type": "react",
+      "date": "2026-05-11",
+      "pr_number": 38,
+      "raw_summary": "## 릴리스 노트\n\n* **새 기능**\n\n  * 점수 `현재/최대` 포맷 통일 + Stage 4 sub-pane 합산 + 가중치 안내 #36\n  * 결과 모달 점수 획득 내역 + Raw 점수 누적 + 자동/스킵 진행 #36\n  * App 에 AudioControls 마운트 #36\n  * AudioControls 우상단 popover 컴포넌트 #36\n  * playSfx 일회성 SFX 헬퍼 도입 #36\n  * useAudioVolume 셀렉터 훅 도입 #36\n  * useAudioStore (zustand + localStorage persist) 도입 #36\n  * ScoreTable 만점·생존선 요약 라인 추가 #36\n  * 점수 막대와 생존선 분기점 표시 #36\n  * TOTAL_MAX_SCORE 상수 도입 #36\n\n* **버그 수정**\n\n  * 데드 코드 및 aria 의미 충돌 정리 #36\n\n* **개선**\n\n  * typing tick 이 useAudioVolume(sfx) 구독 #36\n  * SFX 가 store 볼륨 사용 #36\n  * openDoor SFX 가 playSfx 사용 #36\n  * BGM/jumpscare SFX 가 store 볼륨 사용 #36\n  * BGM 이 useAudioVolume 구독 #36\n  * BGM + SFX 가 useAudioVolume / playSfx 사용 #36\n  * heartbeat BGM 이 useAudioVolume 구독 #36\n  * BgmController 가 useAudioVolume 구독 #36\n\n* **문서**\n\n  * 사운드 컨트롤 UI 구현 플랜 작성 #36\n  * 사운드 컨트롤 UI 디자인 스펙 작성 #36\n  * 점수 표시 UI 구현 플랜 작성 #36\n  * 점수 표시 UI(만점/생존선) 디자인 스펙 작성 #36\n\n* **기타**\n\n  * Merge pull request #37 from greedy-team/20260511_#36_점수_표기_및_사운드_컨트롤_UI_추가\n  * docs : 리포트 문서 작성 #36\n  * 엔딩 cutoff 700 → 1000 (만점 2240 비율 보정) #36\n\n> 💡 더 정확한 릴리스 노트를 원한다면 Claude Code에서 `/github` 스킬로 PR 릴리스 노트를 업데이트할 수 있습니다.",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "점수 `현재/최대` 포맷 통일 + Stage 4 sub-pane 합산 + 가중치 안내 #36",
+            "결과 모달 점수 획득 내역 + Raw 점수 누적 + 자동/스킵 진행 #36",
+            "App 에 AudioControls 마운트 #36",
+            "AudioControls 우상단 popover 컴포넌트 #36",
+            "playSfx 일회성 SFX 헬퍼 도입 #36",
+            "useAudioVolume 셀렉터 훅 도입 #36",
+            "useAudioStore (zustand + localStorage persist) 도입 #36",
+            "ScoreTable 만점·생존선 요약 라인 추가 #36",
+            "점수 막대와 생존선 분기점 표시 #36",
+            "TOTAL_MAX_SCORE 상수 도입 #36"
+          ]
+        },
+        "버그_수정": {
+          "title": "버그 수정",
+          "items": [
+            "데드 코드 및 aria 의미 충돌 정리 #36"
+          ]
+        },
+        "개선": {
+          "title": "개선",
+          "items": [
+            "typing tick 이 useAudioVolume(sfx) 구독 #36",
+            "SFX 가 store 볼륨 사용 #36",
+            "openDoor SFX 가 playSfx 사용 #36",
+            "BGM/jumpscare SFX 가 store 볼륨 사용 #36",
+            "BGM 이 useAudioVolume 구독 #36",
+            "BGM + SFX 가 useAudioVolume / playSfx 사용 #36",
+            "heartbeat BGM 이 useAudioVolume 구독 #36",
+            "BgmController 가 useAudioVolume 구독 #36"
+          ]
+        },
+        "문서": {
+          "title": "문서",
+          "items": [
+            "사운드 컨트롤 UI 구현 플랜 작성 #36",
+            "사운드 컨트롤 UI 디자인 스펙 작성 #36",
+            "점수 표시 UI 구현 플랜 작성 #36",
+            "점수 표시 UI(만점/생존선) 디자인 스펙 작성 #36"
+          ]
+        },
+        "기타": {
+          "title": "기타",
+          "items": [
+            "Merge pull request #37 from greedy-team/20260511_#36_점수_표기_및_사운드_컨트롤_UI_추가",
+            "docs : 리포트 문서 작성 #36",
+            "엔딩 cutoff 700 → 1000 (만점 2240 비율 보정) #36"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.0.26",
       "project_type": "react",
