@@ -3,7 +3,7 @@ import { STAGE1_CONFIG } from '../../stages/stage1/stage1.config.js';
 import { STAGE2_CONFIG } from '../../stages/stage2/stage2.config.js';
 import { STAGE3_CONFIG } from '../../stages/stage3/stage3.config.js';
 import { metricFromPoints } from '../../stages/common/reactionScoring.js';
-import { scoreFromMetric } from '../../scoring.js';
+import { scoreFromMetric, TOTAL_MAX_SCORE, ENDING_SUCCESS_CUTOFF } from '../../scoring.js';
 import './ScoreTable.css';
 
 // stage 별 tier 의 최종 점수 산출.
@@ -53,6 +53,10 @@ export default function ScoreTable({ onClose }) {
         <div className="score-table__header">
           <h2 id="score-table-title">점수 기준</h2>
           <button type="button" className="score-table__close" onClick={onClose} aria-label="닫기">×</button>
+        </div>
+
+        <div className="score-table__summary">
+          만점 {TOTAL_MAX_SCORE} · 생존선 {ENDING_SUCCESS_CUTOFF}
         </div>
 
         <div className="score-table__grid">
