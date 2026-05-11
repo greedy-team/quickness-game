@@ -3,6 +3,7 @@ import {
   STAGE_SCORE_TIERS,
   PERFECT_HEADROOM,
   ENDING_SUCCESS_CUTOFF,
+  TOTAL_MAX_SCORE,
   scoreFromMetric,
   endingOutcomeFromTotal,
 } from './scoring.js';
@@ -21,6 +22,14 @@ describe('STAGE_SCORE_TIERS', () => {
 
   it('ENDING_SUCCESS_CUTOFF 700', () => {
     expect(ENDING_SUCCESS_CUTOFF).toBe(700);
+  });
+
+  it('TOTAL_MAX_SCORE 는 모든 스테이지 perfect tier + PERFECT_HEADROOM 의 합 (1540)', () => {
+    expect(TOTAL_MAX_SCORE).toBe(1540);
+  });
+
+  it('TOTAL_MAX_SCORE 는 ENDING_SUCCESS_CUTOFF 보다 크다', () => {
+    expect(TOTAL_MAX_SCORE).toBeGreaterThan(ENDING_SUCCESS_CUTOFF);
   });
 });
 

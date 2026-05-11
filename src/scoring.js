@@ -67,6 +67,16 @@ export function scoreFromMetric(stageId, metric) {
 // ───── 엔딩 분기 ─────
 
 /**
+ * 가능한 최대 누적 점수 (모든 스테이지 metric=0 가정).
+ * STAGE_SCORE_TIERS / PERFECT_HEADROOM 에서 파생되는 단일 진실 공급원.
+ * 현재 값: Stage 1·2·3 = 360, Stage 4 = 460 → 합 1540.
+ */
+export const TOTAL_MAX_SCORE = Object.values(STAGE_SCORE_TIERS).reduce(
+  (sum, tiers) => sum + tiers[0].points + PERFECT_HEADROOM,
+  0,
+);
+
+/**
  * 누적 점수가 이 값 이상이면 성공 엔딩, 미만이면 실패 엔딩.
  * Tunable — 부스 플레이테스트 후 조정.
  * 만점 변화: 기존 1300 → 신규 1540 (Stage 1·2·3 = 360, Stage 4 = 460).
