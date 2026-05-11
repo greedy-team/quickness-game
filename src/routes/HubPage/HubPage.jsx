@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, selectIsDoor4Unlocked } from '../../store.js';
 import { ASSETS } from '../../assets.js';
+import { playSfx } from '../../audio/playSfx.js';
 import './HubPage.css';
 
 const STAGE_LABELS = {
@@ -17,9 +18,8 @@ export default function HubPage() {
 
   const openDoor = (n) => {
     if (n === 4 && !door4Unlocked) return;
-    
-    const sfx = new Audio(ASSETS.sounds.openDoor);
-    sfx.play().catch(() => {});
+
+    playSfx(ASSETS.sounds.openDoor);
     navigate(`/stage/${n}`);
   };
 

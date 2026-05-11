@@ -1,6 +1,7 @@
 // src/components/DialogueBox/DialogueBox.jsx
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import './DialogueBox.css';
 
 export default function DialogueBox({ lines, onLineChange, onComplete, typingSpeed = 25, soundSrc }) {
@@ -9,6 +10,7 @@ export default function DialogueBox({ lines, onLineChange, onComplete, typingSpe
   const [isTyping, setIsTyping] = useState(false);
   const audioRef = useRef(null);
   const timerRef = useRef(null);
+  const sfxVolume = useAudioVolume('sfx');
 
   useEffect(() => {
     if (currentLineIndex >= lines.length) {
@@ -45,6 +47,10 @@ export default function DialogueBox({ lines, onLineChange, onComplete, typingSpe
 
     return () => clearInterval(timerRef.current);
   }, [currentLineIndex, lines, onLineChange, onComplete, typingSpeed, soundSrc]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = sfxVolume;
+  }, [sfxVolume]);
 
   const handleNext = () => {
     if (isTyping) {

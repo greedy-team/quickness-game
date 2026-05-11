@@ -58,6 +58,19 @@
   opacity: 0.7;
 }
 
+.stage4-intro__weight {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.03em;
+}
+
+.stage4-intro__weight-boost {
+  color: #ffcc00;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+}
+
 .stage4-intro__cta {
   margin-top: 12px;
   font-size: 18px;

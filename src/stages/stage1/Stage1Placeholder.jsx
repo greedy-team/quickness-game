@@ -3,7 +3,8 @@ import './Stage1Placeholder.css';
 import DialogueBox from '../../components/DialogueBox/DialogueBox';
 import { STAGE1_CONFIG } from './stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
-import { scoreFromMetric } from '../../scoring.js';
+import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
+import { useAudioVolume } from '../../audio/useAudioVolume.js';
 
 // 💡 경로 앞에 /를 붙여서 public 폴더 기준임을 명시
 const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
@@ -29,7 +30,9 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
   const [resultTier, setResultTier] = useState(null);
   const [resultScore, setResultScore] = useState(0);
-  
+
+  const bgmVolume = useAudioVolume('bgm');
+
   const startTimeRef = useRef(0);
   const requestRef = useRef();
   
@@ -38,7 +41,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   useEffect(() => {
     bgmRef.current = new Audio(BGM_PATH);
     bgmRef.current.loop = true;
-    
+
     return () => {
       if (bgmRef.current) {
         bgmRef.current.pause();
@@ -46,6 +49,12 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
       }
     };
   }, []);
+
+  // useAudioStore 의 bgmVolume 변경 시 현재 재생 중인 heartbeat 에 즉시 반영
+  useEffect(() => {
+    const bgm = bgmRef.current;
+    if (bgm) bgm.volume = bgmVolume;
+  }, [bgmVolume]);
 
   const getBackgroundImage = () => {
     if (phase === 'END') return null; 
@@ -123,10 +132,10 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
         const bgm = bgmRef.current;
         if (bgm) {
           bgm.currentTime = 0.1;
-          bgm.volume = 0.7;
+          bgm.volume = bgmVolume;
           // play() 성공 여부를 확인하지 않고 그냥 실행하여 지연 최소화
           bgm.playbackRate = 1.15;
-          bgm.play().catch(() => {}); 
+          bgm.play().catch(() => {});
         }
         setPhase('CHIMING');
       }
@@ -136,7 +145,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase]);
+  }, [phase, bgmVolume]);
 
   return (
     <div className="stage-wrapper">
@@ -175,7 +184,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
               <span className="result-label">MEASURED TIME</span>
             </div>
             <p className="result-story-text">{resultTier ? TIER_COMMENT[resultTier.id] : ''}</p>
-            <p className="result-score">+{resultScore}점</p>
+            <p className="result-score">{resultScore} / {maxScoreForStage(1)}점</p>
             <div className="loading-bar-wrap"><div className="loading-bar-inner" /></div>
           </div>
         </div>

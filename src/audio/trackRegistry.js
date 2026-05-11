@@ -27,7 +27,6 @@ export const TRACK_TO_FILE = {
 };
 
 export const BGM_DEFAULTS = {
-  volume: 0.7,
   loop: true,
 };
 

@@ -188,3 +188,13 @@
   line-height: 1.5;
   font-style: italic;
 }
+
+.score-table__summary {
+  margin: 0 0 18px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 204, 0, 0.85);
+  border-left: 2px solid rgba(255, 204, 0, 0.55);
+  background: rgba(255, 204, 0, 0.04);
+}

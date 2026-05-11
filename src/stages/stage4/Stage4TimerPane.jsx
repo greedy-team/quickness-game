@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Stage4TimerPane.css';
 import { STAGE1_CONFIG } from '../stage1/stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
-import { scoreFromMetric } from '../../scoring.js';
+import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 const TIER_COMMENT = {
@@ -60,15 +60,16 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
     const error = Math.abs(time - STAGE1_CONFIG.targetSec);
     const { tier, points } = pointsForError(error, STAGE1_CONFIG);
     const metric = metricFromPoints(points, STAGE1_CONFIG);
+    const score = scoreFromMetric(1, metric);
 
     phaseRef.current = 'end';
     setFinalTime(time);
     setResultTier(tier);
-    setResultScore(scoreFromMetric(1, metric));
+    setResultScore(score);
     setPhase('end');
 
     finishTimeoutRef.current = setTimeout(() => {
-      if (onResult) onResult(metric);
+      if (onResult) onResult(metric, { score });
       finishTimeoutRef.current = null;
     }, 1500);
   };
@@ -116,6 +117,7 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
           metricLabel="MEASURED TIME"
           metricValue={formatTime(finalTime)}
           score={resultScore}
+          maxScore={maxScoreForStage(1)}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
         />
       )}

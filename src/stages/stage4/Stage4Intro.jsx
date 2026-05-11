@@ -1,4 +1,5 @@
 // 통합 인트로 — 3 sub-stage 미리보기 + Space 안내.
+import { maxScoreForStage } from '../../scoring.js';
 import './Stage4Intro.css';
 
 const PREVIEWS = [
@@ -22,6 +23,11 @@ export default function Stage4Intro() {
           </div>
         ))}
       </div>
+
+      <p className="stage4-intro__weight">
+        <span className="stage4-intro__weight-boost">⚡ 최대 {maxScoreForStage(4)}점</span>
+        {' '}— 3개 시련 점수의 합 ({maxScoreForStage(1)} + {maxScoreForStage(2)} + {maxScoreForStage(3)})
+      </p>
 
       <p className="stage4-intro__cta">▶ 준비되면 [Space] 누르기</p>
     </div>
