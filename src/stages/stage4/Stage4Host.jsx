@@ -9,11 +9,12 @@ import Stage4MergeOverlay from './Stage4MergeOverlay.jsx';
 import Stage4JumpscareOverlay from './Stage4JumpscareOverlay.jsx';
 import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
+import { useAudioVolume } from '../../audio/useAudioVolume.js';
+import { useAudioStore } from '../../audio/useAudioStore.js';
 import './Stage4Host.css';
 
 const MERGE_DURATION_MS = 4000;
 const JUMPSCARE_DURATION_MS = 2000;
-const SFX_VOLUME = 1.0;
 
 export default function Stage4Host({ onResult }) {
   const [phase, setPhase] = useState('intro'); // intro | running | merging | jumpscare | done
@@ -21,6 +22,8 @@ export default function Stage4Host({ onResult }) {
   const aggregateRef = useRef(null);
   const sfxAudioRef = useRef(null);
   const bgmAudioRef = useRef(null);
+
+  const bgmVolume = useAudioVolume('bgm');
 
   // intro 단계: Space 누르면 running 진입
   useEffect(() => {
@@ -51,14 +54,20 @@ export default function Stage4Host({ onResult }) {
     if (!audio) return;
 
     if (phase === 'running') {
-      audio.volume = BGM_DEFAULTS.volume;
+      audio.volume = bgmVolume;
       audio.loop = BGM_DEFAULTS.loop;
       audio.play().catch(() => {});
     } else {
       audio.pause();
       audio.currentTime = 0;
     }
-  }, [phase]);
+  }, [phase, bgmVolume]);
+
+  // BGM 볼륨 실시간 동기화
+  useEffect(() => {
+    const audio = bgmAudioRef.current;
+    if (audio) audio.volume = bgmVolume;
+  }, [bgmVolume]);
 
   // 3개 모두 도착하면 평균 산출 + merging 진입
   useEffect(() => {
@@ -77,7 +86,8 @@ export default function Stage4Host({ onResult }) {
     const sfxSrc = ASSETS.sounds.cutsceneJumpscareSfx;
     if (sfxSrc) {
       const audio = new Audio(sfxSrc);
-      audio.volume = SFX_VOLUME;
+      const { sfxVolume, isMuted } = useAudioStore.getState();
+      audio.volume = isMuted ? 0 : sfxVolume;
       audio.play().catch(() => {});
       sfxAudioRef.current = audio;
     }
