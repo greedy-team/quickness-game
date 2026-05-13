@@ -53,8 +53,12 @@ export default function Stage3Field({ isRunning, onResult }) {
   const itemsRef = useRef(items);
   itemsRef.current = items;
 
-  // 집계용 ref
-  const statsRef = useRef({ caughtCount: 0, missedCount: 0 });
+  // 집계용 ref (missedCount는 종료 시점에 config.itemCount - caughtCount로 계산)
+  const statsRef = useRef({ caughtCount: 0 });
+  const pressesLeftRef = useRef(config.itemCount);
+  const gameEndedRef = useRef(false);
+  // 게임 종료 로직 — RAF 만료와 keydown 양쪽에서 호출. 한 번만 실행됨.
+  const finishRef = useRef(null);
 
   // 점수 누적 헬퍼 — ref(동기 읽기용) 업데이트.
   const addPoints = useCallback((delta) => {
@@ -75,7 +79,9 @@ export default function Stage3Field({ isRunning, onResult }) {
     if (!isRunning) return;
     startTimeRef.current = performance.now();
     totalPointsRef.current = 0;
-    statsRef.current = { caughtCount: 0, missedCount: 0 };
+    statsRef.current = { caughtCount: 0 };
+    pressesLeftRef.current = config.itemCount;
+    gameEndedRef.current = false;
     setItems(sequence.map((s, idx) => ({
       id: idx,
       ...s,
@@ -84,8 +90,23 @@ export default function Stage3Field({ isRunning, onResult }) {
     })));
 
     // 종료 조건 — 마지막 아이템의 spawnAt + fallDuration + 0.5초 마진
-    // 루프 밖에서 1회 계산 (sequence·config는 effect 동안 불변).
     const lastEnd = sequence[sequence.length - 1].spawnAt + config.fallDurationSec + 0.5;
+
+    // 게임 종료 — RAF 만료 또는 프레스 소진 시 호출. gameEndedRef로 중복 방지.
+    finishRef.current = () => {
+      if (gameEndedRef.current) return;
+      gameEndedRef.current = true;
+      cancelAnimationFrame(rafRef.current);
+      const caughtCount = statsRef.current.caughtCount;
+      const missedCount = config.itemCount - caughtCount;
+      const maxPossible = config.itemCount * config.catchPoints;
+      const ratio = Math.max(0, Math.min(1, totalPointsRef.current / maxPossible));
+      const metric = 1 - ratio;
+      setItems((prev) => prev.map(
+        (it) => it.status === 'falling' ? { ...it, status: 'missed' } : it
+      ));
+      onResult({ metric, caughtCount, missedCount, realCount: config.itemCount, totalScore: totalPointsRef.current });
+    };
 
     const tick = () => {
       const now = performance.now();
@@ -96,7 +117,6 @@ export default function Stage3Field({ isRunning, onResult }) {
         const localT = elapsed - it.spawnAt;
         if (localT < 0) return { ...it, topPercent: -10 };
         if (localT > config.fallDurationSec) {
-          statsRef.current.missedCount += 1;
           return { ...it, status: 'missed', topPercent: 110 };
         }
         const topPercent = -10 + (localT / config.fallDurationSec) * 120; // -10% → 110%
@@ -104,19 +124,7 @@ export default function Stage3Field({ isRunning, onResult }) {
       }));
 
       if (elapsed >= lastEnd) {
-        // metric 산출
-        const maxPossible = config.itemCount * config.catchPoints;
-        const ratio = Math.max(0, Math.min(1, totalPointsRef.current / maxPossible));
-        const metric = 1 - ratio;
-        const caughtCount = statsRef.current.caughtCount;
-        cancelAnimationFrame(rafRef.current);
-        onResult({
-          metric,
-          caughtCount,
-          missedCount: statsRef.current.missedCount,
-          realCount: config.itemCount,
-          totalScore: totalPointsRef.current,
-        });
+        finishRef.current?.();
         return;
       }
 
@@ -133,7 +141,11 @@ export default function Stage3Field({ isRunning, onResult }) {
 
     const handleKeyDown = (e) => {
       if (e.code !== 'ArrowRight') return;
+      if (gameEndedRef.current) return;
       e.preventDefault();
+
+      // 프레스 1회 소모 (zone 비어있어도 차감)
+      pressesLeftRef.current -= 1;
 
       const zoneCenter = 70;
       const zoneHalf = config.catchZoneRatio / 2 * 100;
@@ -143,21 +155,25 @@ export default function Stage3Field({ isRunning, onResult }) {
       const candidates = itemsRef.current.filter(
         (it) => it.status === 'falling' && it.topPercent >= zoneTop && it.topPercent <= zoneBottom
       );
-      if (candidates.length === 0) return;
 
-      const target = candidates.reduce((best, it) => {
-        const itDist = Math.abs(it.topPercent - zoneCenter);
-        const bestDist = Math.abs(best.topPercent - zoneCenter);
-        return itDist < bestDist ? it : best;
-      });
+      if (candidates.length > 0) {
+        const target = candidates.reduce((best, it) => {
+          const itDist = Math.abs(it.topPercent - zoneCenter);
+          const bestDist = Math.abs(best.topPercent - zoneCenter);
+          return itDist < bestDist ? it : best;
+        });
+        addPoints(config.catchPoints);
+        showPopup(config.catchLabel, config.catchPoints, '#FFD700');
+        statsRef.current.caughtCount += 1;
+        setItems((prev) => prev.map(
+          (it) => it.id === target.id ? { ...it, status: 'caught' } : it
+        ));
+      }
 
-      addPoints(config.catchPoints);
-      showPopup(config.catchLabel, config.catchPoints, '#FFD700');
-      statsRef.current.caughtCount += 1;
-
-      setItems((prev) => prev.map(
-        (it) => it.id === target.id ? { ...it, status: 'caught' } : it
-      ));
+      // 회수 소진 시 즉시 게임 종료
+      if (pressesLeftRef.current <= 0) {
+        finishRef.current?.();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
