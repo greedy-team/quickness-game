@@ -11,9 +11,10 @@
 }
 
 .result-modal {
-  max-width: calc(100% - 16px);
-  padding: 22px 28px;
-  background: rgba(0, 0, 0, 0.6);
+  max-width: min(560px, calc(100% - 16px));
+  width: 100%;
+  padding: 28px 36px;
+  background: #000;
   border: 1px solid #444;
   text-align: center;
   box-sizing: border-box;
@@ -102,17 +103,16 @@
   column-gap: 12px;
   align-items: center;
   padding: 5px 8px;
-  opacity: 0.35;
   border-radius: 4px;
   letter-spacing: 1px;
-  transition: opacity 0.15s;
+  color: #888;
 }
 
 .result-modal__tier-row--current {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.1);
-  outline: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  outline: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 1.15rem;
+  color: #fff;
 }
 
 .result-modal__tier-name {

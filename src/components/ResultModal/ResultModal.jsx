@@ -63,7 +63,7 @@ export default function ResultModal({
             ))}
           </ul>
         )}
-        <p className="result-modal__score">{scoreText}</p>
+        {score != null && <p className="result-modal__score">{scoreText}</p>}
         {hint && <p className="result-modal__hint">{hint}</p>}
       </div>
     </div>
