@@ -15,8 +15,8 @@ export default function InfoModal({ onClose }) {
           <button type="button" className="info-modal__close" onClick={onClose} aria-label="닫기">×</button>
         </div>
         <div className="info-modal__body">
-          <p>그린이가 둘이 됐다.</p>
-          <p>진짜와 가짜를 구분해 네 가지 게임을 클리어하고 도플갱어를 퇴치하라.</p>
+          <p className="info-modal__horror">그린이는 나야,</p>
+          <p className="info-modal__horror">둘이 될 수 없어.</p>
           <ul>
             <li>Stage 1 — 괘종시계: <span className="info-modal__arrow">←</span> 키</li>
             <li>Stage 2 — 반응속도: <span className="info-modal__arrow">↑</span> 키</li>

@@ -3,10 +3,16 @@
   50% { opacity: 0.4; transform: scale(1.4); }
 }
 
+@keyframes flicker {
+  0%, 92%, 96%, 100% { opacity: 1; }
+  93%, 95%            { opacity: 0.25; }
+  94%                 { opacity: 0.7; }
+}
+
 .info-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,13 +22,14 @@
 }
 
 .info-modal {
-  background: #1a1a1a;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #0e0e0e;
+  border: 1px solid rgba(180, 0, 0, 0.5);
   border-radius: clamp(6px, 1vw, 12px);
   padding: clamp(28px, 5vw, 60px);
   max-width: min(800px, 92vw);
   width: 100%;
   color: #ffffff;
+  box-shadow: 0 0 40px rgba(160, 0, 0, 0.25), inset 0 0 60px rgba(0, 0, 0, 0.6);
 }
 
 .info-modal__header {
@@ -35,14 +42,16 @@
 .info-modal__header h2 {
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
 }
 
 .info-modal__close {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.4);
   font-size: clamp(1.6rem, 3vw, 2.4rem);
   cursor: pointer;
   line-height: 1;
@@ -51,31 +60,47 @@
 }
 
 .info-modal__close:hover {
-  color: #ffffff;
+  color: rgba(200, 0, 0, 0.9);
 }
 
 .info-modal__body p {
   margin: 0 0 clamp(12px, 2vw, 22px);
-  line-height: 1.7;
+  line-height: 1.6;
   font-size: clamp(1.05rem, 2.2vw, 1.5rem);
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.info-modal__horror {
+  color: #cc1111 !important;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(200, 0, 0, 0.6), 0 0 30px rgba(180, 0, 0, 0.3);
+  animation: flicker 5s ease-in-out infinite;
+}
+
+.info-modal__horror:nth-child(2) {
+  animation-delay: 0.4s;
 }
 
 .info-modal__body ul {
   margin: 0;
   padding-left: 0;
   list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: clamp(12px, 2vw, 20px);
+  margin-top: clamp(4px, 1vw, 8px);
 }
 
 .info-modal__body li {
   margin-bottom: clamp(10px, 1.5vw, 18px);
   font-size: clamp(1rem, 2vw, 1.4rem);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.65);
   letter-spacing: 0.02em;
 }
 
 .info-modal__arrow {
   display: inline-block;
   font-weight: 900;
+  color: #ffffff;
   animation: pulse-arrow 1.2s ease-in-out infinite;
 }

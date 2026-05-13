@@ -10,7 +10,7 @@ describe('InfoModal', () => {
   it('게임 설명 모달이 렌더된다', () => {
     render(<InfoModal onClose={() => {}} />);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByText(/그린이가 둘이 됐다/)).toBeInTheDocument();
+    expect(screen.getByText(/그린이는 나야/)).toBeInTheDocument();
   });
 
   it('닫기 버튼 클릭 시 onClose가 호출된다', async () => {
