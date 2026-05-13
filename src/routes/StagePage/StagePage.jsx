@@ -1,5 +1,5 @@
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { useGameStore, selectEndingOutcome } from '../../store.js';
+import { useGameStore } from '../../store.js';
 import { ASSETS } from '../../assets.js';
 import Stage1Placeholder from '../../stages/stage1/Stage1Placeholder.jsx';
 import Stage2Placeholder from '../../stages/stage2/Stage2Placeholder.jsx';
@@ -25,10 +25,6 @@ export default function StagePage() {
   if (!VALID_IDS.includes(id)) return <Navigate to="/hub" replace />;
 
   const stageId = Number(id);
-  // Stage 4 종료 직후 누적 점수로 엔딩 분기 URL 계산. recordResult가 동기라
-  // getState로 즉시 합산된 totalScore 기준 outcome을 평가할 수 있다.
-  const endingRouteFromCurrentScore = () =>
-    `/ending/${selectEndingOutcome(useGameStore.getState())}`;
 
   // Stage 1 — 괘종시계 실 구현 연결
   if (id === '1') {
@@ -80,7 +76,7 @@ export default function StagePage() {
       <Stage4Host
         onResult={(metric, extras) => {
           recordResult(4, metric, { scoreOverride: extras?.score });
-          navigate(endingRouteFromCurrentScore());
+          navigate('/hub');
         }}
       />
     );
