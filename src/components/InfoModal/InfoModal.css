@@ -12,15 +12,16 @@
   justify-content: center;
   z-index: 200;
   pointer-events: auto;
+  padding: clamp(16px, 4vw, 40px);
 }
 
 .info-modal {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 40px;
-  max-width: 620px;
-  width: 90%;
+  border-radius: clamp(6px, 1vw, 12px);
+  padding: clamp(28px, 5vw, 60px);
+  max-width: min(800px, 92vw);
+  width: 100%;
   color: #ffffff;
 }
 
@@ -28,11 +29,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: clamp(20px, 3vw, 36px);
 }
 
 .info-modal__header h2 {
-  font-size: 1.5rem;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   margin: 0;
@@ -42,10 +43,11 @@
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 1.8rem;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
   cursor: pointer;
   line-height: 1;
   padding: 0 4px;
+  flex-shrink: 0;
 }
 
 .info-modal__close:hover {
@@ -53,9 +55,9 @@
 }
 
 .info-modal__body p {
-  margin: 0 0 16px;
+  margin: 0 0 clamp(12px, 2vw, 22px);
   line-height: 1.7;
-  font-size: 1.15rem;
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -66,8 +68,8 @@
 }
 
 .info-modal__body li {
-  margin-bottom: 12px;
-  font-size: 1.1rem;
+  margin-bottom: clamp(10px, 1.5vw, 18px);
+  font-size: clamp(1rem, 2vw, 1.4rem);
   color: rgba(255, 255, 255, 0.8);
   letter-spacing: 0.02em;
 }
