@@ -11,6 +11,7 @@ export default function ResultModal({
   maxScore,
   tone = 'failed',
   hint,
+  tiers,
 }) {
   // maxScore가 주어지면 `현재 / 최대` 포맷, 없으면 기존 `+N` 포맷 (호환성).
   const scoreText = typeof maxScore === 'number'
@@ -29,6 +30,22 @@ export default function ResultModal({
             {metricValue}
           </p>
         )}
+        {tiers && tiers.length > 0 && (
+          <ul className="result-modal__tier-table">
+            {tiers.map((t) => (
+              <li
+                key={t.label}
+                className={`result-modal__tier-row${t.isCurrent ? ' result-modal__tier-row--current' : ''}`}
+              >
+                <span className="result-modal__tier-name" style={t.color ? { color: t.color } : undefined}>
+                  {t.label}
+                </span>
+                <span className="result-modal__tier-range">{t.rangeLabel}</span>
+                <span className="result-modal__tier-pts">{t.points}점</span>
+              </li>
+            ))}
+          </ul>
+        )}
         {breakdown && breakdown.length > 0 && (
           <ul className="result-modal__breakdown">
             {breakdown.map((row) => (
@@ -46,7 +63,7 @@ export default function ResultModal({
             ))}
           </ul>
         )}
-        <p className="result-modal__score">{scoreText}</p>
+        {score != null && <p className="result-modal__score">{scoreText}</p>}
         {hint && <p className="result-modal__hint">{hint}</p>}
       </div>
     </div>

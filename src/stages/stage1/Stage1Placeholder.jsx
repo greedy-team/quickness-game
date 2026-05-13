@@ -5,6 +5,7 @@ import { STAGE1_CONFIG } from './stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 // 💡 경로 앞에 /를 붙여서 public 폴더 기준임을 명시
 const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
@@ -35,6 +36,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
   const startTimeRef = useRef(0);
   const requestRef = useRef();
+  const pendingMetricRef = useRef(null);
   
   // 💡 오디오 객체를 안전하게 한 번만 생성
   const bgmRef = useRef(null);
@@ -114,7 +116,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
     setResultTier(tier);
     const metric = metricFromPoints(points, STAGE1_CONFIG);
     setResultScore(scoreFromMetric(1, metric));
-    setTimeout(() => { if (onResult) onResult(metric); }, 4500);
+    pendingMetricRef.current = metric;
   };
 
   useEffect(() => {
@@ -141,6 +143,10 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
       }
       if (e.key === 'ArrowLeft' && phase === 'CHIMING') {
         handleFinish((Date.now() - startTimeRef.current) / 1000);
+      }
+      if (phase === 'END' && (e.code === 'Space' || e.code === 'Enter')) {
+        e.preventDefault();
+        if (onResult && pendingMetricRef.current !== null) onResult(pendingMetricRef.current);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -176,18 +182,19 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
         </div>
       )}
 
-      {phase === 'END' && (
-        <div className="result-overlay immersive">
-          <div className="result-container">
-            <div className="result-time-display">
-              <h1 className="result-val">{formatTime(finalResultTime)}</h1>
-              <span className="result-label">MEASURED TIME</span>
-            </div>
-            <p className="result-story-text">{resultTier ? TIER_COMMENT[resultTier.id] : ''}</p>
-            <p className="result-score">{resultScore} / {maxScoreForStage(1)}점</p>
-            <div className="loading-bar-wrap"><div className="loading-bar-inner" /></div>
-          </div>
-        </div>
+      {phase === 'END' && resultTier && (
+        <ResultModal
+          metricLabel="MEASURED TIME"
+          metricValue={formatTime(finalResultTime)}
+          tone={resultTier.id === 'bare' ? 'failed' : 'success'}
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => {
+            const rangeLabel = t.maxError === Infinity
+              ? '그 외'
+              : `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
+            return { label: t.label, rangeLabel, points: t.points, isCurrent: resultTier.id === t.id, color: t.color };
+          })}
+          hint="Space / Enter 로 계속"
+        />
       )}
     </div>
   );

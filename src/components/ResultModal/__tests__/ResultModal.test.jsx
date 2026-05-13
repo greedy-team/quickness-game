@@ -74,4 +74,30 @@ describe('ResultModal', () => {
     const { container } = render(<ResultModal tierComment="멘트" score={100} />);
     expect(container.querySelector('.result-modal--failed')).not.toBeNull();
   });
+
+  it('tiers 미지정 시 tier-table 미렌더', () => {
+    const { container } = render(<ResultModal tierComment="멘트" score={100} />);
+    expect(container.querySelector('.result-modal__tier-table')).toBeNull();
+  });
+
+  it('tiers 지정 시 tier-table 렌더 + 각 행 표시', () => {
+    const tiers = [
+      { label: '완벽!', rangeLabel: '±0.05초', points: 100, isCurrent: true, color: '#FFD700' },
+      { label: '훌륭!', rangeLabel: '±0.10초', points: 80, isCurrent: false, color: '#FF8855' },
+    ];
+    const { container } = render(<ResultModal tierComment="멘트" score={100} tiers={tiers} />);
+    expect(container.querySelector('.result-modal__tier-table')).not.toBeNull();
+    expect(container.querySelectorAll('.result-modal__tier-row')).toHaveLength(2);
+  });
+
+  it('isCurrent=true인 tier 행에 result-modal__tier-row--current 클래스 적용', () => {
+    const tiers = [
+      { label: '완벽!', rangeLabel: '±0.05초', points: 100, isCurrent: true },
+      { label: '훌륭!', rangeLabel: '±0.10초', points: 80, isCurrent: false },
+    ];
+    const { container } = render(<ResultModal tierComment="멘트" score={100} tiers={tiers} />);
+    const rows = container.querySelectorAll('.result-modal__tier-row');
+    expect(rows[0].classList.contains('result-modal__tier-row--current')).toBe(true);
+    expect(rows[1].classList.contains('result-modal__tier-row--current')).toBe(false);
+  });
 });

@@ -1,10 +1,16 @@
 import React from 'react';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import HudOverlay from '../HudOverlay.jsx';
 import { useGameStore } from '../../../store.js';
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, useNavigate: () => mockNavigate };
+});
 
 function renderHud({ path = '/hub' } = {}) {
   return render(
@@ -14,16 +20,16 @@ function renderHud({ path = '/hub' } = {}) {
   );
 }
 
-function setTotalScore(score) {
-  // Stage 1 의 score 슬롯에만 점수를 넣어 selectTotalScore 가 그대로 score 를 반환하게 한다.
-  useGameStore.setState({
-    stageResults: { 1: { metric: 0, score }, 2: null, 3: null, 4: null },
-  });
+function setStageScore(stageId, score) {
+  useGameStore.setState((s) => ({
+    stageResults: { ...s.stageResults, [stageId]: { metric: 0, score } },
+  }));
 }
 
-describe('HudOverlay 점수 막대', () => {
+describe('HudOverlay', () => {
   beforeEach(() => {
     useGameStore.getState().resetGame();
+    mockNavigate.mockClear();
   });
 
   afterEach(() => {
@@ -31,61 +37,54 @@ describe('HudOverlay 점수 막대', () => {
     useGameStore.getState().resetGame();
   });
 
-  it('total=0 일 때 채움 폭은 0%, alive 클래스 없음', () => {
-    setTotalScore(0);
-    const { container } = renderHud();
-    const fill = container.querySelector('.hud-overlay__bar-fill');
-    expect(fill).not.toBeNull();
-    expect(fill.style.width).toBe('0%');
-    expect(fill.className).not.toContain('hud-overlay__bar-fill--alive');
+  it('/ 라우트에서는 HUD가 렌더되지 않는다', () => {
+    const { container } = renderHud({ path: '/' });
+    expect(container.querySelector('.hud-overlay')).toBeNull();
   });
 
-  it('total=999 → 채움 폭 ≈ 44.6%, alive 클래스 없음', () => {
-    setTotalScore(999);
-    const { container } = renderHud();
-    const fill = container.querySelector('.hud-overlay__bar-fill');
-    const pct = parseFloat(fill.style.width);
-    expect(pct).toBeGreaterThan(44.5);
-    expect(pct).toBeLessThan(44.7);
-    expect(fill.className).not.toContain('hud-overlay__bar-fill--alive');
+  it('/ranking 라우트에서는 HUD가 렌더되지 않는다', () => {
+    const { container } = renderHud({ path: '/ranking' });
+    expect(container.querySelector('.hud-overlay')).toBeNull();
   });
 
-  it('total=1000 → 채움 폭 ≈ 44.6%, alive 클래스 있음 (생존선 정확 통과)', () => {
-    setTotalScore(1000);
-    const { container } = renderHud();
-    const fill = container.querySelector('.hud-overlay__bar-fill');
-    const pct = parseFloat(fill.style.width);
-    expect(pct).toBeGreaterThanOrEqual(44.6);
-    expect(pct).toBeLessThanOrEqual(44.7);
-    expect(fill.className).toContain('hud-overlay__bar-fill--alive');
+  it('/stage/* 라우트에서는 SCORE 텍스트만 노출되고 아이콘 버튼은 없다', () => {
+    renderHud({ path: '/stage/1' });
+    expect(screen.getByText(/SCORE/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '게임 설명' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '결과 확인' })).toBeNull();
   });
 
-  it('total=2240 → 채움 폭 100%, alive 클래스 있음', () => {
-    setTotalScore(2240);
-    const { container } = renderHud();
-    const fill = container.querySelector('.hud-overlay__bar-fill');
-    expect(fill.style.width).toBe('100%');
-    expect(fill.className).toContain('hud-overlay__bar-fill--alive');
-  });
-
-  it('만점 텍스트(/ 2240)와 생존선 라벨(1000)이 노출된다', () => {
-    setTotalScore(0);
+  it('초기 상태 — 스테이지 점수 0 · 0 · 0 · 0 텍스트가 노출된다', () => {
     renderHud();
-    expect(screen.getByText(/\/\s*2240/)).toBeInTheDocument();
-    expect(screen.getByText(/생존선 1000/)).toBeInTheDocument();
+    expect(screen.getByText('0 · 0 · 0 · 0')).toBeInTheDocument();
   });
 
-  it('점수 블록 클릭 시 ScoreTable 모달이 열린다 (회귀 보호)', async () => {
-    setTotalScore(250);
+  it('Stage 1 클리어 후 해당 점수가 반영된다', () => {
+    setStageScore(1, 360);
+    renderHud();
+    expect(screen.getByText('360 · 0 · 0 · 0')).toBeInTheDocument();
+  });
+
+  it('Info 버튼 클릭 시 InfoModal이 열린다', async () => {
     const user = userEvent.setup();
     renderHud();
-    await user.click(screen.getByRole('button', { name: /점수 기준 보기/ }));
+    await user.click(screen.getByRole('button', { name: '게임 설명' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
-  it('/ (타이틀) 라우트에서는 HUD 가 렌더되지 않는다', () => {
-    setTotalScore(0);
-    const { container } = renderHud({ path: '/' });
-    expect(container.querySelector('.hud-overlay')).toBeNull();
+  it('LogIn 버튼 클릭 시 269점 → /ending/silhouette로 이동한다', async () => {
+    setStageScore(1, 269);
+    const user = userEvent.setup();
+    renderHud();
+    await user.click(screen.getByRole('button', { name: '결과 확인' }));
+    expect(mockNavigate).toHaveBeenCalledWith('/ending/silhouette');
+  });
+
+  it('LogIn 버튼 클릭 시 270점 → /ending/alive로 이동한다', async () => {
+    setStageScore(1, 270);
+    const user = userEvent.setup();
+    renderHud();
+    await user.click(screen.getByRole('button', { name: '결과 확인' }));
+    expect(mockNavigate).toHaveBeenCalledWith('/ending/alive');
   });
 });

@@ -11,9 +11,10 @@
 }
 
 .result-modal {
-  max-width: calc(100% - 16px);
-  padding: 22px 28px;
-  background: rgba(0, 0, 0, 0.6);
+  max-width: min(560px, calc(100% - 16px));
+  width: 100%;
+  padding: 28px 36px;
+  background: #000;
   border: 1px solid #444;
   text-align: center;
   box-sizing: border-box;
@@ -86,6 +87,51 @@
   font-weight: bold;
 }
 
+.result-modal__tier-table {
+  list-style: none;
+  margin: 18px auto 0 auto;
+  padding: 0;
+  max-width: 340px;
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.05rem;
+}
+
+.result-modal__tier-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 12px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  color: #888;
+}
+
+.result-modal__tier-row--current {
+  background: rgba(255, 255, 255, 0.08);
+  outline: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 1.15rem;
+  color: #fff;
+}
+
+.result-modal__tier-name {
+  text-align: left;
+  font-weight: bold;
+}
+
+.result-modal__tier-range {
+  text-align: center;
+  color: #888;
+  font-size: 0.88rem;
+}
+
+.result-modal__tier-pts {
+  text-align: right;
+  color: #ffcc00;
+  font-weight: bold;
+}
+
 .result-modal__hint {
   margin: 18px 0 0 0;
   font-size: 0.85rem;
@@ -95,10 +141,10 @@
 
 .result-modal__score {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 2.2rem;
+  font-size: 3rem;
   color: #ffcc00;
   font-weight: bold;
-  margin: 10px 0 0 0;
-  text-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
-  letter-spacing: 2px;
+  margin: 16px 0 0 0;
+  text-shadow: 0 0 16px rgba(255, 204, 0, 0.7);
+  letter-spacing: 3px;
 }

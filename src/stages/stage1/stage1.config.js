@@ -12,5 +12,5 @@ export const STAGE1_CONFIG = {
     { id: 'ok',      maxError: 0.40,     points: 40,  label: '통과',  color: '#FFEE88' },
     { id: 'bare',    maxError: Infinity, points: 20,  label: '아슬',  color: '#CCCCCC' },
   ],
-  precisionBonusMax: 60,  // perfect tier 안 선형 정밀도 보너스 폭
+  precisionBonusMax: 0,  // 100점 만점 체계 — perfect 내 정밀도 보너스 제거
 };

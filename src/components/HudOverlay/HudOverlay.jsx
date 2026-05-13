@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useGameStore, selectTotalScore, selectClearedCount } from '../../store.js';
-import { TOTAL_MAX_SCORE, ENDING_SUCCESS_CUTOFF, maxScoreForStage } from '../../scoring.js';
-import ScoreTable from './ScoreTable.jsx';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Info, LogIn } from 'lucide-react';
+import { useGameStore, selectTotalScore } from '../../store.js';
+import { endingOutcomeFromTotal } from '../../scoring.js';
+import InfoModal from '../InfoModal/InfoModal.jsx';
 import './HudOverlay.css';
 
 const HIDDEN_ROUTES = new Set(['/', '/ranking']);
 
-const CUTOFF_PCT = (ENDING_SUCCESS_CUTOFF / TOTAL_MAX_SCORE) * 100;
-
 export default function HudOverlay() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const total = useGameStore(selectTotalScore);
-  const cleared = useGameStore(selectClearedCount);
-  const [tableOpen, setTableOpen] = useState(false);
+  const stageResults = useGameStore((s) => s.stageResults);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   useEffect(() => {
-    if (!tableOpen) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') setTableOpen(false); };
+    if (!infoOpen) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setInfoOpen(false); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [tableOpen]);
+  }, [infoOpen]);
 
   if (HIDDEN_ROUTES.has(pathname)) return null;
 
@@ -32,40 +32,32 @@ export default function HudOverlay() {
     );
   }
 
-  const fillPct = Math.min(100, (total / TOTAL_MAX_SCORE) * 100);
-  const isAlive = total >= ENDING_SUCCESS_CUTOFF;
-  const fillClass = isAlive
-    ? 'hud-overlay__bar-fill hud-overlay__bar-fill--alive'
-    : 'hud-overlay__bar-fill';
+  const scoreText = [1, 2, 3, 4]
+    .map((n) => stageResults[n]?.score ?? 0)
+    .join(' · ');
 
   return (
     <div className="hud-overlay" aria-hidden="false">
-      <button
-        type="button"
-        className="hud-overlay__score"
-        onClick={() => setTableOpen((v) => !v)}
-        aria-label={`점수 기준 보기 — 현재 ${total}점, 목표 ${ENDING_SUCCESS_CUTOFF}점 ${isAlive ? '통과' : '미도달'}`}
-      >
-        <span className="hud-overlay__score-line">
-          SCORE {total}
-          <span className="hud-overlay__score-max"> / {TOTAL_MAX_SCORE}</span>
-        </span>
-        <span className="hud-overlay__bar" role="presentation">
-          <span className={fillClass} style={{ width: `${fillPct}%` }} />
-          <span className="hud-overlay__bar-tick" style={{ left: `${CUTOFF_PCT}%` }} />
-          <span className="hud-overlay__bar-tick-label" style={{ left: `${CUTOFF_PCT}%` }}>
-            생존선 {ENDING_SUCCESS_CUTOFF}
-          </span>
-        </span>
-        <span className="hud-overlay__weights" aria-label="스테이지별 만점 가중치">
-          S1·2 {maxScoreForStage(1)}
-          {' · '}S3 {maxScoreForStage(3)}
-          {' · '}S4 {maxScoreForStage(4)}
-          <span className="hud-overlay__weights-boost"> ⚡</span>
-        </span>
-      </button>
-      <div className="hud-overlay__progress">{cleared} / 4</div>
-      {tableOpen && <ScoreTable onClose={() => setTableOpen(false)} />}
+      <div className="hud-overlay__scores">{scoreText}</div>
+      <div className="hud-overlay__actions">
+        <button
+          type="button"
+          className="hud-overlay__action-btn"
+          onClick={() => setInfoOpen(true)}
+          aria-label="게임 설명"
+        >
+          <Info size={30} />
+        </button>
+        <button
+          type="button"
+          className="hud-overlay__action-btn"
+          onClick={() => navigate(`/ending/${endingOutcomeFromTotal(total)}`)}
+          aria-label="결과 확인"
+        >
+          <LogIn size={30} />
+        </button>
+      </div>
+      {infoOpen && <InfoModal onClose={() => setInfoOpen(false)} />}
     </div>
   );
 }

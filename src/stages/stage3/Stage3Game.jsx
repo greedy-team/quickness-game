@@ -72,29 +72,25 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
   const handleFieldDone = useCallback((data) => {
     setResultData(data);
     setPhase('result');
-    finishTimeoutRef.current = setTimeout(() => {
-      onResult(data.metric, { score: data.totalScore });
-      finishTimeoutRef.current = null;
-    }, mode === 'split' ? 1500 : 4000);
+    // split은 타이머 자동 진행, standalone은 키 입력 대기
+    if (mode === 'split') {
+      finishTimeoutRef.current = setTimeout(() => {
+        onResult(data.metric, { score: data.totalScore });
+        finishTimeoutRef.current = null;
+      }, 1500);
+    }
   }, [mode, onResult]);
 
-  // standalone result phase — 키 입력 시 대기시간을 건너뛰고 즉시 hub로 이동.
+  // standalone result phase — Space/Enter 키 입력 시 hub로 이동.
   useEffect(() => {
     if (mode !== 'standalone') return;
     if (phase !== 'result') return;
     if (!resultData) return;
 
-    const skip = () => {
-      if (finishTimeoutRef.current) {
-        clearTimeout(finishTimeoutRef.current);
-        finishTimeoutRef.current = null;
-      }
-      onResult(resultData.metric, { score: resultData.totalScore });
-    };
     const handleKeyDown = (e) => {
       if (e.code === 'Space' || e.code === 'Enter' || e.key === 'ArrowRight') {
         e.preventDefault();
-        skip();
+        onResult(resultData.metric, { score: resultData.totalScore });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -166,15 +162,13 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     }
 
     return {
-      headline: isSuccess ? 'MEMORY RECOVERED' : 'PIECES LOST',
-      tierComment: comment,
       metricLabel: 'PIECES',
       metricValue: `${caughtCount}/${realCount}`,
       breakdown,
-      score: totalScore,
-      maxScore: maxScoreForStage(3),
+      score: undefined,
+      maxScore: undefined,
       tone: isSuccess ? 'success' : 'failed',
-      hint: mode === 'standalone' ? '아무 키나 눌러 계속...' : null,
+      hint: mode === 'standalone' ? 'Space / Enter 로 계속' : null,
     };
   })();
 
