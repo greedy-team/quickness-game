@@ -5,7 +5,6 @@ import './CatchZone.css';
 export default function CatchZone() {
   return (
     <div className="catch-zone" aria-hidden="true">
-      <div className="catch-zone__band" />
       <div className="catch-zone__center-line" />
       <div className="catch-zone__key">→</div>
       <div className="catch-zone__hint">황금선 위에서</div>
