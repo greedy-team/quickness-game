@@ -36,6 +36,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
   const startTimeRef = useRef(0);
   const requestRef = useRef();
+  const pendingMetricRef = useRef(null);
   
   // 💡 오디오 객체를 안전하게 한 번만 생성
   const bgmRef = useRef(null);
@@ -115,7 +116,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
     setResultTier(tier);
     const metric = metricFromPoints(points, STAGE1_CONFIG);
     setResultScore(scoreFromMetric(1, metric));
-    setTimeout(() => { if (onResult) onResult(metric); }, 4500);
+    pendingMetricRef.current = metric;
   };
 
   useEffect(() => {
@@ -142,6 +143,10 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
       }
       if (e.key === 'ArrowLeft' && phase === 'CHIMING') {
         handleFinish((Date.now() - startTimeRef.current) / 1000);
+      }
+      if (phase === 'END' && (e.code === 'Space' || e.code === 'Enter')) {
+        e.preventDefault();
+        if (onResult && pendingMetricRef.current !== null) onResult(pendingMetricRef.current);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -179,8 +184,6 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
       {phase === 'END' && resultTier && (
         <ResultModal
-          headline={resultTier.id === 'bare' ? 'DOPPELGANGER WINS' : 'FREQUENCY BLOCKED'}
-          tierComment={TIER_COMMENT[resultTier.id]}
           metricLabel="MEASURED TIME"
           metricValue={formatTime(finalResultTime)}
           score={resultScore}
@@ -193,7 +196,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
             isCurrent: resultTier.id === t.id,
             color: t.color,
           }))}
-          hint="잠시 후 다음 화면으로..."
+          hint="Space / Enter 로 계속"
         />
       )}
     </div>

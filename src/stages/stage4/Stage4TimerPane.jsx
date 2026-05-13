@@ -113,7 +113,6 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
 
       {phase === 'end' && resultTier && (
         <ResultModal
-          tierComment={TIER_COMMENT[resultTier.id]}
           metricLabel="MEASURED TIME"
           metricValue={formatTime(finalTime)}
           score={resultScore}

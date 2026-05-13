@@ -23,7 +23,7 @@ describe('Stage4TimerPane', () => {
 
     expect(screen.getByText(/MEASURED TIME/i)).toBeInTheDocument();
     expect(screen.getByText(/\d+\s*\/\s*\d+점/)).toBeInTheDocument();
-    expect(screen.getByText(/도플갱어|타이밍|정각/)).toBeInTheDocument();
+    expect(screen.getAllByText(/완벽!|훌륭!|좋아!|통과|아슬/).length).toBeGreaterThan(0);
   });
 
   it('ArrowLeft 입력 후 1500ms 경과 시 onResult를 1회 호출한다', () => {

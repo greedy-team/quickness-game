@@ -88,29 +88,31 @@
 
 .result-modal__tier-table {
   list-style: none;
-  margin: 14px auto 0 auto;
+  margin: 18px auto 0 auto;
   padding: 0;
-  max-width: 300px;
+  max-width: 340px;
+  width: 100%;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
 }
 
 .result-modal__tier-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  column-gap: 10px;
+  column-gap: 12px;
   align-items: center;
-  padding: 3px 6px;
-  opacity: 0.4;
-  border-radius: 3px;
+  padding: 5px 8px;
+  opacity: 0.35;
+  border-radius: 4px;
   letter-spacing: 1px;
   transition: opacity 0.15s;
 }
 
 .result-modal__tier-row--current {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-  outline: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  outline: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 1.15rem;
 }
 
 .result-modal__tier-name {
@@ -121,12 +123,13 @@
 .result-modal__tier-range {
   text-align: center;
   color: #888;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
 }
 
 .result-modal__tier-pts {
   text-align: right;
   color: #ffcc00;
+  font-weight: bold;
 }
 
 .result-modal__hint {
@@ -138,10 +141,10 @@
 
 .result-modal__score {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 2.2rem;
+  font-size: 3rem;
   color: #ffcc00;
   font-weight: bold;
-  margin: 10px 0 0 0;
-  text-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
-  letter-spacing: 2px;
+  margin: 16px 0 0 0;
+  text-shadow: 0 0 16px rgba(255, 204, 0, 0.7);
+  letter-spacing: 3px;
 }

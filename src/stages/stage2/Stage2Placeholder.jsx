@@ -60,6 +60,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   const jumpscareAudioTimeoutRef = useRef(null);
   // 🚀 [추가] 재생 중인 점프스케어 오디오 인스턴스를 추적하기 위한 Ref
   const realAudioRef = useRef(null);
+  const pendingResultRef = useRef(null);
 
   const syncPhase = (p) => { stateRef.current.phase = p; setPhase(p); };
   const syncGameState = (g) => { stateRef.current.gameState = g; setGameState(g); };
@@ -137,6 +138,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     setReaction({ time: rTime, comment: rComment });
     setResultTier(tier);
     setResultScore(score);
+    pendingResultRef.current = { metric, score };
     syncPhase('END');
 
     // 🚀 [추가] 게임 종료 시 점프스케어 타이머 취소
@@ -151,10 +153,13 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       realAudioRef.current = null;
     }
 
-    setTimeout(() => {
-      if (onResult) onResult(metric, { score });
-    }, 2000);
-  }, [onResult]);
+    // split 모드는 타이머로 자동 진행, standalone은 키 입력 대기
+    if (mode === 'split') {
+      setTimeout(() => {
+        if (onResult) onResult(metric, { score });
+      }, 1500);
+    }
+  }, [onResult, mode]);
 
   const handleShutter = useCallback(() => {
     if (stateRef.current.phase !== 'PLAY' || stateRef.current.isFinished) return;
@@ -298,10 +303,15 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     const handleKeyDown = (e) => {
       if (stateRef.current.phase === 'MANUAL' && (e.code === 'Space' || e.code === 'Enter')) startGame();
       else if (stateRef.current.phase === 'PLAY' && e.key === 'ArrowUp') handleShutter();
+      else if (stateRef.current.phase === 'END' && mode !== 'split' && (e.code === 'Space' || e.code === 'Enter')) {
+        e.preventDefault();
+        const r = pendingResultRef.current;
+        if (onResult && r) onResult(r.metric, { score: r.score });
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleShutter]);
+  }, [handleShutter, mode, onResult]);
 
   return (
     <div className={`stage2-wrapper ${isShaking ? 'screen-shake' : ''} ${mode === 'split' ? 'split-mode' : ''}`}>
@@ -337,8 +347,6 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
       {phase === 'END' && resultTier && (
         <ResultModal
-          headline={resultTier.id !== 'bare' ? 'EVIDENCE CAPTURED' : 'LOST IN DARKNESS'}
-          tierComment={reaction.comment}
           metricLabel={reaction.time ? 'REACTION TIME' : null}
           metricValue={reaction.time ? `${reaction.time}s` : null}
           score={resultScore}
@@ -351,7 +359,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
             isCurrent: resultTier.id === t.id,
             color: t.color,
           }))}
-          hint={mode !== 'split' ? '잠시 후 다음 화면으로...' : null}
+          hint={mode !== 'split' ? 'Space / Enter 로 계속' : null}
         />
       )}
     </div>
