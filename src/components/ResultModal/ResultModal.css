@@ -86,6 +86,49 @@
   font-weight: bold;
 }
 
+.result-modal__tier-table {
+  list-style: none;
+  margin: 14px auto 0 auto;
+  padding: 0;
+  max-width: 300px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+}
+
+.result-modal__tier-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 3px 6px;
+  opacity: 0.4;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  transition: opacity 0.15s;
+}
+
+.result-modal__tier-row--current {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+  outline: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.result-modal__tier-name {
+  text-align: left;
+  font-weight: bold;
+}
+
+.result-modal__tier-range {
+  text-align: center;
+  color: #888;
+  font-size: 0.78rem;
+}
+
+.result-modal__tier-pts {
+  text-align: right;
+  color: #ffcc00;
+}
+
 .result-modal__hint {
   margin: 18px 0 0 0;
   font-size: 0.85rem;

@@ -5,6 +5,7 @@ import { STAGE1_CONFIG } from './stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 // 💡 경로 앞에 /를 붙여서 public 폴더 기준임을 명시
 const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
@@ -176,18 +177,24 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
         </div>
       )}
 
-      {phase === 'END' && (
-        <div className="result-overlay immersive">
-          <div className="result-container">
-            <div className="result-time-display">
-              <h1 className="result-val">{formatTime(finalResultTime)}</h1>
-              <span className="result-label">MEASURED TIME</span>
-            </div>
-            <p className="result-story-text">{resultTier ? TIER_COMMENT[resultTier.id] : ''}</p>
-            <p className="result-score">{resultScore} / {maxScoreForStage(1)}점</p>
-            <div className="loading-bar-wrap"><div className="loading-bar-inner" /></div>
-          </div>
-        </div>
+      {phase === 'END' && resultTier && (
+        <ResultModal
+          headline={resultTier.id === 'bare' ? 'DOPPELGANGER WINS' : 'FREQUENCY BLOCKED'}
+          tierComment={TIER_COMMENT[resultTier.id]}
+          metricLabel="MEASURED TIME"
+          metricValue={formatTime(finalResultTime)}
+          score={resultScore}
+          maxScore={maxScoreForStage(1)}
+          tone={resultTier.id === 'bare' ? 'failed' : 'success'}
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => ({
+            label: t.label,
+            rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError.toFixed(2)}초`,
+            points: t.points,
+            isCurrent: resultTier.id === t.id,
+            color: t.color,
+          }))}
+          hint="잠시 후 다음 화면으로..."
+        />
       )}
     </div>
   );

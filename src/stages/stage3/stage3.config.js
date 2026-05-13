@@ -11,18 +11,18 @@ export const STAGE3_CONFIG = {
   horizontalRandomRatio:  0.2, // 중앙 ±20%
   seed:              null,    // null = 매 플레이 timestamp 사용
 
-  // 캐치 존 내 정확도 tier (per-item points)
+  // 캐치 존 내 정확도 tier (per-item points). realCount(4) × perfect(25) = 100점 만점.
   // maxOffset: 0=중심, 1=캐치 존 가장자리
   // id: CSS 클래스용 영문 식별자 / label: 화면 표시용 한국어
   accuracyTiers: [
-    { id: 'perfect', maxOffset: 0.05, points: 100, label: '완벽!',  color: '#FFD700' },
-    { id: 'great',   maxOffset: 0.15, points: 80,  label: '훌륭!',  color: '#FF8855' },
-    { id: 'good',    maxOffset: 0.30, points: 60,  label: '좋아!',  color: '#FFCC00' },
-    { id: 'ok',      maxOffset: 0.50, points: 40,  label: '통과',   color: '#FFEE88' },
-    { id: 'bare',    maxOffset: 1.00, points: 20,  label: '아슬',   color: '#CCCCCC' },
+    { id: 'perfect', maxOffset: 0.05, points: 25, label: '완벽!',  color: '#FFD700' },
+    { id: 'great',   maxOffset: 0.15, points: 20, label: '훌륭!',  color: '#FF8855' },
+    { id: 'good',    maxOffset: 0.30, points: 15, label: '좋아!',  color: '#FFCC00' },
+    { id: 'ok',      maxOffset: 0.50, points: 10, label: '통과',   color: '#FFEE88' },
+    { id: 'bare',    maxOffset: 1.00, points:  5, label: '아슬',   color: '#CCCCCC' },
   ],
 
-  fakePenalty: -50,    // fake 캐치 시
+  fakePenalty: -12,    // fake 캐치 시 (100점 만점 기준 비례 조정)
   missScore:    0,     // real 미입력 / 캐치 존 밖 입력
 
   // 표시용 라벨 (popup)

@@ -119,6 +119,13 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
           score={resultScore}
           maxScore={maxScoreForStage(1)}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => ({
+            label: t.label,
+            rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError.toFixed(2)}초`,
+            points: t.points,
+            isCurrent: resultTier.id === t.id,
+            color: t.color,
+          }))}
         />
       )}
     </div>

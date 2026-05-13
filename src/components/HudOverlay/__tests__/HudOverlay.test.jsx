@@ -72,16 +72,16 @@ describe('HudOverlay', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
-  it('LogIn 버튼 클릭 시 999점 → /ending/silhouette로 이동한다', async () => {
-    setStageScore(1, 999);
+  it('LogIn 버튼 클릭 시 269점 → /ending/silhouette로 이동한다', async () => {
+    setStageScore(1, 269);
     const user = userEvent.setup();
     renderHud();
     await user.click(screen.getByRole('button', { name: '결과 확인' }));
     expect(mockNavigate).toHaveBeenCalledWith('/ending/silhouette');
   });
 
-  it('LogIn 버튼 클릭 시 1000점 → /ending/alive로 이동한다', async () => {
-    setStageScore(1, 1000);
+  it('LogIn 버튼 클릭 시 270점 → /ending/alive로 이동한다', async () => {
+    setStageScore(1, 270);
     const user = userEvent.setup();
     renderHud();
     await user.click(screen.getByRole('button', { name: '결과 확인' }));

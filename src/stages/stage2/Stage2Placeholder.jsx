@@ -333,20 +333,9 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
         )}
 
-        {phase === 'END' && mode !== 'split' && (
-          <div className="final-message-overlay">
-            <div className={resultTier && resultTier.id !== 'bare' ? 'msg-success' : 'msg-failed'}>
-              <h1 className="main-msg">{resultTier && resultTier.id !== 'bare' ? "EVIDENCE CAPTURED" : "LOST IN DARKNESS"}</h1>
-              <p className="sub-msg">{reaction.comment}</p>
-              {reaction.time && <p className="reaction-time">REACTION TIME: {reaction.time}s</p>}
-              <p className="result-score">{resultScore} / {maxScoreForStage(2)}점</p>
-            </div>
-            <p className="start-btn" style={{ marginTop: '40px' }}>메인 화면으로 돌아갑니다...</p>
-          </div>
-        )}
       </div>
 
-      {phase === 'END' && mode === 'split' && resultTier && (
+      {phase === 'END' && resultTier && (
         <ResultModal
           headline={resultTier.id !== 'bare' ? 'EVIDENCE CAPTURED' : 'LOST IN DARKNESS'}
           tierComment={reaction.comment}
@@ -355,6 +344,14 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           score={resultScore}
           maxScore={maxScoreForStage(2)}
           tone={resultTier.id !== 'bare' ? 'success' : 'failed'}
+          tiers={STAGE2_CONFIG.accuracyTiers.map((t) => ({
+            label: t.label,
+            rangeLabel: t.maxError === Infinity ? '그 외' : `${t.maxError.toFixed(2)}초 이내`,
+            points: t.points,
+            isCurrent: resultTier.id === t.id,
+            color: t.color,
+          }))}
+          hint={mode !== 'split' ? '잠시 후 다음 화면으로...' : null}
         />
       )}
     </div>

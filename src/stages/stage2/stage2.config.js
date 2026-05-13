@@ -11,5 +11,5 @@ export const STAGE2_CONFIG = {
     { id: 'ok',      maxError: 0.65,     points: 40,  label: '통과',  color: '#FFEE88' },
     { id: 'bare',    maxError: Infinity, points: 20,  label: '아슬',  color: '#CCCCCC' },
   ],
-  precisionBonusMax: 60,
+  precisionBonusMax: 0,
 };
