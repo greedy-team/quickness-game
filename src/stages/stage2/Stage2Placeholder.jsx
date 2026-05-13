@@ -349,16 +349,14 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
         <ResultModal
           metricLabel={reaction.time ? 'REACTION TIME' : null}
           metricValue={reaction.time ? `${reaction.time}s` : null}
-          score={resultScore}
-          maxScore={maxScoreForStage(2)}
           tone={resultTier.id !== 'bare' ? 'success' : 'failed'}
-          tiers={STAGE2_CONFIG.accuracyTiers.map((t) => ({
-            label: t.label,
-            rangeLabel: t.maxError === Infinity ? '그 외' : `${t.maxError.toFixed(2)}초 이내`,
-            points: t.points,
-            isCurrent: resultTier.id === t.id,
-            color: t.color,
-          }))}
+          tiers={STAGE2_CONFIG.accuracyTiers.map((t, i, arr) => {
+            const prevMax = i === 0 ? 0 : arr[i - 1].maxError;
+            const rangeLabel = t.maxError === Infinity
+              ? `${prevMax.toFixed(2)}초~`
+              : `${prevMax.toFixed(2)}~${t.maxError.toFixed(2)}초`;
+            return { label: t.label, rangeLabel, points: t.points, isCurrent: resultTier.id === t.id, color: t.color };
+          })}
           hint={mode !== 'split' ? 'Space / Enter 로 계속' : null}
         />
       )}

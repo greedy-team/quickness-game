@@ -165,8 +165,8 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
       metricLabel: 'PIECES',
       metricValue: `${caughtCount}/${realCount}`,
       breakdown,
-      score: totalScore,
-      maxScore: maxScoreForStage(3),
+      score: undefined,
+      maxScore: undefined,
       tone: isSuccess ? 'success' : 'failed',
       hint: mode === 'standalone' ? 'Space / Enter 로 계속' : null,
     };

@@ -115,16 +115,13 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
         <ResultModal
           metricLabel="MEASURED TIME"
           metricValue={formatTime(finalTime)}
-          score={resultScore}
-          maxScore={maxScoreForStage(1)}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => ({
-            label: t.label,
-            rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError.toFixed(2)}초`,
-            points: t.points,
-            isCurrent: resultTier.id === t.id,
-            color: t.color,
-          }))}
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => {
+            const rangeLabel = t.maxError === Infinity
+              ? '그 외'
+              : `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
+            return { label: t.label, rangeLabel, points: t.points, isCurrent: resultTier.id === t.id, color: t.color };
+          })}
         />
       )}
     </div>
