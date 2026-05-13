@@ -7,7 +7,8 @@ export default function CatchZone() {
     <div className="catch-zone" aria-hidden="true">
       <div className="catch-zone__band" />
       <div className="catch-zone__center-line" />
-      <div className="catch-zone__hint">→ 키로 캐치</div>
+      <div className="catch-zone__key">→</div>
+      <div className="catch-zone__hint">황금선 위에서</div>
     </div>
   );
 }
