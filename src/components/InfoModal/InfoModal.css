@@ -1,3 +1,8 @@
+@keyframes pulse-arrow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+
 .info-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -11,9 +16,9 @@
 .info-modal {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  padding: 24px;
-  max-width: 480px;
+  border-radius: 8px;
+  padding: 40px;
+  max-width: 620px;
   width: 90%;
   color: #ffffff;
 }
@@ -22,11 +27,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .info-modal__header h2 {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   margin: 0;
@@ -36,7 +41,7 @@
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   cursor: pointer;
   line-height: 1;
   padding: 0 4px;
@@ -47,21 +52,27 @@
 }
 
 .info-modal__body p {
-  margin: 0 0 12px;
-  line-height: 1.6;
-  font-size: 0.95rem;
+  margin: 0 0 16px;
+  line-height: 1.7;
+  font-size: 1.15rem;
   color: rgba(255, 255, 255, 0.85);
 }
 
 .info-modal__body ul {
   margin: 0;
-  padding-left: 20px;
+  padding-left: 0;
   list-style: none;
 }
 
 .info-modal__body li {
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
   letter-spacing: 0.02em;
+}
+
+.info-modal__arrow {
+  display: inline-block;
+  font-weight: 900;
+  animation: pulse-arrow 1.2s ease-in-out infinite;
 }

@@ -18,10 +18,10 @@ export default function InfoModal({ onClose }) {
           <p>그린이가 둘이 됐다.</p>
           <p>진짜와 가짜를 구분해 네 가지 게임을 클리어하고 도플갱어를 퇴치하라.</p>
           <ul>
-            <li>Stage 1 — 괘종시계: ← 키</li>
-            <li>Stage 2 — 반응속도: ↑ 키</li>
-            <li>Stage 3 — 캐치: → 키</li>
-            <li>Stage 4 — 최종전: ← / ↑ / → 동시</li>
+            <li>Stage 1 — 괘종시계: <span className="info-modal__arrow">←</span> 키</li>
+            <li>Stage 2 — 반응속도: <span className="info-modal__arrow">↑</span> 키</li>
+            <li>Stage 3 — 캐치: <span className="info-modal__arrow">→</span> 키</li>
+            <li>Stage 4 — 최종전: <span className="info-modal__arrow">←</span> / <span className="info-modal__arrow">↑</span> / <span className="info-modal__arrow">→</span> 동시</li>
           </ul>
         </div>
       </div>

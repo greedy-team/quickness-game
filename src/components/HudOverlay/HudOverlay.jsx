@@ -46,7 +46,7 @@ export default function HudOverlay() {
           onClick={() => setInfoOpen(true)}
           aria-label="게임 설명"
         >
-          <Info size={22} />
+          <Info size={30} />
         </button>
         <button
           type="button"
@@ -54,7 +54,7 @@ export default function HudOverlay() {
           onClick={() => navigate(`/ending/${endingOutcomeFromTotal(total)}`)}
           aria-label="결과 확인"
         >
-          <LogIn size={22} />
+          <LogIn size={30} />
         </button>
       </div>
       {infoOpen && <InfoModal onClose={() => setInfoOpen(false)} />}
