@@ -1,8 +1,3 @@
-@keyframes pulse-arrow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.4); }
-}
-
 @keyframes flicker {
   0%, 92%, 96%, 100% { opacity: 1; }
   93%, 95%            { opacity: 0.25; }
@@ -82,25 +77,3 @@
   animation-delay: 0.4s;
 }
 
-.info-modal__body ul {
-  margin: 0;
-  padding-left: 0;
-  list-style: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: clamp(12px, 2vw, 20px);
-  margin-top: clamp(4px, 1vw, 8px);
-}
-
-.info-modal__body li {
-  margin-bottom: clamp(10px, 1.5vw, 18px);
-  font-size: clamp(1rem, 2vw, 1.4rem);
-  color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.02em;
-}
-
-.info-modal__arrow {
-  display: inline-block;
-  font-weight: 900;
-  color: #ffffff;
-  animation: pulse-arrow 1.2s ease-in-out infinite;
-}
