@@ -47,11 +47,9 @@ describe('HudOverlay', () => {
     expect(container.querySelector('.hud-overlay')).toBeNull();
   });
 
-  it('/stage/* 라우트에서는 SCORE 텍스트만 노출되고 아이콘 버튼은 없다', () => {
-    renderHud({ path: '/stage/1' });
-    expect(screen.getByText(/SCORE/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '게임 설명' })).toBeNull();
-    expect(screen.queryByRole('button', { name: '결과 확인' })).toBeNull();
+  it('/stage/* 라우트에서는 HUD가 렌더되지 않는다', () => {
+    const { container } = renderHud({ path: '/stage/1' });
+    expect(container.querySelector('.hud-overlay')).toBeNull();
   });
 
   it('초기 상태 — 스테이지 점수 0 · 0 · 0 · 0 텍스트가 노출된다', () => {

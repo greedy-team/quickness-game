@@ -9,7 +9,6 @@ import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
-import { maxScoreForStage } from '../../scoring.js';
 import { STAGE3_CONFIG } from './stage3.config.js';
 import './Stage3Game.css';
 
@@ -107,56 +106,29 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
 
   const modalProps = (() => {
     if (!resultData) return null;
-    const {
-      caughtCount,
-      realCount,
-      totalScore,
-      tierCounts = {},
-      fakeCaught = 0,
-      realMissed = 0,
-    } = resultData;
-    const ratio = realCount > 0 ? caughtCount / realCount : 0;
-    const isSuccess = ratio >= 0.5;
+    const { caughtCount, missedCount, realCount, totalScore } = resultData;
+
+    const isSuccess = caughtCount >= realCount / 2;
+
     let comment;
-    if (ratio >= 0.85) comment = '기억의 조각을 모두 모았습니다.';
-    else if (ratio >= 0.5) comment = '대부분의 조각을 회수했습니다.';
-    else comment = '기억이 흩어져버렸습니다.';
+    if (caughtCount === realCount)         comment = '모든 기억을 되찾았습니다.';
+    else if (caughtCount >= realCount / 2) comment = '대부분의 조각을 회수했습니다.';
+    else                                   comment = '기억이 흩어져버렸습니다.';
 
-    // 부호 포함 점수 델타 포맷 — 0 은 표시 안 함(놓침은 0점이라 의미가 약하므로 생략).
-    const formatDelta = (n) => {
-      if (n > 0) return `+${n}`;
-      if (n < 0) return `${n}`;
-      return null;
-    };
-
-    // tier별 캐치 횟수: 0 회는 숨겨 가독성 확보.
-    const breakdown = STAGE3_CONFIG.accuracyTiers
-      .map((t) => {
-        const count = tierCounts[t.id] ?? 0;
-        return {
-          label: t.label,
-          value: `${count}개`,
-          delta: formatDelta(count * t.points),
-          color: t.color,
-          count,
-        };
-      })
-      .filter((row) => row.count > 0)
-      .map(({ count, ...row }) => row);
-
-    if (fakeCaught > 0) {
+    const breakdown = [];
+    if (caughtCount > 0) {
       breakdown.push({
-        label: `${STAGE3_CONFIG.fakeLabel} 캐치`,
-        value: `${fakeCaught}개`,
-        delta: formatDelta(fakeCaught * STAGE3_CONFIG.fakePenalty),
-        color: '#FF3333',
+        label: '캐치',
+        value: `${caughtCount}개`,
+        delta: `+${caughtCount * STAGE3_CONFIG.catchPoints}`,
+        color: '#FFD700',
       });
     }
-    if (realMissed > 0) {
+    if (missedCount > 0) {
       breakdown.push({
-        label: STAGE3_CONFIG.missLabel,
-        value: `${realMissed}개`,
-        delta: formatDelta(realMissed * STAGE3_CONFIG.missScore),
+        label: '놓침',
+        value: `${missedCount}개`,
+        delta: null,
         color: '#888',
       });
     }
@@ -169,6 +141,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
       maxScore: undefined,
       tone: isSuccess ? 'success' : 'failed',
       hint: mode === 'standalone' ? 'Space / Enter 로 계속' : null,
+      tierComment: comment,
     };
   })();
 

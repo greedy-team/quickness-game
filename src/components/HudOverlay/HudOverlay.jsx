@@ -25,11 +25,7 @@ export default function HudOverlay() {
   if (HIDDEN_ROUTES.has(pathname)) return null;
 
   if (pathname.startsWith('/stage/')) {
-    return (
-      <div className="hud-overlay" aria-hidden="false">
-        <div className="hud-overlay__score-simple">SCORE {total}</div>
-      </div>
-    );
+    return null;
   }
 
   const scoreText = [1, 2, 3, 4]
