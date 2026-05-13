@@ -2,7 +2,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 70%;
   transform: translateY(-50%);
   height: 25%;            /* STAGE3_CONFIG.catchZoneRatio = 0.25 와 일치 */
   pointer-events: none;
