@@ -46,6 +46,7 @@ export default function Stage3Field({ isRunning, onResult }) {
   // status: 'falling' | 'caught' | 'missed'
   const [items, setItems] = useState([]);
   const [popup, setPopup] = useState({ visible: false, label: '', points: null, color: '', key: 0 });
+  const [pressesLeft, setPressesLeft] = useState(config.itemCount);
 
   const startTimeRef = useRef(null);
   const rafRef = useRef(null);
@@ -82,6 +83,7 @@ export default function Stage3Field({ isRunning, onResult }) {
     statsRef.current = { caughtCount: 0 };
     pressesLeftRef.current = config.itemCount;
     gameEndedRef.current = false;
+    setPressesLeft(config.itemCount);
     setItems(sequence.map((s, idx) => ({
       id: idx,
       ...s,
@@ -146,6 +148,7 @@ export default function Stage3Field({ isRunning, onResult }) {
 
       // 프레스 1회 소모 (zone 비어있어도 차감)
       pressesLeftRef.current -= 1;
+      setPressesLeft(pressesLeftRef.current);
 
       const zoneCenter = 70;
       const zoneHalf = config.catchZoneRatio / 2 * 100;
@@ -187,6 +190,12 @@ export default function Stage3Field({ isRunning, onResult }) {
   return (
     <div className="stage3-field">
       <div className="stage3-hud" aria-live="polite">
+        <div className="stage3-hud__row">
+          <span className="stage3-hud__label">기회</span>
+          <span className="stage3-hud__count">
+            <strong>{pressesLeft}</strong> / {total}
+          </span>
+        </div>
         <div className="stage3-hud__row">
           <span className="stage3-hud__label">남은 조각</span>
           <span className="stage3-hud__count">
