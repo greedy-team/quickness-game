@@ -50,33 +50,33 @@ describe('scoreFromMetric — Stage 1', () => {
     expect(scoreFromMetric(1, 0)).toBe(100);
   });
 
-  it('metric = 0.05 → sentinel과 tier[0] 모두 100점이라 100', () => {
-    // sentinel(0, 100) ↔ tier[0](0.10, 100): t=0.5, score=100+(100-100)*0.5=100
-    expect(scoreFromMetric(1, 0.05)).toBe(100);
+  it('metric = 0.10 → perfect/great 사이 보간 = 90', () => {
+    // tier[0](0.00,100) ↔ tier[1](0.20,80): t=0.5, score=90
+    expect(scoreFromMetric(1, 0.10)).toBe(90);
   });
 
-  it('metric = 0.10 → perfect tier 경계 = 100', () => {
-    expect(scoreFromMetric(1, 0.10)).toBe(100);
+  it('metric = 0.20 → great 경계 = 80', () => {
+    expect(scoreFromMetric(1, 0.20)).toBe(80);
   });
 
-  it('metric = 0.25 → great 경계 = 80', () => {
-    expect(scoreFromMetric(1, 0.25)).toBe(80);
+  it('metric = 0.40 → good 경계 = 60', () => {
+    expect(scoreFromMetric(1, 0.40)).toBe(60);
   });
 
-  it('metric = 0.45 → good 경계 = 60', () => {
-    expect(scoreFromMetric(1, 0.45)).toBe(60);
+  it('metric = 0.60 → ok 경계 = 40', () => {
+    expect(scoreFromMetric(1, 0.60)).toBe(40);
   });
 
-  it('metric = 0.70 → ok 경계 = 40', () => {
-    expect(scoreFromMetric(1, 0.70)).toBe(40);
+  it('metric = 0.80 → bare 경계 = 20', () => {
+    expect(scoreFromMetric(1, 0.80)).toBe(20);
   });
 
-  it('metric = 0.575 → ok 안 보간 (lo 60 ↔ hi 40 의 절반)', () => {
-    // (0.575 − 0.45) / (0.70 − 0.45) = 0.5; round(60 + (40−60)*0.5) = 50
-    expect(scoreFromMetric(1, 0.575)).toBe(50);
+  it('metric = 0.50 → good/ok 사이 보간 (lo 60 ↔ hi 40 의 절반)', () => {
+    // (0.50 − 0.40) / (0.60 − 0.40) = 0.5; round(60 + (40−60)*0.5) = 50
+    expect(scoreFromMetric(1, 0.50)).toBe(50);
   });
 
-  it('metric = 1.00 → bare 끝 = 20', () => {
+  it('metric = 1.00 → bare 이후 fallback = 20', () => {
     expect(scoreFromMetric(1, 1.00)).toBe(20);
   });
 
@@ -85,7 +85,7 @@ describe('scoreFromMetric — Stage 1', () => {
   });
 
   it('metric 음수도 절댓값 + clamp', () => {
-    expect(scoreFromMetric(1, -0.10)).toBe(100);
+    expect(scoreFromMetric(1, -0.20)).toBe(80);
   });
 
   it('metric NaN → 0', () => {
@@ -100,7 +100,8 @@ describe('scoreFromMetric — Stage 1', () => {
 describe('scoreFromMetric — Stage 2', () => {
   it('Stage 1 과 동일 tier 표 → 동일 결과', () => {
     expect(scoreFromMetric(2, 0)).toBe(100);
-    expect(scoreFromMetric(2, 0.10)).toBe(100);
+    expect(scoreFromMetric(2, 0.20)).toBe(80);
+    expect(scoreFromMetric(2, 0.80)).toBe(20);
     expect(scoreFromMetric(2, 1.0)).toBe(20);
   });
 });
@@ -110,8 +111,12 @@ describe('scoreFromMetric — Stage 3 (호환)', () => {
     expect(scoreFromMetric(3, 0)).toBe(100);
   });
 
-  it('tier 경계 metric 0.10 → 100', () => {
-    expect(scoreFromMetric(3, 0.10)).toBe(100);
+  it('tier 경계 metric 0.20 → 80', () => {
+    expect(scoreFromMetric(3, 0.20)).toBe(80);
+  });
+
+  it('tier 경계 metric 0.80 → 20', () => {
+    expect(scoreFromMetric(3, 0.80)).toBe(20);
   });
 
   it('tier 경계 metric 1.0 → 20', () => {
@@ -124,8 +129,12 @@ describe('scoreFromMetric — Stage 4 (호환)', () => {
     expect(scoreFromMetric(4, 0)).toBe(100);
   });
 
-  it('tier 경계 metric 0.10 → 100', () => {
-    expect(scoreFromMetric(4, 0.10)).toBe(100);
+  it('tier 경계 metric 0.20 → 80', () => {
+    expect(scoreFromMetric(4, 0.20)).toBe(80);
+  });
+
+  it('tier 경계 metric 0.80 → 20', () => {
+    expect(scoreFromMetric(4, 0.80)).toBe(20);
   });
 });
 

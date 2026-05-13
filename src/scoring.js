@@ -4,34 +4,37 @@
 
 export const PERFECT_HEADROOM = 0;  // 동점방지 헤드룸 제거 — 100점 만점 체계.
 
+// maxAbsError 는 metric (0=완벽, 1=최저) 공간의 임계값.
+// metricFromPoints 가 생성하는 값: perfect=0, great=0.2, good=0.4, ok=0.6, bare=0.8.
+// 경계를 그 값에 정확히 맞춰야 scoreFromMetric 이 round-trip 으로 올바른 점수를 반환.
 export const STAGE_SCORE_TIERS = {
   1: [
-    { maxAbsError: 0.10, points: 100 },
-    { maxAbsError: 0.25, points: 80  },
-    { maxAbsError: 0.45, points: 60  },
-    { maxAbsError: 0.70, points: 40  },
-    { maxAbsError: 1.00, points: 20  },
+    { maxAbsError: 0.00, points: 100 },
+    { maxAbsError: 0.20, points: 80  },
+    { maxAbsError: 0.40, points: 60  },
+    { maxAbsError: 0.60, points: 40  },
+    { maxAbsError: 0.80, points: 20  },
   ],
   2: [
-    { maxAbsError: 0.10, points: 100 },
-    { maxAbsError: 0.25, points: 80  },
-    { maxAbsError: 0.45, points: 60  },
-    { maxAbsError: 0.70, points: 40  },
-    { maxAbsError: 1.00, points: 20  },
+    { maxAbsError: 0.00, points: 100 },
+    { maxAbsError: 0.20, points: 80  },
+    { maxAbsError: 0.40, points: 60  },
+    { maxAbsError: 0.60, points: 40  },
+    { maxAbsError: 0.80, points: 20  },
   ],
   3: [
-    { maxAbsError: 0.10, points: 100 },
-    { maxAbsError: 0.25, points: 80  },
-    { maxAbsError: 0.45, points: 60  },
-    { maxAbsError: 0.70, points: 40  },
-    { maxAbsError: 1.00, points: 20  },
+    { maxAbsError: 0.00, points: 100 },
+    { maxAbsError: 0.20, points: 80  },
+    { maxAbsError: 0.40, points: 60  },
+    { maxAbsError: 0.60, points: 40  },
+    { maxAbsError: 0.80, points: 20  },
   ],
   4: [
-    { maxAbsError: 0.10, points: 100 },
-    { maxAbsError: 0.25, points: 80  },
-    { maxAbsError: 0.45, points: 60  },
-    { maxAbsError: 0.70, points: 40  },
-    { maxAbsError: 1.00, points: 20  },
+    { maxAbsError: 0.00, points: 100 },
+    { maxAbsError: 0.20, points: 80  },
+    { maxAbsError: 0.40, points: 60  },
+    { maxAbsError: 0.60, points: 40  },
+    { maxAbsError: 0.80, points: 20  },
   ],
 };
 
