@@ -11,7 +11,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, selectTotalScore } from '../../store.js';
 import { ENDING_CONFIG } from './ending.config.js';
-import { appendRankingEntry } from '../../ranking/rankingStore.js';
 import EndingCutscene from './EndingCutscene.jsx';
 import EndingNicknameForm from './EndingNicknameForm.jsx';
 import './EndingPage.css';
@@ -39,12 +38,7 @@ export default function EndingPage({ outcome }) {
     return () => clearTimeout(id);
   }, [phase]);
 
-  // hold → leaving (holdMs 후 자동)
-  useEffect(() => {
-    if (phase !== 'hold') return undefined;
-    const id = setTimeout(() => setPhase('leaving'), ENDING_CONFIG.holdMs);
-    return () => clearTimeout(id);
-  }, [phase]);
+  // hold → leaving: 키 입력으로만 진행 (자동 타이머 없음)
 
   // leaving → register (leaveMs 후, 컷씬 페이드아웃 완료)
   useEffect(() => {
@@ -89,15 +83,9 @@ export default function EndingPage({ outcome }) {
     return () => window.removeEventListener('keydown', handle);
   }, [phase, navigate, highlightId]);
 
-  const handleNicknameSubmit = (nickname) => {
-    // 폼이 빈 입력을 차단하므로 throw는 도달 불가하지만, 방어적 try/catch로
-    // 예상치 못한 실패에도 사용자가 컷씬에 갇히지 않고 outro로 진행하게 한다.
-    try {
-      const entry = appendRankingEntry({ nickname, score: totalScore, outcome });
-      setHighlightId(entry.id);
-    } catch (err) {
-      console.warn('[EndingPage] appendRankingEntry 실패 — 등록 없이 진행', err);
-    }
+  const handleNicknameSubmit = async (nickname) => {
+    // TODO: 백엔드 API 연동 — POST /api/ranking { nickname, score: totalScore, outcome }
+    //       응답으로 받은 entry.id를 setHighlightId(entry.id)에 전달
     setPhase('outro');
   };
 

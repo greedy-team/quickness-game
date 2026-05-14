@@ -33,6 +33,17 @@ const TIER_COMMENT = {
   bare:    '간발의 차이로 놓쳤습니다.',
 };
 
+const buildS2RangeLabel = (tier) => {
+  const tiers = STAGE2_CONFIG.accuracyTiers;
+  const idx = tiers.findIndex(t => t.id === tier.id);
+  if (tier.maxError === Infinity) {
+    const prev = idx > 0 ? tiers[idx - 1].maxError : 0;
+    return `${prev.toFixed(2)}초~`;
+  }
+  const prevMax = idx === 0 ? 0 : tiers[idx - 1].maxError;
+  return `${prevMax.toFixed(2)}~${tier.maxError.toFixed(2)}초`;
+};
+
 export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   const [phase, setPhase] = useState('MANUAL'); 
   const [gameState, setGameState] = useState('IDLE');
@@ -326,7 +337,11 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       <div className={`camera-flash ${isFlash ? 'active' : ''}`} />
 
       <div className="stage2-ui-layer">
-        
+
+        {mode !== 'split' && (phase === 'MANUAL' || phase === 'PLAY') && (
+          <div className="stage-key-hint">가까이 온 순간 ↑ 키를 누르세요</div>
+        )}
+
         {phase === 'MANUAL' && (
           <div className="start-minimal">
             <p className="start-btn-simple">Space / Enter를 눌러 시험을 시작합니다.</p>
@@ -343,13 +358,20 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
         )}
 
+        {phase === 'END' && mode === 'split' && (
+          <div className="s2-split-result">
+            {reaction.time && <span className="s2-split-time">{reaction.time}s</span>}
+            <span className="s2-split-points">{resultScore}점</span>
+          </div>
+        )}
+
       </div>
 
-      {phase === 'END' && resultTier && (
+      {phase === 'END' && resultTier && mode !== 'split' && (
         <ResultModal
-          metricLabel={reaction.time ? 'REACTION TIME' : null}
-          metricValue={reaction.time ? `${reaction.time}s` : null}
+          metricValue={reaction.time != null ? `${reaction.time}s` : null}
           tone={resultTier.id !== 'bare' ? 'success' : 'failed'}
+          score={resultScore}
           tiers={STAGE2_CONFIG.accuracyTiers.map((t, i, arr) => {
             const prevMax = i === 0 ? 0 : arr[i - 1].maxError;
             const rangeLabel = t.maxError === Infinity

@@ -4,10 +4,9 @@
 // - 타이틀에서 직접 진입: highlightId 없음 → 보드만 표시.
 // - 자동 복귀: autoReturnMs 만료 또는 Space/Enter → resetGame + navigate('/').
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store.js';
-import { getRankingEntries } from '../../ranking/rankingStore.js';
 import { RANKING_CONFIG } from '../../ranking/ranking.config.js';
 import './RankingPage.css';
 
@@ -20,8 +19,9 @@ export default function RankingPage() {
 
   const highlightId = location.state?.highlightId ?? null;
 
-  // 마운트 시점 1회 스냅샷 (렌더 중 보드가 바뀔 일 없음)
-  const entries = useMemo(() => getRankingEntries(), []);
+  // TODO: 백엔드 API 연동 — GET /api/ranking?limit={RANKING_CONFIG.topN}
+  //       응답 데이터를 entries에 세팅, highlightId로 본인 행 강조
+  const [entries] = useState([]);
   const top = entries.slice(0, RANKING_CONFIG.topN);
   const myEntry = highlightId
     ? entries.find((e) => e.id === highlightId) ?? null

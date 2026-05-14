@@ -105,7 +105,7 @@ export const TOTAL_MAX_SCORE = [1, 2, 3, 4].reduce(
  * Tunable — 부스 플레이테스트 후 조정.
  * 600점 만점 기준 270점 ≈ 45% — "꾸준히 good 근처로 가야 통과" 의도.
  */
-export const ENDING_SUCCESS_CUTOFF = 270;
+export const ENDING_SUCCESS_CUTOFF = 400;
 
 /**
  * 누적 점수 → 엔딩 outcome 결정.

@@ -13,7 +13,7 @@ import { STAGE3_CONFIG } from './stage3.config.js';
 import './Stage3Game.css';
 
 export default function Stage3Game({ mode = 'standalone', isRunning, onResult }) {
-  // local phase: 'idle' | 'running' | 'result'
+  // local phase: 'idle' | 'countdown' | 'go' | 'running' | 'result'
   const [phase, setPhase] = useState('idle');
   const [resultData, setResultData] = useState(null);
   const audioRef = useRef(null);
@@ -28,7 +28,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     const handleKeyDown = (e) => {
       if (e.code === 'Space') {
         e.preventDefault();
-        setPhase('running');
+        setPhase('countdown');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -38,8 +38,21 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
   // split: isRunning prop watch
   useEffect(() => {
     if (mode !== 'split') return;
-    if (isRunning && phase === 'idle') setPhase('running');
+    if (isRunning && phase === 'idle') setPhase('countdown');
   }, [mode, isRunning, phase]);
+
+  // countdown → go → running
+  useEffect(() => {
+    if (phase !== 'countdown') return;
+    const id = setTimeout(() => setPhase('go'), 700);
+    return () => clearTimeout(id);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== 'go') return;
+    const id = setTimeout(() => setPhase('running'), 400);
+    return () => clearTimeout(id);
+  }, [phase]);
 
   // BGM: standalone 모드의 running phase에서만 재생.
   // 라우트 기반 BgmController 대신 phase 기반 로컬 제어 — split 모드에서는
@@ -48,7 +61,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (mode === 'standalone' && phase === 'running') {
+    if (mode === 'standalone' && (phase === 'countdown' || phase === 'go' || phase === 'running')) {
       audio.volume = bgmVolume;
       audio.loop = BGM_DEFAULTS.loop;
       audio.play().catch(() => {});
@@ -110,11 +123,6 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
 
     const isSuccess = caughtCount >= realCount / 2;
 
-    let comment;
-    if (caughtCount === realCount)         comment = '모든 기억을 되찾았습니다.';
-    else if (caughtCount >= realCount / 2) comment = '대부분의 조각을 회수했습니다.';
-    else                                   comment = '기억이 흩어져버렸습니다.';
-
     const breakdown = [];
     if (caughtCount > 0) {
       breakdown.push({
@@ -134,27 +142,40 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     }
 
     return {
-      metricLabel: 'PIECES',
-      metricValue: `${caughtCount}/${realCount}`,
+      metricValue: `${caughtCount} / ${realCount}`,
       breakdown,
-      score: undefined,
-      maxScore: undefined,
+      score: totalScore,
       tone: isSuccess ? 'success' : 'failed',
       hint: mode === 'standalone' ? 'Space / Enter 로 계속' : null,
-      tierComment: comment,
     };
   })();
 
   return (
     <div className={`stage3-game stage3-game--${mode}`}>
+      {mode === 'standalone' && (phase === 'idle' || phase === 'running') && (
+        <div className="stage-key-hint">노란선에 위치했을 때 → 키를 누르세요</div>
+      )}
       {phase === 'idle' && mode === 'standalone' && <Stage3Intro />}
+      {(phase === 'countdown' || phase === 'go') && (
+        <div className="stage3-countdown">
+          <span key={phase} className="stage3-countdown__text">
+            {phase === 'countdown' ? '준비' : '시작!'}
+          </span>
+        </div>
+      )}
       {(phase === 'running' || phase === 'result') && (
         <Stage3Field
           isRunning={phase === 'running'}
           onResult={handleFieldDone}
         />
       )}
-      {phase === 'result' && modalProps && (
+      {phase === 'result' && resultData && mode === 'split' && (
+        <div className="s3-split-result">
+          <span className="s3-split-catch">{resultData.caughtCount} / {resultData.realCount}</span>
+          <span className="s3-split-score">{resultData.totalScore}점</span>
+        </div>
+      )}
+      {phase === 'result' && modalProps && mode !== 'split' && (
         <ResultModal {...modalProps} />
       )}
       {mode === 'standalone' && (

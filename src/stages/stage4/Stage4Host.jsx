@@ -136,7 +136,15 @@ export default function Stage4Host({ onResult }) {
       {/* 인트로는 intro phase에서만 */}
       {phase === 'intro' && <Stage4Intro />}
       {/* 합체 오버레이는 merging phase에서만 */}
-      {phase === 'merging' && <Stage4MergeOverlay />}
+      {phase === 'merging' && (
+        <Stage4MergeOverlay
+          scores={{
+            pane1: results[1]?.score ?? 0,
+            pane2: results[2]?.score ?? 0,
+            pane3: results[3]?.score ?? 0,
+          }}
+        />
+      )}
       {/* 점프스케어는 jumpscare phase에서만 */}
       {phase === 'jumpscare' && <Stage4JumpscareOverlay />}
       <audio ref={bgmAudioRef} src={ASSETS.sounds.bgmStage4} preload="auto" />

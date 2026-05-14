@@ -8,3 +8,62 @@
 .stage3-game--split {
   /* 3분할 칸 안에서도 동작하도록 — 부모가 사이즈 결정 */
 }
+
+.s3-split-result {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  animation: s3-result-fadein 0.4s ease-out;
+}
+
+.s3-split-catch {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.8vw;
+  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 0 0 14px rgba(255, 215, 0, 0.7);
+}
+
+.s3-split-score {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.4vw;
+  color: #ffcc00;
+  font-weight: bold;
+  text-shadow: 0 0 12px rgba(255, 204, 0, 0.7);
+}
+
+@keyframes s3-result-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stage3-countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  z-index: 50;
+}
+
+.stage3-countdown__text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(3rem, 8vw, 6rem);
+  color: #fff;
+  letter-spacing: 0.2em;
+  animation: s3-countdown-pulse 1s ease-out forwards;
+}
+
+@keyframes s3-countdown-pulse {
+  0%   { opacity: 0; transform: scale(0.7); }
+  25%  { opacity: 1; transform: scale(1.05); }
+  80%  { opacity: 1; transform: scale(1.0); }
+  100% { opacity: 0; transform: scale(1.1); }
+}

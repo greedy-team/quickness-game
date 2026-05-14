@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAudioStore } from '../../audio/useAudioStore.js';
 import './AudioControls.css';
 
@@ -21,7 +22,7 @@ function MuteIcon({ muted }) {
   );
 }
 
-export default function AudioControls() {
+function AudioControlsInner() {
   const bgmVolume = useAudioStore((s) => s.bgmVolume);
   const sfxVolume = useAudioStore((s) => s.sfxVolume);
   const isMuted = useAudioStore((s) => s.isMuted);
@@ -106,4 +107,10 @@ export default function AudioControls() {
       )}
     </div>
   );
+}
+
+export default function AudioControls() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith('/stage/')) return null;
+  return <AudioControlsInner />;
 }

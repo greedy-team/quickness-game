@@ -4,14 +4,16 @@ import './Stage4TimerPane.css';
 import { STAGE1_CONFIG } from '../stage1/stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
-import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
-const TIER_COMMENT = {
-  perfect: '완벽한 정각. 도플갱어의 주파수가 끊어졌습니다.',
-  great:   '거의 정확한 타이밍. 가짜의 형체가 흐려집니다.',
-  good:    '준수한 타이밍. 도플갱어를 잠시 밀어냈습니다.',
-  ok:      '간발의 차이로 도플갱어를 막아냈습니다.',
-  bare:    '타이밍이 어긋났습니다. 도플갱어와 눈이 마주쳤습니다.',
+const buildRangeLabel = (tier) => {
+  const tiers = STAGE1_CONFIG.accuracyTiers;
+  const idx = tiers.findIndex(t => t.id === tier.id);
+  if (tier.maxError === Infinity) return '그 외';
+  if (idx === 0) {
+    return `${(STAGE1_CONFIG.targetSec - tier.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + tier.maxError).toFixed(2)}초`;
+  }
+  const prevMax = tiers[idx - 1].maxError;
+  return `${(STAGE1_CONFIG.targetSec - tier.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec - prevMax).toFixed(2)} 또는 ${(STAGE1_CONFIG.targetSec + prevMax).toFixed(2)}~${(STAGE1_CONFIG.targetSec + tier.maxError).toFixed(2)}초`;
 };
 
 export default function Stage4TimerPane({ isRunning, onResult }) {
@@ -111,18 +113,11 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
         </h1>
       </div>
 
-      {phase === 'end' && resultTier && (
-        <ResultModal
-          metricLabel="MEASURED TIME"
-          metricValue={formatTime(finalTime)}
-          tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => {
-            const rangeLabel = t.maxError === Infinity
-              ? '그 외'
-              : `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
-            return { label: t.label, rangeLabel, points: t.points, isCurrent: resultTier.id === t.id, color: t.color };
-          })}
-        />
+      {phase === 'end' && (
+        <div className="s4-result-info">
+          <span className="s4-result-time">{finalTime.toFixed(2)}초</span>
+          <span className="s4-result-points">{resultScore}점</span>
+        </div>
       )}
     </div>
   );
