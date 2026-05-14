@@ -6,14 +6,14 @@
   justify-content: center;
   align-items: center;
   z-index: 200;
-  padding: 16px;
+  padding: clamp(16px, 4vw, 40px);
   box-sizing: border-box;
 }
 
 .result-modal {
-  max-width: min(560px, calc(100% - 16px));
+  max-width: min(800px, 92vw);
   width: 100%;
-  padding: 28px 36px;
+  padding: clamp(32px, 5vw, 64px) clamp(36px, 6vw, 72px);
   background: #000;
   border: 1px solid #444;
   text-align: center;
@@ -23,9 +23,9 @@
 }
 
 .result-modal__headline {
-  font-size: 1.7rem;
+  font-size: clamp(2rem, 3.5vw, 3rem);
   letter-spacing: 3px;
-  margin: 0 0 14px 0;
+  margin: 0 0 18px 0;
   word-break: keep-all;
 }
 .result-modal--success .result-modal__headline {
@@ -38,7 +38,7 @@
 }
 
 .result-modal__tier {
-  font-size: 1.35rem;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
   color: #ddd;
   margin: 0;
   word-break: keep-all;
@@ -47,19 +47,19 @@
 
 .result-modal__metric {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1.6rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
   color: #ffcc00;
   letter-spacing: 1px;
-  margin: 14px 0 0 0;
+  margin: 18px 0 0 0;
 }
 
 .result-modal__breakdown {
   list-style: none;
-  margin: 14px auto 0 auto;
+  margin: 18px auto 0 auto;
   padding: 0;
-  max-width: 320px;
+  max-width: 520px;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1rem;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
   color: #ddd;
 }
 
@@ -68,7 +68,7 @@
   grid-template-columns: 1fr auto auto;
   column-gap: 14px;
   align-items: baseline;
-  padding: 2px 0;
+  padding: 3px 0;
   letter-spacing: 1px;
 }
 
@@ -83,26 +83,26 @@
 
 .result-modal__breakdown-delta {
   text-align: right;
-  min-width: 56px;
+  min-width: 64px;
   font-weight: bold;
 }
 
 .result-modal__tier-table {
   list-style: none;
-  margin: 18px auto 0 auto;
+  margin: 22px auto 0 auto;
   padding: 0;
-  max-width: 340px;
+  max-width: 540px;
   width: 100%;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
 }
 
 .result-modal__tier-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  column-gap: 12px;
+  column-gap: 16px;
   align-items: center;
-  padding: 5px 8px;
+  padding: 7px 10px;
   border-radius: 4px;
   letter-spacing: 1px;
   color: #888;
@@ -111,7 +111,7 @@
 .result-modal__tier-row--current {
   background: rgba(255, 255, 255, 0.08);
   outline: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 1.15rem;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
   color: #fff;
 }
 
@@ -123,7 +123,7 @@
 .result-modal__tier-range {
   text-align: center;
   color: #888;
-  font-size: 0.88rem;
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
 }
 
 .result-modal__tier-pts {
@@ -133,18 +133,18 @@
 }
 
 .result-modal__hint {
-  margin: 18px 0 0 0;
-  font-size: 0.85rem;
+  margin: 22px 0 0 0;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
   color: #888;
   letter-spacing: 1px;
 }
 
 .result-modal__score {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 3rem;
+  font-size: clamp(3.2rem, 5vw, 4.5rem);
   color: #ffcc00;
   font-weight: bold;
-  margin: 16px 0 0 0;
+  margin: 20px 0 0 0;
   text-shadow: 0 0 16px rgba(255, 204, 0, 0.7);
   letter-spacing: 3px;
 }
