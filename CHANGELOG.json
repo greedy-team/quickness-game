@@ -1,11 +1,93 @@
 {
   "metadata": {
-    "lastUpdated": "2026-05-11T11:57:41Z",
-    "currentVersion": "0.0.27",
+    "lastUpdated": "2026-05-14T01:46:58Z",
+    "currentVersion": "0.0.32",
     "projectType": "react",
-    "totalReleases": 2
+    "totalReleases": 3
   },
   "releases": [
+    {
+      "version": "0.0.32",
+      "project_type": "react",
+      "date": "2026-05-14",
+      "pr_number": 47,
+      "raw_summary": "## 릴리스 노트\n\n* **새 기능**\n\n  * Stage3 HUD 좌상단에 기회 횟수 표시 #42\n  * HudOverlay stage 라우트 score 표시 제거 #42\n  * 결과 모달 키 입력 진행 + headline/tierComment 제거 + 점수표 강조\n  * ResultModal 공통화 및 600점 만점 점수 체계 개편\n  * InfoModal 스테이지 목록 제거 및 게임 소개 텍스트로 교체 #39\n  * InfoModal 공포 테마 UI - 빨간 텍스트 플리커 + 혈흔 글로우 #39\n  * InfoModal 반응형 크기 확대 #39\n  * InfoModal 크기/텍스트 확대, 화살표 펄스 애니메이션, HUD 아이콘 버튼 컨테이너 제거 #39\n  * Stage4 완료 후 /hub 복귀 + ScoreTable 제거 #39\n  * HudOverlay 리디자인 - 점수 텍스트 + 아이콘 버튼 #39\n  * InfoModal 컴포넌트 추가 - 게임 설명 모달 #39\n\n* **버그 수정**\n\n  * Stage3 missedCount 2배 버그 수정 및 → 프레스 소진 시 즉시 게임 종료 #42\n  * InfoModal 두 번째 문단 줄바꿈 추가 #39\n  * InfoModal backdrop pointer-events 상속 버그 수정 #39\n\n* **개선**\n\n  * CatchZone 키 표시 및 힌트 문구 제거 #42\n  * CatchZone 밴드/점선 제거, 황금선만 두껍게 (6px) #42\n  * CatchZone 안내 문구 — 키 좌측 표시, 황금선 타이밍 워딩으로 변경 #42\n  * CatchZone y축 위치 50% → 70% #42\n  * Stage3Game ResultModal breakdown catch/miss 단순화 #42\n  * FallingItem kind prop 제거, fake CSS 정리 #42\n  * Stage3Field fake 제거, catch/miss 단순화, zone 70% #42\n  * Stage3 config 단순화 — accuracyTiers/fake 제거, catchPoints 추가 #42\n\n* **문서**\n\n  * Stage3 단순화 구현 플랜 추가 #42\n  * Stage3 단순화 및 score UI 제거 설계 스펙 추가 #42\n  * HUD overlay 리디자인 스펙 추가 #39\n\n* **기타**\n\n  * Merge pull request #46 from greedy-team/20260513_#43_결과_모달_제거_및_점수_팝업_방식으로_변경\n  * refactor : stage 1~3 phase명 통일 및 key-hint 표시 시점 수정 #43\n  * test : alive 결말 진입 기준 점수 400으로 수정 #43\n  * Merge pull request #45 from greedy-team/20260513_#43_결과_모달_제거_및_점수_팝업_방식으로_변경\n  * docs : 설계 문서 및 리포트 작성 #43\n  * style : AudioControls stage 화면에서 숨김 및 key-hint 스타일 추가 #43\n  * feat : 엔딩·랭킹 개선 #43\n  * feat : Stage4 각 pane 결과 정보 및 MergeOverlay 점수 합산 표시 #43\n  * feat : Stage3 카운트다운 추가 및 아이템 낙하 속도 랜덤화 #43\n  * fix : Stage2 결과 모달 score 누락 수정 및 split 모드 결과 표시 추가 #43\n  * fix : Stage1 결과 모달 범위 표시 exclusive 범위로 수정 및 측정값 단순화 #43\n  * style : ResultModal 크기 개선 (InfoModal 수준으로 확대) #43\n  * Merge branch 'main' of https://github.com/greedy-team/quickness-game\n  * docs : 문서 작성\n  * Merge pull request #44 from greedy-team/20260513_#42_스테이지_score_표시_제거_및_Stage3_게임로직_단순화\n  * docs : 이슈 문서 작성 #42\n  * Merge pull request #41 from greedy-team/20260513_#39_사이드_UI_개편_점수_텍스트화_및_아이콘_버튼_추가\n  * docs : 설계 파일 업로드 #39\n  * feat : 결과 모달 티어 범위 포맷 실측값 기준으로 변경 및 score 표시 제거 #39\n  * style : ResultModal 투명도 제거, 모달 크기 확대, score 조건부 렌더링 #39\n  * fix : STAGE_SCORE_TIERS 경계값 metric 정렬로 bare 티어 점수 오류 수정 #39\n  * lucide-react 설치 #39\n\n> 💡 더 정확한 릴리스 노트를 원한다면 Claude Code에서 `/github` 스킬로 PR 릴리스 노트를 업데이트할 수 있습니다.",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "Stage3 HUD 좌상단에 기회 횟수 표시 #42",
+            "HudOverlay stage 라우트 score 표시 제거 #42",
+            "결과 모달 키 입력 진행 + headline/tierComment 제거 + 점수표 강조",
+            "ResultModal 공통화 및 600점 만점 점수 체계 개편",
+            "InfoModal 스테이지 목록 제거 및 게임 소개 텍스트로 교체 #39",
+            "InfoModal 공포 테마 UI - 빨간 텍스트 플리커 + 혈흔 글로우 #39",
+            "InfoModal 반응형 크기 확대 #39",
+            "InfoModal 크기/텍스트 확대, 화살표 펄스 애니메이션, HUD 아이콘 버튼 컨테이너 제거 #39",
+            "Stage4 완료 후 /hub 복귀 + ScoreTable 제거 #39",
+            "HudOverlay 리디자인 - 점수 텍스트 + 아이콘 버튼 #39",
+            "InfoModal 컴포넌트 추가 - 게임 설명 모달 #39"
+          ]
+        },
+        "버그_수정": {
+          "title": "버그 수정",
+          "items": [
+            "Stage3 missedCount 2배 버그 수정 및 → 프레스 소진 시 즉시 게임 종료 #42",
+            "InfoModal 두 번째 문단 줄바꿈 추가 #39",
+            "InfoModal backdrop pointer-events 상속 버그 수정 #39"
+          ]
+        },
+        "개선": {
+          "title": "개선",
+          "items": [
+            "CatchZone 키 표시 및 힌트 문구 제거 #42",
+            "CatchZone 밴드/점선 제거, 황금선만 두껍게 (6px) #42",
+            "CatchZone 안내 문구 — 키 좌측 표시, 황금선 타이밍 워딩으로 변경 #42",
+            "CatchZone y축 위치 50% → 70% #42",
+            "Stage3Game ResultModal breakdown catch/miss 단순화 #42",
+            "FallingItem kind prop 제거, fake CSS 정리 #42",
+            "Stage3Field fake 제거, catch/miss 단순화, zone 70% #42",
+            "Stage3 config 단순화 — accuracyTiers/fake 제거, catchPoints 추가 #42"
+          ]
+        },
+        "문서": {
+          "title": "문서",
+          "items": [
+            "Stage3 단순화 구현 플랜 추가 #42",
+            "Stage3 단순화 및 score UI 제거 설계 스펙 추가 #42",
+            "HUD overlay 리디자인 스펙 추가 #39"
+          ]
+        },
+        "기타": {
+          "title": "기타",
+          "items": [
+            "Merge pull request #46 from greedy-team/20260513_#43_결과_모달_제거_및_점수_팝업_방식으로_변경",
+            "refactor : stage 1~3 phase명 통일 및 key-hint 표시 시점 수정 #43",
+            "test : alive 결말 진입 기준 점수 400으로 수정 #43",
+            "Merge pull request #45 from greedy-team/20260513_#43_결과_모달_제거_및_점수_팝업_방식으로_변경",
+            "docs : 설계 문서 및 리포트 작성 #43",
+            "style : AudioControls stage 화면에서 숨김 및 key-hint 스타일 추가 #43",
+            "feat : 엔딩·랭킹 개선 #43",
+            "feat : Stage4 각 pane 결과 정보 및 MergeOverlay 점수 합산 표시 #43",
+            "feat : Stage3 카운트다운 추가 및 아이템 낙하 속도 랜덤화 #43",
+            "fix : Stage2 결과 모달 score 누락 수정 및 split 모드 결과 표시 추가 #43",
+            "fix : Stage1 결과 모달 범위 표시 exclusive 범위로 수정 및 측정값 단순화 #43",
+            "style : ResultModal 크기 개선 (InfoModal 수준으로 확대) #43",
+            "Merge branch 'main' of https://github.com/greedy-team/quickness-game",
+            "docs : 문서 작성",
+            "Merge pull request #44 from greedy-team/20260513_#42_스테이지_score_표시_제거_및_Stage3_게임로직_단순화",
+            "docs : 이슈 문서 작성 #42",
+            "Merge pull request #41 from greedy-team/20260513_#39_사이드_UI_개편_점수_텍스트화_및_아이콘_버튼_추가",
+            "docs : 설계 파일 업로드 #39",
+            "feat : 결과 모달 티어 범위 포맷 실측값 기준으로 변경 및 score 표시 제거 #39",
+            "style : ResultModal 투명도 제거, 모달 크기 확대, score 조건부 렌더링 #39",
+            "fix : STAGE_SCORE_TIERS 경계값 metric 정렬로 bare 티어 점수 오류 수정 #39",
+            "lucide-react 설치 #39"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "0.0.27",
       "project_type": "react",
