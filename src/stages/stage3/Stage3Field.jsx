@@ -34,7 +34,8 @@ function buildSequence(config) {
     const spawnAt = Math.max(0, i * baseInterval + offset);
     const horizontalPct = 50 + (rand() * 2 - 1) * config.horizontalRandomRatio * 100;
     const imgSrc = ASSETS.images.memoryReal[Math.floor(rand() * ASSETS.images.memoryReal.length)];
-    return { imgSrc, spawnAt, horizontalPct };
+    const fallDurationSec = config.fallDurationSecMin + rand() * (config.fallDurationSecMax - config.fallDurationSecMin);
+    return { imgSrc, spawnAt, horizontalPct, fallDurationSec };
   });
 }
 
@@ -91,8 +92,8 @@ export default function Stage3Field({ isRunning, onResult }) {
       status: 'falling',
     })));
 
-    // 종료 조건 — 마지막 아이템의 spawnAt + fallDuration + 0.5초 마진
-    const lastEnd = sequence[sequence.length - 1].spawnAt + config.fallDurationSec + 0.5;
+    // 종료 조건 — 모든 아이템 중 가장 늦게 끝나는 시점 + 0.5초 마진
+    const lastEnd = Math.max(...sequence.map(s => s.spawnAt + s.fallDurationSec)) + 0.5;
 
     // 게임 종료 — RAF 만료 또는 프레스 소진 시 호출. gameEndedRef로 중복 방지.
     finishRef.current = () => {
@@ -118,10 +119,10 @@ export default function Stage3Field({ isRunning, onResult }) {
         if (it.status !== 'falling') return it;
         const localT = elapsed - it.spawnAt;
         if (localT < 0) return { ...it, topPercent: -10 };
-        if (localT > config.fallDurationSec) {
+        if (localT > it.fallDurationSec) {
           return { ...it, status: 'missed', topPercent: 110 };
         }
-        const topPercent = -10 + (localT / config.fallDurationSec) * 120; // -10% → 110%
+        const topPercent = -10 + (localT / it.fallDurationSec) * 120; // -10% → 110%
         return { ...it, topPercent };
       }));
 

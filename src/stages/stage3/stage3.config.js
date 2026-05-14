@@ -2,7 +2,8 @@
 export const STAGE3_CONFIG = {
   durationSec:             10,
   itemCount:               4,        // 전부 real, fake 없음
-  fallDurationSec:         2.0,
+  fallDurationSecMin:      0.9,
+  fallDurationSecMax:      2.0,
   catchZoneRatio:          0.25,
   spawnIntervalJitterSec:  0.4,
   horizontalRandomRatio:   0.2,
