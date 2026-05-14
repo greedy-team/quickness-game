@@ -14,11 +14,8 @@ export const RANKING_CONFIG = {
 
   // 결말 라벨 (보드 표시용)
   outcomeLabels: {
-    alive:      '⭐ alive',
-    silhouette: '👻 silhouette',
+    alive:      '⭐ 생존',
+    silhouette: '👻 사망',
   },
 
-  // 저장소 — schema 변경 시 .v2 등으로 키 갱신
-  storageKey: 'quickness-game.ranking.v1',
-  storageCap: 200,
 };
