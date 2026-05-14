@@ -71,3 +71,37 @@
   50% { opacity: 0.9; filter: blur(0px); }
 }
 
+.s4-result-info {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  gap: 1vw;
+  animation: s4-result-fadein 0.4s ease-out;
+}
+
+.s4-result-time {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.8vw;
+  color: #ff4444;
+  font-weight: bold;
+  text-shadow: 0 0 14px rgba(255, 68, 68, 0.7);
+}
+
+.s4-result-points {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.4vw;
+  color: #ffcc00;
+  font-weight: bold;
+  text-shadow: 0 0 12px rgba(255, 204, 0, 0.7);
+}
+
+@keyframes s4-result-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
