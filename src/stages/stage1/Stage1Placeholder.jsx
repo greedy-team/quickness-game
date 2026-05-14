@@ -167,6 +167,10 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
         />
       )}
 
+      {(phase === 'MANUAL' || phase === 'CHIMING') && (
+        <div className="stage-key-hint">10초에 정확히 ← 키를 누르세요</div>
+      )}
+
       {phase === 'MANUAL' && (
         <div className="manual-overlay">
           <p className="start-instruction">Space / Enter를 눌러 시험을 시작합니다.</p>
@@ -184,13 +188,18 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
       {phase === 'END' && resultTier && (
         <ResultModal
-          metricLabel="MEASURED TIME"
-          metricValue={formatTime(finalResultTime)}
+          metricValue={`${finalResultTime.toFixed(2)}초`}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map((t) => {
-            const rangeLabel = t.maxError === Infinity
-              ? '그 외'
-              : `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t, i, arr) => {
+            let rangeLabel;
+            if (t.maxError === Infinity) {
+              rangeLabel = '그 외';
+            } else if (i === 0) {
+              rangeLabel = `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
+            } else {
+              const prevMax = arr[i - 1].maxError;
+              rangeLabel = `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec - prevMax).toFixed(2)} 또는 ${(STAGE1_CONFIG.targetSec + prevMax).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
+            }
             return { label: t.label, rangeLabel, points: t.points, isCurrent: resultTier.id === t.id, color: t.color };
           })}
           hint="Space / Enter 로 계속"
