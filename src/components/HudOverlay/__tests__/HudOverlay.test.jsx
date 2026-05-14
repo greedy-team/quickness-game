@@ -78,8 +78,8 @@ describe('HudOverlay', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/ending/silhouette');
   });
 
-  it('LogIn 버튼 클릭 시 270점 → /ending/alive로 이동한다', async () => {
-    setStageScore(1, 270);
+  it('LogIn 버튼 클릭 시 400점 → /ending/alive로 이동한다', async () => {
+    setStageScore(1, 400);
     const user = userEvent.setup();
     renderHud();
     await user.click(screen.getByRole('button', { name: '결과 확인' }));

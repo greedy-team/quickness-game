@@ -13,8 +13,8 @@ import { STAGE3_CONFIG } from './stage3.config.js';
 import './Stage3Game.css';
 
 export default function Stage3Game({ mode = 'standalone', isRunning, onResult }) {
-  // local phase: 'idle' | 'countdown' | 'go' | 'running' | 'result'
-  const [phase, setPhase] = useState('idle');
+  // local phase: 'ready' | 'countdown' | 'go' | 'running' | 'result'
+  const [phase, setPhase] = useState('ready');
   const [resultData, setResultData] = useState(null);
   const audioRef = useRef(null);
   const finishTimeoutRef = useRef(null);
@@ -23,7 +23,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
   // standalone: Space 키로 self-trigger
   useEffect(() => {
     if (mode !== 'standalone') return;
-    if (phase !== 'idle') return;
+    if (phase !== 'ready') return;
 
     const handleKeyDown = (e) => {
       if (e.code === 'Space') {
@@ -38,7 +38,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
   // split: isRunning prop watch
   useEffect(() => {
     if (mode !== 'split') return;
-    if (isRunning && phase === 'idle') setPhase('countdown');
+    if (isRunning && phase === 'ready') setPhase('countdown');
   }, [mode, isRunning, phase]);
 
   // countdown → go → running
@@ -152,10 +152,10 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
 
   return (
     <div className={`stage3-game stage3-game--${mode}`}>
-      {mode === 'standalone' && (phase === 'idle' || phase === 'running') && (
+      {mode === 'standalone' && phase === 'running' && (
         <div className="stage-key-hint">노란선에 위치했을 때 → 키를 누르세요</div>
       )}
-      {phase === 'idle' && mode === 'standalone' && <Stage3Intro />}
+      {phase === 'ready' && mode === 'standalone' && <Stage3Intro />}
       {(phase === 'countdown' || phase === 'go') && (
         <div className="stage3-countdown">
           <span key={phase} className="stage3-countdown__text">
