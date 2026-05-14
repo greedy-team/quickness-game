@@ -45,7 +45,7 @@ const buildS2RangeLabel = (tier) => {
 };
 
 export default function Stage2Placeholder({ onResult, isRunning, mode }) {
-  const [phase, setPhase] = useState('MANUAL'); 
+  const [phase, setPhase] = useState('ready'); 
   const [gameState, setGameState] = useState('IDLE');
   const [currentBG, setCurrentBG] = useState(BGS.INFO); 
   const [timer, setTimer] = useState(10);
@@ -58,7 +58,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   const [resultScore, setResultScore] = useState(0);
 
   const stateRef = useRef({
-    phase: 'MANUAL',
+    phase: 'ready',
     gameState: 'IDLE',
     isFinished: false,
     attackStartTime: 0 
@@ -105,7 +105,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     const bgm = bgmRef.current;
     if (!bgm) return;
 
-    if (phase === 'PLAY' && isRunning) {
+    if (phase === 'running' && isRunning) {
       bgm.volume = bgmVolume;
       bgm.currentTime = 86; // 1분 26초부터 재생 시작
       bgm.play().catch(() => {});
@@ -121,16 +121,16 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   }, [bgmVolume]);
 
   useEffect(() => {
-    if (mode === 'split' && isRunning && stateRef.current.phase === 'MANUAL') {
+    if (mode === 'split' && isRunning && stateRef.current.phase === 'ready') {
       startGame();
     }
   }, [isRunning, mode]);
 
   const startGame = () => {
-    if (stateRef.current.phase !== 'MANUAL') return;
+    if (stateRef.current.phase !== 'ready') return;
     
     stateRef.current.isFinished = false;
-    syncPhase('PLAY');
+    syncPhase('running');
     syncGameState('LURKING');
     setCurrentBG(BGS.BASE);
     setTimer(10);
@@ -150,7 +150,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     setResultTier(tier);
     setResultScore(score);
     pendingResultRef.current = { metric, score };
-    syncPhase('END');
+    syncPhase('result');
 
     // 🚀 [추가] 게임 종료 시 점프스케어 타이머 취소
     if (jumpscareAudioTimeoutRef.current) {
@@ -173,7 +173,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   }, [onResult, mode]);
 
   const handleShutter = useCallback(() => {
-    if (stateRef.current.phase !== 'PLAY' || stateRef.current.isFinished) return;
+    if (stateRef.current.phase !== 'running' || stateRef.current.isFinished) return;
 
     // 🚀 [추가] 점프스케어 소리 예약이 있으면 즉시 취소
     if (jumpscareAudioTimeoutRef.current) {
@@ -225,7 +225,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   }, [handleFinish]);
 
   useEffect(() => {
-    if (phase !== 'PLAY') return;
+    if (phase !== 'running') return;
 
     const timeouts = [];
     const countdown = setInterval(() => {
@@ -312,9 +312,9 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (stateRef.current.phase === 'MANUAL' && (e.code === 'Space' || e.code === 'Enter')) startGame();
-      else if (stateRef.current.phase === 'PLAY' && e.key === 'ArrowUp') handleShutter();
-      else if (stateRef.current.phase === 'END' && mode !== 'split' && (e.code === 'Space' || e.code === 'Enter')) {
+      if (stateRef.current.phase === 'ready' && (e.code === 'Space' || e.code === 'Enter')) startGame();
+      else if (stateRef.current.phase === 'running' && e.key === 'ArrowUp') handleShutter();
+      else if (stateRef.current.phase === 'result' && mode !== 'split' && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
         const r = pendingResultRef.current;
         if (onResult && r) onResult(r.metric, { score: r.score });
@@ -328,7 +328,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     <div className={`stage2-wrapper ${isShaking ? 'screen-shake' : ''} ${mode === 'split' ? 'split-mode' : ''}`}>
       
       <div 
-        className={`stage2-content ${phase === 'PLAY' ? 'camera-sway' : ''} ${gameState === 'FLICKERING' ? 'flicker-bright' : ''}`} 
+        className={`stage2-content ${phase === 'running' ? 'camera-sway' : ''} ${gameState === 'FLICKERING' ? 'flicker-bright' : ''}`} 
         style={{ backgroundImage: `url(${currentBG})` }} 
       />
       
@@ -338,17 +338,17 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
       <div className="stage2-ui-layer">
 
-        {mode !== 'split' && (phase === 'MANUAL' || phase === 'PLAY') && (
+        {mode !== 'split' && phase === 'running' && (
           <div className="stage-key-hint">가까이 온 순간 ↑ 키를 누르세요</div>
         )}
 
-        {phase === 'MANUAL' && (
+        {phase === 'ready' && (
           <div className="start-minimal">
             <p className="start-btn-simple">Space / Enter를 눌러 시험을 시작합니다.</p>
           </div>
         )}
 
-        {phase === 'PLAY' && (
+        {phase === 'running' && (
           <div className="camera-hud">
             <div className="hud-top">
               <div className="rec-info"><div className="rec-dot" /><span>REC 00:00:{timer.toString().padStart(2, '0')}</span></div>
@@ -358,7 +358,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
         )}
 
-        {phase === 'END' && mode === 'split' && (
+        {phase === 'result' && mode === 'split' && (
           <div className="s2-split-result">
             {reaction.time && <span className="s2-split-time">{reaction.time}s</span>}
             <span className="s2-split-points">{resultScore}점</span>
@@ -367,7 +367,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
       </div>
 
-      {phase === 'END' && resultTier && mode !== 'split' && (
+      {phase === 'result' && resultTier && mode !== 'split' && (
         <ResultModal
           metricValue={reaction.time != null ? `${reaction.time}s` : null}
           tone={resultTier.id !== 'bare' ? 'success' : 'failed'}

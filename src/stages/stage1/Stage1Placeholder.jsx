@@ -24,7 +24,7 @@ const TIER_COMMENT = {
 };
 
 export default function Stage1Placeholder({ mode = 'standalone', isRunning = true, onResult }) {
-  const [phase, setPhase] = useState('STORY');
+  const [phase, setPhase] = useState('story');
   const [currentTime, setCurrentTime] = useState(0.00);
   const [finalResultTime, setFinalResultTime] = useState(0.00);
   const [isEyesClosed, setIsEyesClosed] = useState(false);
@@ -59,9 +59,9 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   }, [bgmVolume]);
 
   const getBackgroundImage = () => {
-    if (phase === 'END') return null; 
-    if (phase === 'MANUAL') return '/assets/images/bg_stage1_info.png';
-    if (phase === 'CHIMING') return '/assets/images/bg_stage1_clock.png'; 
+    if (phase === 'result') return null; 
+    if (phase === 'ready') return '/assets/images/bg_stage1_info.png';
+    if (phase === 'running') return '/assets/images/bg_stage1_clock.png'; 
     switch (currentDialogueIndex) {
       case 1: return '/assets/images/bg_stage1_corridor_그린이.png';
       default: return '/assets/images/bg_stage1_corridor.png';
@@ -87,7 +87,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
 
   // 💡 BGM 제어 로직 최적화 (상태 변화 시 정지만 담당)
   useEffect(() => {
-    if (phase !== 'CHIMING' || !isRunning) {
+    if (phase !== 'running' || !isRunning) {
       if (bgmRef.current) {
         bgmRef.current.pause();
         bgmRef.current.currentTime = 0;
@@ -109,7 +109,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
     cancelAnimationFrame(requestRef.current);
     setFinalResultTime(time);
     setIsEyesClosed(true);
-    setPhase('END');
+    setPhase('result');
 
     const error = Math.abs(time - STAGE1_CONFIG.targetSec);
     const { tier, points } = pointsForError(error, STAGE1_CONFIG);
@@ -120,7 +120,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   };
 
   useEffect(() => {
-    if (phase === 'CHIMING' && isRunning) {
+    if (phase === 'running' && isRunning) {
       startTimeRef.current = Date.now();
       requestRef.current = requestAnimationFrame(animate);
     }
@@ -130,7 +130,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
   // 💡 입력 처리: 0.1초 딜레이 제거 및 재생 안정화
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (phase === 'MANUAL' && (e.code === 'Space' || e.code === 'Enter')) {
+      if (phase === 'ready' && (e.code === 'Space' || e.code === 'Enter')) {
         const bgm = bgmRef.current;
         if (bgm) {
           bgm.currentTime = 0.1;
@@ -139,12 +139,12 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
           bgm.playbackRate = 1.15;
           bgm.play().catch(() => {});
         }
-        setPhase('CHIMING');
+        setPhase('running');
       }
-      if (e.key === 'ArrowLeft' && phase === 'CHIMING') {
+      if (e.key === 'ArrowLeft' && phase === 'running') {
         handleFinish((Date.now() - startTimeRef.current) / 1000);
       }
-      if (phase === 'END' && (e.code === 'Space' || e.code === 'Enter')) {
+      if (phase === 'result' && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
         if (onResult && pendingMetricRef.current !== null) onResult(pendingMetricRef.current);
       }
@@ -159,25 +159,25 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
       <div className={`eye-lid top ${isEyesClosed ? 'closed' : ''}`} />
       <div className={`eye-lid bottom ${isEyesClosed ? 'closed' : ''}`} />
 
-      {phase === 'STORY' && (
+      {phase === 'story' && (
         <DialogueBox 
           lines={STAGE1_STORY} 
           onLineChange={(idx) => setCurrentDialogueIndex(idx)}
-          onComplete={() => setPhase('MANUAL')} 
+          onComplete={() => setPhase('ready')} 
         />
       )}
 
-      {(phase === 'MANUAL' || phase === 'CHIMING') && (
+      {phase === 'running' && (
         <div className="stage-key-hint">10초에 정확히 ← 키를 누르세요</div>
       )}
 
-      {phase === 'MANUAL' && (
+      {phase === 'ready' && (
         <div className="manual-overlay">
           <p className="start-instruction">Space / Enter를 눌러 시험을 시작합니다.</p>
         </div>
       )}
 
-      {phase === 'CHIMING' && (
+      {phase === 'running' && (
         <div className="led-clock-view">
           <h1 className={`led-timer ${currentTime > 8.00 ? 'off' : currentTime > 7.00 ? 'flicker' : ''}`}>
             {formatTime(currentTime)}
@@ -186,7 +186,7 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
         </div>
       )}
 
-      {phase === 'END' && resultTier && (
+      {phase === 'result' && resultTier && (
         <ResultModal
           metricValue={`${finalResultTime.toFixed(2)}초`}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
