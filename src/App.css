@@ -5,3 +5,15 @@
   overflow: hidden;
   background: #000;
 }
+
+.stage-key-hint {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  color: rgba(150, 150, 150, 0.65);
+  font-size: 2rem;
+  z-index: 100;
+  pointer-events: none;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+}
