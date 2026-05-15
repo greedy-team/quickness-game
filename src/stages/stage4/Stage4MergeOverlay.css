@@ -1,85 +1,127 @@
-.stage4-merge-overlay {
+/* src/stages/stage4/Stage4MergeOverlay.css */
+
+.s4-merge-overlay {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  /* ResultModal의 backdrop(z-index 200)보다 위로 올려야 머징 단계에서 모달도 함께 어두워짐 */
-  z-index: 300;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: radial-gradient(
-    circle at center,
-    transparent 0%,
-    transparent 20%,
-    rgba(0, 0, 0, 0.55) 45%,
-    rgba(0, 0, 0, 1) 70%
-  );
-  opacity: 0;
-  animation: stage4-merge-vignette 4s linear forwards;
-}
-
-@keyframes stage4-merge-vignette {
-  0%   { opacity: 0;    transform: scale(6);   background-color: rgba(0, 0, 0, 0); }
-  20%  { opacity: 0.20; transform: scale(4);   background-color: rgba(0, 0, 0, 0); }
-  40%  { opacity: 0.45; transform: scale(2.5); background-color: rgba(0, 0, 0, 0.15); }
-  60%  { opacity: 0.75; transform: scale(1.5); background-color: rgba(0, 0, 0, 0.5); }
-  75%  { opacity: 0.95; transform: scale(1.1); background-color: rgba(0, 0, 0, 0.9); }
-  85%  { opacity: 1.0;  transform: scale(1.0); background-color: rgba(0, 0, 0, 1); }
-  100% { opacity: 1.0;  transform: scale(1.0); background-color: rgba(0, 0, 0, 1); }
-}
-
-/* ── 점수 합산 오버레이 ── */
-.merge-content {
-  position: absolute;
-  inset: 0;
+  background: rgba(12, 13, 17, 0.98); /* 화장실 배경 완벽 차단 */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 2vh, 24px);
-  z-index: 302;
-  pointer-events: none;
+  z-index: 99999; 
+  animation: s4-overlay-fade-in 0.8s ease-out;
+  font-family: 'Courier New', Courier, monospace;
 }
 
-.merge-scores {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
+@keyframes s4-overlay-fade-in {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(15px); }
 }
 
-.merge-score {
-  font-size: clamp(32px, 5vw, 56px);
-  font-weight: 900;
-  color: #FFD700;
-  font-family: 'Courier New', monospace;
-  min-width: clamp(80px, 12vw, 140px);
-  text-align: center;
-}
-
-.merge-op {
-  font-size: clamp(20px, 3vw, 32px);
-  font-weight: 900;
-  color: #888;
-  font-family: 'Courier New', monospace;
-  padding: 0 clamp(6px, 1.2vw, 14px);
-}
-
-.merge-result {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(8px, 1.5vw, 16px);
-}
-
-.merge-eq {
-  font-size: clamp(20px, 3vw, 32px);
-  font-weight: 900;
-  color: #aaa;
-  font-family: 'Courier New', monospace;
-}
-
-.merge-total {
-  font-size: clamp(36px, 6vw, 64px);
-  font-weight: 900;
+.s4-merge-title {
   color: #fff;
-  font-family: 'Courier New', monospace;
+  font-size: 4rem;
+  letter-spacing: 0.3em;
+  font-family: 'Malgun Gothic', sans-serif;
+  font-weight: 900;
+  margin-bottom: 50px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  animation: s4-title-glitch 3s infinite;
+}
+
+.s4-merge-math-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 50px 100px;
+  border: 3px solid #3a3f4b;
+  border-radius: 20px;
+  background: #0c0d11;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(255, 0, 0, 0.1);
+}
+
+.s4-merge-math-row {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.s4-score-item {
+  font-size: 5rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+  animation: s4-pop-in 0.5s ease-out backwards;
+}
+
+.s4-score-1 { animation-delay: 0.5s; }
+.s4-score-2 { animation-delay: 1.0s; }
+.s4-score-3 { animation-delay: 1.5s; }
+
+.s4-math-sign {
+  font-size: 4rem;
+  color: #64748b;
+  animation: s4-pop-in 0.5s ease-out backwards;
+}
+.s4-sign-1 { animation-delay: 0.75s; }
+.s4-sign-2 { animation-delay: 1.25s; }
+
+.s4-total-row {
+  margin-top: 20px;
+  padding-top: 40px;
+  border-top: 3px dashed #3a3f4b;
+  display: flex;
+  align-items: baseline;
+  gap: 40px;
+  animation: s4-slam-down 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation-delay: 2.5s;
+  opacity: 0;
+}
+
+.s4-math-sign.equals {
+  font-size: 6rem;
+  color: #fff;
+}
+
+.s4-total-score {
+  font-size: 10rem;
+  font-weight: 900;
+  color: #ff0000;
+  text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 80px #ff0000;
+  letter-spacing: 5px;
+}
+
+.s4-return-btn {
+  margin-top: 60px;
+  padding: 20px 50px;
+  background: #f1f2f6;
+  border-radius: 10px;
+  cursor: pointer;
+  animation: s4-pop-in 0.5s ease-out backwards;
+  animation-delay: 3.5s;
+  transition: all 0.3s ease;
+}
+
+.s4-return-btn span {
+  color: #0c0d11;
+  font-size: 1.8rem;
+  font-weight: 950;
+  font-family: 'Malgun Gothic', sans-serif;
+}
+
+.s4-return-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+}
+
+@keyframes s4-pop-in {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes s4-slam-down {
+  0% { opacity: 0; transform: scale(3) translateY(-50px); filter: blur(10px); }
+  50% { opacity: 1; transform: scale(0.9) translateY(10px); filter: blur(0px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }

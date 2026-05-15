@@ -1,3 +1,4 @@
+/* 1. 전체 페이지 레이아웃 */
 .hub-page {
   position: relative;
   width: 100%;
@@ -9,15 +10,17 @@
   overflow: hidden;
 }
 
+/* 2. 문들을 담는 컨테이너 */
 .doors-container {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  gap: 50px;
-  width: 95%;
-  height: 65%; /* 문의 세로 위치 조절 */
+  align-items: flex-end; /* 문의 바닥선을 맞춤 */
+  gap: 80px; 
+  width: 100%;
+  height: auto;
 }
 
+/* 3. 개별 스테이지 버튼 (문 + 명판) */
 .hub-page__door {
   background: transparent;
   border: none;
@@ -25,48 +28,67 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 20%;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  width: 140px; 
+  flex: 0 0 140px; /* 크기 절대 고정 */
   padding: 0;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* STAGE 명판 스타일 */
+/* 4. STAGE 명판 스타일 */
 .door-plate {
   background: rgba(10, 10, 10, 0.95);
   border: 1px solid #444;
-  padding: 15px 25px;
-  margin-bottom: 30px;
-  min-width: 180px;
+  padding: 10px 0;
+  margin-bottom: 25px;
+  width: 100%; 
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
   transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
 }
 
 .plate-label-big {
   color: #ff2222;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 900;
-  letter-spacing: 3px;
-  text-shadow: 0 0 10px #ff0000;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px #ff0000;
   font-family: 'Courier New', Courier, monospace;
 }
 
-/* 문 이미지 및 효과 */
+/* 5. 문 이미지 프레임 (비율 고정) */
 .door-view {
   width: 100%;
-  aspect-ratio: 9 / 16;
+  height: 250px; 
   position: relative;
   transition: filter 0.4s ease;
+  overflow: hidden;
+  border-radius: 4px;
+  /* 💡 스테이지 4 contain 적용 시 생길 수 있는 여백 대비 배경색 */
+  background-color: rgba(0, 0, 0, 0.2); 
 }
 
+/* 6. 기본 문 이미지 설정 (Stage 1, 2, 3) */
 .door-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover; /* 일반 문은 프레임에 꽉 채움 */
+  object-position: center; 
   filter: brightness(0.65) grayscale(0.1); 
   transition: all 0.4s ease;
 }
 
-/* 호버 연출 */
+/* ── 🔒 7. 스테이지 4 잠긴 문 전용 스타일 (예외 처리) ── */
+.hub-page__door.is-locked .door-img {
+  /* 💡 핵심: 세로로 긴 이미지를 자르지 않고 전체 다 보여줌 */
+  object-fit: contain; 
+  /* 💡 윗부분(전등 장식)이 잘리지 않도록 상단에 바짝 붙임 */
+  object-position: top; 
+  /* 잠긴 문 특유의 어두운 느낌 유지 */
+  filter: brightness(0.5) grayscale(0.5); 
+}
+
+/* 8. 호버 연출 (잠기지 않은 문만) */
 .hub-page__door:not(.is-locked):hover {
   transform: translateY(-15px) scale(1.05);
 }
@@ -76,28 +98,48 @@
 }
 
 .hub-page__door:not(.is-locked):hover .door-view {
-  filter: drop-shadow(0 0 25px rgba(255, 0, 0, 0.8))
-          drop-shadow(0 0 50px rgba(255, 0, 0, 0.4));
+  filter: drop-shadow(0 0 25px rgba(255, 0, 0, 0.8));
 }
 
-.hub-page__door:not(.is-locked):hover .door-plate {
-  border-color: #ff2222;
-}
-
-/* 잠긴 문 스타일 */
+/* 9. 잠긴 문 호버 금지 및 스타일 */
 .hub-page__door.is-locked {
-  cursor: not-allowed;
+  cursor: default;
 }
 
-.hub-page__door.is-locked .door-img {
-  filter: brightness(0.2) grayscale(1);
+.hub-page__door.is-locked:hover {
+  transform: none;
 }
 
 .hub-page__door.is-locked .plate-label-big {
-  color: #222;
+  color: #333;
   text-shadow: none;
 }
 
 .hub-page__door.is-locked .door-plate {
   border-color: #222;
+}
+
+/* 10. 잠금 경고 토스트 */
+.locked-toast {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(150, 0, 0, 0.95);
+  color: white;
+  padding: 12px 35px;
+  border-radius: 4px;
+  font-weight: bold;
+  z-index: 1000;
+  border: 1px solid #ff0000;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
+  animation: toast-fade 2s forwards;
+  pointer-events: none;
+}
+
+@keyframes toast-fade {
+  0% { opacity: 0; transform: translate(-50%, 15px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -15px); }
 }

@@ -3,46 +3,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Stage4TimerPane.css';
 import { STAGE1_CONFIG } from '../stage1/stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
-import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
-
-const buildRangeLabel = (tier) => {
-  const tiers = STAGE1_CONFIG.accuracyTiers;
-  const idx = tiers.findIndex(t => t.id === tier.id);
-  if (tier.maxError === Infinity) return '그 외';
-  if (idx === 0) {
-    return `${(STAGE1_CONFIG.targetSec - tier.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + tier.maxError).toFixed(2)}초`;
-  }
-  const prevMax = tiers[idx - 1].maxError;
-  return `${(STAGE1_CONFIG.targetSec - tier.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec - prevMax).toFixed(2)} 또는 ${(STAGE1_CONFIG.targetSec + prevMax).toFixed(2)}~${(STAGE1_CONFIG.targetSec + tier.maxError).toFixed(2)}초`;
-};
+import { scoreFromMetric } from '../../scoring.js';
+import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
 export default function Stage4TimerPane({ isRunning, onResult }) {
-  const [currentTime, setCurrentTime] = useState(0.00);
+  const [currentTime, setCurrentTime] = useState(0.000);
   const [phase, setPhase] = useState('running'); // 'running' | 'end'
   const [finalTime, setFinalTime] = useState(0);
-  const [resultTier, setResultTier] = useState(null);
   const [resultScore, setResultScore] = useState(0);
+  const [resultTier, setResultTier] = useState(null);
 
   const startTimeRef = useRef(0);
   const requestRef = useRef();
   const phaseRef = useRef('running');
   const finishTimeoutRef = useRef(null);
 
-  // 시간 포맷
+  // 1단계의 포맷팅 (00:000)
   const formatTime = (elapsed) => {
-    const totalSec = 50 + elapsed;
-    let hourMin, secMs;
-    if (totalSec < 60) {
-      hourMin = "11:59:";
-      secMs = `${Math.floor(totalSec).toString().padStart(2, '0')}${(totalSec % 1).toFixed(2).substring(1)}`;
-    } else {
-      const overSec = totalSec - 60;
-      hourMin = "12:00:";
-      secMs = `${Math.floor(overSec).toString().padStart(2, '0')}${(overSec % 1).toFixed(2).substring(1)}`;
-    }
-    return (
-      <><span className="s4-hour-min">{hourMin}</span>{secMs}</>
-    );
+    const s = Math.floor(elapsed).toString().padStart(2, '0');
+    const ms = Math.floor((elapsed % 1) * 1000).toString().padStart(3, '0');
+    return `${s}:${ms}`;
   };
 
   const animate = () => {
@@ -66,14 +46,14 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
 
     phaseRef.current = 'end';
     setFinalTime(time);
-    setResultTier(tier);
     setResultScore(score);
+    setResultTier(tier);
     setPhase('end');
 
     finishTimeoutRef.current = setTimeout(() => {
       if (onResult) onResult(metric, { score });
       finishTimeoutRef.current = null;
-    }, 1500);
+    }, 1500); // 1.5초 후 4단계 호스트로 완료 신호 전송
   };
 
   useEffect(() => {
@@ -83,13 +63,11 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
     }
     return () => {
       cancelAnimationFrame(requestRef.current);
-      if (finishTimeoutRef.current) {
-        clearTimeout(finishTimeoutRef.current);
-        finishTimeoutRef.current = null;
-      }
+      if (finishTimeoutRef.current) clearTimeout(finishTimeoutRef.current);
     };
   }, [isRunning]);
 
+  // 💡 1단계와 동일하게 왼쪽 방향키(ArrowLeft)를 눌렀을 때 멈춤!
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft' && isRunning && phaseRef.current === 'running') {
@@ -102,22 +80,35 @@ export default function Stage4TimerPane({ isRunning, onResult }) {
 
   return (
     <div className="s4-timer-pane">
+      {/* 💡 1단계 시계 배경 */}
       <div className="s4-timer-bg" />
 
+      {/* 💡 1단계 인게임 뷰 */}
       <div className="s4-timer-content">
         <h1 className={`s4-timer-display ${
-          currentTime > 8.00 ? 'off' :
-          currentTime > 7.00 ? 'flicker' : ''
+          (currentTime > 7.00 && finalTime === 0) ? 'off' : ''
+        } ${
+          (currentTime > 6.00 && currentTime <= 7.00 && finalTime === 0) ? 'flicker' : ''
         }`}>
           {formatTime(currentTime)}
         </h1>
+        <p className="s4-target-hint" style={{ opacity: (currentTime > 7.00 && finalTime === 0) ? 0 : 1 }}>
+          TARGET : 10.000s
+        </p>
       </div>
 
-      {phase === 'end' && (
-        <div className="s4-result-info">
-          <span className="s4-result-time">{finalTime.toFixed(2)}초</span>
-          <span className="s4-result-points">{resultScore}점</span>
-        </div>
+      {/* 💡 게임 종료 시 심플하게 점수만 표시 (거대 모달 X) -> 이제 ResultModal 적용 */}
+      {phase === 'end' && resultTier && (
+        <ResultModal
+          metricValue={`${finalTime.toFixed(3)}초`}
+          tone={resultTier.id === 'bare' ? 'failed' : 'success'}
+          tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({ 
+            ...t, 
+            isCurrent: resultTier.id === t.id, 
+            rangeLabel: t.maxError === Infinity ? '그 외' : `≤ ${t.maxError}s` 
+          }))}
+          hint={resultTier.id === 'bare' ? "끝까지 집중하세요." : ""} 
+        />
       )}
     </div>
   );

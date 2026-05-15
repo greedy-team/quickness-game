@@ -1,30 +1,36 @@
-// 1초 합체 연출 골격 — 3 panes fade + scale + center 모임.
-// 부모(Stage4Host)가 active 동안만 마운트, 1초 후 unmount.
-// TODO(post-skeleton): 거울 균열 SVG, "진짜만 남음" 텍스트, 충격음 등 후속 폴리싱.
-
+// src/stages/stage4/Stage4MergeOverlay.jsx
 import React from 'react';
-import './Stage4MergeOverlay.css';
+import './Stage4MergeOverlay.css'; // 🚨 이 경로가 무조건 맞아야 합니다!
 
-export default function Stage4MergeOverlay({ scores }) {
+export default function Stage4MergeOverlay({ scores, onComplete }) {
   const p1 = scores?.pane1 ?? 0;
   const p2 = scores?.pane2 ?? 0;
   const p3 = scores?.pane3 ?? 0;
-  const total = p1 + p2 + p3;
+  const totalScore = p1 + p2 + p3;
 
   return (
-    <div className="stage4-merge-overlay" aria-hidden="true">
-      <div className="merge-content">
-        <div className="merge-scores">
-          <span className="merge-score merge-score--1">{p1}</span>
-          <span className="merge-op merge-op--1">+</span>
-          <span className="merge-score merge-score--2">{p2}</span>
-          <span className="merge-op merge-op--2">+</span>
-          <span className="merge-score merge-score--3">{p3}</span>
+    <div className="s4-merge-overlay">
+      <h1 className="s4-merge-title">FINAL SYNCHRONIZATION</h1>
+      
+      <div className="s4-merge-math-container">
+        <div className="s4-merge-math-row">
+          <span className="s4-score-item s4-score-1">{p1}</span>
+          <span className="s4-math-sign s4-sign-1">+</span>
+          
+          <span className="s4-score-item s4-score-2">{p2}</span>
+          <span className="s4-math-sign s4-sign-2">+</span>
+          
+          <span className="s4-score-item s4-score-3">{p3}</span>
         </div>
-        <div className="merge-result">
-          <span className="merge-eq">=</span>
-          <span className="merge-total" data-testid="merge-total">{total}</span>
+
+        <div className="s4-total-row">
+          <span className="s4-math-sign equals">=</span>
+          <span className="s4-total-score">{totalScore}</span>
         </div>
+      </div>
+
+      <div className="s4-return-btn" onClick={onComplete}>
+        <span>메인 화면으로 복귀 (ENTER)</span>
       </div>
     </div>
   );

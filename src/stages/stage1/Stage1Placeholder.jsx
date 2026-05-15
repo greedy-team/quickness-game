@@ -3,11 +3,10 @@ import './Stage1Placeholder.css';
 import DialogueBox from '../../components/DialogueBox/DialogueBox';
 import { STAGE1_CONFIG } from './stage1.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
-import { scoreFromMetric, maxScoreForStage } from '../../scoring.js';
+import { scoreFromMetric } from '../../scoring.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
 
-// 💡 경로 앞에 /를 붙여서 public 폴더 기준임을 명시
 const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
 
 const STAGE1_STORY = [
@@ -15,133 +14,80 @@ const STAGE1_STORY = [
   "당황하는 순간 주도권은 도플갱어에게 넘어갑니다. 평정심을 유지하며 놈의 주파수를 차단해야 합니다."
 ];
 
-const TIER_COMMENT = {
-  perfect: '완벽한 정각. 도플갱어의 주파수가 끊어졌습니다.',
-  great:   '거의 정확한 타이밍. 가짜의 형체가 흐려집니다.',
-  good:    '준수한 타이밍. 도플갱어를 잠시 밀어냈습니다.',
-  ok:      '간발의 차이로 도플갱어를 막아냈습니다.',
-  bare:    '타이밍이 어긋났습니다. 도플갱어와 눈이 마주쳤습니다.',
-};
-
-export default function Stage1Placeholder({ mode = 'standalone', isRunning = true, onResult }) {
-  const [phase, setPhase] = useState('story');
-  const [currentTime, setCurrentTime] = useState(0.00);
-  const [finalResultTime, setFinalResultTime] = useState(0.00);
+export default function Stage1Placeholder({ onResult, isRunning = true }) {
+  const [phase, setPhase] = useState('ready');
+  const [currentTime, setCurrentTime] = useState(0.000);
+  const [finalResultTime, setFinalResultTime] = useState(0.000);
   const [isEyesClosed, setIsEyesClosed] = useState(false);
   const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
   const [resultTier, setResultTier] = useState(null);
-  const [resultScore, setResultScore] = useState(0);
 
   const bgmVolume = useAudioVolume('bgm');
-
   const startTimeRef = useRef(0);
   const requestRef = useRef();
   const pendingMetricRef = useRef(null);
-  
-  // 💡 오디오 객체를 안전하게 한 번만 생성
   const bgmRef = useRef(null);
-  useEffect(() => {
-    bgmRef.current = new Audio(BGM_PATH);
-    bgmRef.current.loop = true;
 
-    return () => {
-      if (bgmRef.current) {
-        bgmRef.current.pause();
-        bgmRef.current = null;
-      }
-    };
+  useEffect(() => {
+    if (!bgmRef.current) {
+      bgmRef.current = new Audio(BGM_PATH);
+      bgmRef.current.loop = true;
+    }
+    return () => { if (bgmRef.current) { bgmRef.current.pause(); bgmRef.current = null; } };
   }, []);
 
-  // useAudioStore 의 bgmVolume 변경 시 현재 재생 중인 heartbeat 에 즉시 반영
-  useEffect(() => {
-    const bgm = bgmRef.current;
-    if (bgm) bgm.volume = bgmVolume;
-  }, [bgmVolume]);
-
-  const getBackgroundImage = () => {
-    if (phase === 'result') return null; 
-    if (phase === 'ready') return '/assets/images/bg_stage1_info.png';
-    if (phase === 'running') return '/assets/images/bg_stage1_clock.png'; 
-    switch (currentDialogueIndex) {
-      case 1: return '/assets/images/bg_stage1_corridor_그린이.png';
-      default: return '/assets/images/bg_stage1_corridor.png';
-    }
-  };
-
-  const bgImage = getBackgroundImage();
-  const bgStyle = bgImage ? { backgroundImage: `url(${bgImage})` } : {};
+  useEffect(() => { if (bgmRef.current) bgmRef.current.volume = bgmVolume; }, [bgmVolume]);
 
   const formatTime = (elapsed) => {
-    const totalSec = 50 + elapsed; 
-    let hourMin, secMs;
-    if (totalSec < 60) {
-      hourMin = "11:59:";
-      secMs = `${Math.floor(totalSec).toString().padStart(2, '0')}${(totalSec % 1).toFixed(2).substring(1)}`;
-    } else {
-      const overSec = totalSec - 60;
-      hourMin = "12:00:";
-      secMs = `${Math.floor(overSec).toString().padStart(2, '0')}${(overSec % 1).toFixed(2).substring(1)}`;
-    }
-    return <><span className="hour-min-text">{hourMin}</span>{secMs}</>;
+    const s = Math.floor(elapsed).toString().padStart(2, '0');
+    const ms = Math.floor((elapsed % 1) * 1000).toString().padStart(3, '0');
+    return `${s}:${ms}`;
   };
 
-  // 💡 BGM 제어 로직 최적화 (상태 변화 시 정지만 담당)
-  useEffect(() => {
-    if (phase !== 'running' || !isRunning) {
-      if (bgmRef.current) {
-        bgmRef.current.pause();
-        bgmRef.current.currentTime = 0;
-      }
-    }
-  }, [phase, isRunning]);
+  const handleFinish = (time) => {
+    cancelAnimationFrame(requestRef.current);
+    setFinalResultTime(time);
+    setCurrentTime(time);
+
+    setTimeout(() => {
+      setIsEyesClosed(true);
+      setTimeout(() => {
+        setPhase('result');
+      }, 600);
+    }, 2000);
+
+    const error = Math.abs(time - STAGE1_CONFIG.targetSec);
+    const { tier, points } = pointsForError(error, STAGE1_CONFIG);
+    setResultTier(tier);
+    const metric = metricFromPoints(points, STAGE1_CONFIG);
+    pendingMetricRef.current = metric;
+  };
 
   const animate = () => {
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
     if (elapsed <= STAGE1_CONFIG.timeoutSec) {
       setCurrentTime(elapsed);
       requestRef.current = requestAnimationFrame(animate);
-    } else {
-      handleFinish(elapsed);
-    }
+    } else { handleFinish(elapsed); }
   };
 
-  const handleFinish = (time) => {
-    cancelAnimationFrame(requestRef.current);
-    setFinalResultTime(time);
-    setIsEyesClosed(true);
-    setPhase('result');
-
-    const error = Math.abs(time - STAGE1_CONFIG.targetSec);
-    const { tier, points } = pointsForError(error, STAGE1_CONFIG);
-    setResultTier(tier);
-    const metric = metricFromPoints(points, STAGE1_CONFIG);
-    setResultScore(scoreFromMetric(1, metric));
-    pendingMetricRef.current = metric;
+  const startGame = () => {
+    if (bgmRef.current) {
+      bgmRef.current.currentTime = 0.1;
+      bgmRef.current.playbackRate = 1.15;
+      bgmRef.current.play().catch(() => {});
+    }
+    startTimeRef.current = Date.now();
+    requestRef.current = requestAnimationFrame(animate);
+    setPhase('running');
   };
 
-  useEffect(() => {
-    if (phase === 'running' && isRunning) {
-      startTimeRef.current = Date.now();
-      requestRef.current = requestAnimationFrame(animate);
-    }
-    return () => cancelAnimationFrame(requestRef.current);
-  }, [phase, isRunning]);
-
-  // 💡 입력 처리: 0.1초 딜레이 제거 및 재생 안정화
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (phase === 'ready' && (e.code === 'Space' || e.code === 'Enter')) {
-        const bgm = bgmRef.current;
-        if (bgm) {
-          bgm.currentTime = 0.1;
-          bgm.volume = bgmVolume;
-          // play() 성공 여부를 확인하지 않고 그냥 실행하여 지연 최소화
-          bgm.playbackRate = 1.15;
-          bgm.play().catch(() => {});
-        }
-        setPhase('running');
+        startGame(); 
       }
-      if (e.key === 'ArrowLeft' && phase === 'running') {
+      if (e.key === 'ArrowLeft' && phase === 'running' && finalResultTime === 0) {
         handleFinish((Date.now() - startTimeRef.current) / 1000);
       }
       if (phase === 'result' && (e.code === 'Space' || e.code === 'Enter')) {
@@ -151,58 +97,88 @@ export default function Stage1Placeholder({ mode = 'standalone', isRunning = tru
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [phase, bgmVolume]);
+  }, [phase, finalResultTime, bgmVolume]);
+
+  // 💡 배경 교체 로직 수정 (준비: 복도 / 게임: 시계)
+  const getBackgroundImage = () => {
+    if (phase === 'result') return null;
+    if (phase === 'ready') return '/assets/images/bg_stage1_corridor_ledclock.png'; 
+    if (phase === 'running') return '/assets/images/bg_stage1_clock.png'; 
+    return currentDialogueIndex === 1 ? '/assets/images/bg_stage1_corridor_그린이.png' : '/assets/images/bg_stage1_corridor.png';
+  };
 
   return (
     <div className="stage-wrapper">
-      <div className="stage1-bg" style={bgStyle} />
+      <div className="stage1-bg" style={{backgroundImage: getBackgroundImage() ? `url(${getBackgroundImage()})` : 'none'}} />
       <div className={`eye-lid top ${isEyesClosed ? 'closed' : ''}`} />
       <div className={`eye-lid bottom ${isEyesClosed ? 'closed' : ''}`} />
 
       {phase === 'story' && (
-        <DialogueBox 
-          lines={STAGE1_STORY} 
-          onLineChange={(idx) => setCurrentDialogueIndex(idx)}
-          onComplete={() => setPhase('ready')} 
-        />
-      )}
-
-      {phase === 'running' && (
-        <div className="stage-key-hint">10초에 정확히 ← 키를 누르세요</div>
+        <DialogueBox lines={STAGE1_STORY} onLineChange={setCurrentDialogueIndex} onComplete={() => setPhase('ready')} />
       )}
 
       {phase === 'ready' && (
-        <div className="manual-overlay">
-          <p className="start-instruction">Space / Enter를 눌러 시험을 시작합니다.</p>
+        <div className="stage-info-screen">
+          <div className="info-top-section">
+            <h1 className="stage-title">1단계: 10초 게임</h1>
+          </div>
+
+          <div className="info-middle-section">
+            <div className="image-frame">
+              <div className="image-frame-header">STAGE 01: SENSE OF TIME</div>
+              <div className="preview-content" />
+            </div>
+
+            <div className="instruction-item">
+              <div className="arrow-keys-cluster">
+                <div className="arrow-row">
+                  <div className="key-cap">↑</div>
+                </div>
+                <div className="arrow-row">
+                  <div className="key-cap left-active">←</div>
+                  <div className="key-cap">↓</div>
+                  <div className="key-cap">→</div>
+                </div>
+              </div>
+              <div className="main-instruction-text">
+                타이머가 정확히 10초가 되는 순간<br/>
+                <span className="highlight-key">[←] 키</span>를 눌러 타이머를 멈추세요
+              </div>
+            </div>
+          </div>
+
+          <div className="info-bottom-section">
+            <div 
+              className="key-icon-wrapper start-btn" 
+              onClick={() => { if(phase === 'ready') startGame(); }}
+            >
+              <span>GAME START</span>
+            </div>
+            <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+          </div>
         </div>
       )}
 
       {phase === 'running' && (
         <div className="led-clock-view">
-          <h1 className={`led-timer ${currentTime > 8.00 ? 'off' : currentTime > 7.00 ? 'flicker' : ''}`}>
+          <h1 className={`led-timer 
+            ${(currentTime > 7.00 && finalResultTime === 0) ? 'off' : ''} 
+            ${(currentTime > 6.00 && currentTime <= 7.00 && finalResultTime === 0) ? 'flicker' : ''}
+          `}>
             {formatTime(currentTime)}
           </h1>
-          <p className={`target-hint ${currentTime > 8.00 ? 'off' : ''}`}>TARGET : 12:00:00.00</p>
+          <p className="target-hint" style={{ opacity: (currentTime > 7.00 && finalResultTime === 0) ? 0 : 1 }}>
+            TARGET : 10.000s
+          </p>
         </div>
       )}
 
       {phase === 'result' && resultTier && (
         <ResultModal
-          metricValue={`${finalResultTime.toFixed(2)}초`}
+          metricValue={`${finalResultTime.toFixed(3)}초`}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map((t, i, arr) => {
-            let rangeLabel;
-            if (t.maxError === Infinity) {
-              rangeLabel = '그 외';
-            } else if (i === 0) {
-              rangeLabel = `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
-            } else {
-              const prevMax = arr[i - 1].maxError;
-              rangeLabel = `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}~${(STAGE1_CONFIG.targetSec - prevMax).toFixed(2)} 또는 ${(STAGE1_CONFIG.targetSec + prevMax).toFixed(2)}~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}초`;
-            }
-            return { label: t.label, rangeLabel, points: t.points, isCurrent: resultTier.id === t.id, color: t.color };
-          })}
-          hint="Space / Enter 로 계속"
+          tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({ ...t, isCurrent: resultTier.id === t.id, rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError}s` }))}
+          hint="" 
         />
       )}
     </div>
