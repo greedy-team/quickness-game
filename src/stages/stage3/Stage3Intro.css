@@ -1,63 +1,104 @@
+/* ── 💡 3단계 정보 페이지 (준비 화면) 레이아웃 ── */
 .stage3-intro {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 36px;
-  padding: 48px;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 10;
+  position: absolute; inset: 0; z-index: 110;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 0; background: rgba(12, 13, 17, 0.85); /* 반투명 배경 */
+  font-family: 'Malgun Gothic', sans-serif;
 }
 
-.stage3-intro__title {
-  font-size: clamp(40px, 5.5vw, 72px);
-  margin: 0;
-  letter-spacing: 0.04em;
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
+/* [상단] 타이틀 영역 */
+.info-top-section {
+  position: absolute; top: 50px; text-align: center;
 }
 
-.stage3-intro__group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+.stage-title {
+  font-size: 4.5rem; font-weight: 950; color: #fff; margin-bottom: 10px;
+  letter-spacing: -1px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
-.stage3-intro__label {
-  margin: 0;
-  font-size: clamp(22px, 2.4vw, 32px);
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+/* [중앙] 이미지 및 방향키 영역 */
+.info-middle-section {
+  display: flex; align-items: center; justify-content: center;
+  gap: 100px; width: 100%; height: 100%;
 }
 
-.stage3-intro__label--real { color: #88dd88; }
-.stage3-intro__label--fake { color: #ff8888; }
-
-.stage3-intro__row {
-  display: flex;
-  gap: 24px;
+.simple-preview-image {
+  width: 550px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.stage3-intro__thumb {
-  width: clamp(120px, 12vw, 168px);
-  height: clamp(120px, 12vw, 168px);
-  object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+.instruction-item { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+/* ── ⌨️ 방향키 아이콘 클러스터 ── */
+.arrow-keys-cluster { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 5px; }
+.arrow-row { display: flex; gap: 8px; }
+
+.key-cap {
+  width: 70px; height: 70px; background: #1e293b; border: 2px solid #475569;
+  border-radius: 12px; display: flex; justify-content: center; align-items: center;
+  color: #64748b; font-size: 1.8rem; font-weight: 900; box-shadow: 0 5px 0 #000;
 }
 
-.stage3-intro__cta {
-  margin-top: 24px;
-  font-size: clamp(22px, 2.2vw, 30px);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
-  animation: stage3-intro-pulse 1.4s ease-in-out infinite;
+/* 💡 3단계 전용: [오른쪽 방향키] 발광 */
+.key-cap.right-active {
+  background: #2d0a0a; border: 3px solid #ff2222; color: #ff2222;
+  box-shadow: 0 5px 0 #000, 0 0 25px rgba(255, 34, 34, 0.6);
+  animation: red-glow-pulse 1.5s infinite ease-in-out;
 }
 
-@keyframes stage3-intro-pulse {
-  0%, 100% { opacity: 0.7; }
-  50%      { opacity: 1.0; }
+@keyframes red-glow-pulse {
+  0%, 100% { box-shadow: 0 5px 0 #000, 0 0 15px rgba(255, 34, 34, 0.4); }
+  50% { box-shadow: 0 5px 0 #000, 0 0 40px rgba(255, 34, 34, 0.9); filter: brightness(1.2); }
+}
+
+.main-instruction-text {
+  font-size: 1.6rem; font-weight: 700; color: #cbd5e1; 
+  text-align: center; line-height: 1.5;
+}
+
+.highlight-key {
+  color: #ff2222; font-weight: 900; text-shadow: 0 0 10px rgba(255, 34, 34, 0.4);
+}
+
+.warning-text {
+  font-size: 1.2rem; color: #ff4444; font-weight: 800; margin-top: 5px;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5); letter-spacing: 1px;
+}
+
+/* [하단] 게임 시작 버튼 영역 */
+.info-bottom-section {
+  position: absolute; bottom: 50px; display: flex; flex-direction: column; align-items: center;
+}
+
+.key-icon-wrapper.start-btn {
+  width: 280px; height: 85px; background: #f1f2f6; border-radius: 15px;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer; box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.key-icon-wrapper.start-btn span {
+  color: #0c0d11; font-size: 2rem; font-weight: 950; letter-spacing: 4px;
+}
+
+.key-icon-wrapper.start-btn:hover {
+  animation: hover-pulse-effect 1.2s infinite;
+}
+
+@keyframes hover-pulse-effect {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 40px rgba(255, 255, 255, 0.8); }
+}
+
+.sub-instruction-text {
+  font-size: 1.3rem; color: #94a3b8; font-weight: 700; margin-top: 20px;
+  animation: text-flicker-pulse 2s infinite ease-in-out;
+}
+
+@keyframes text-flicker-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.99); text-shadow: none; }
+  50% { opacity: 1; transform: scale(1); color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.6); }
 }

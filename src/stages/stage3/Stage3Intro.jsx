@@ -1,32 +1,55 @@
-// 인트로 화면 — real/fake 미리보기 + Space 안내.
-// standalone 모드에서만 사용. split 모드에서는 호스트가 통합 인트로.
 import { ASSETS } from '../../assets.js';
 import './Stage3Intro.css';
 
-export default function Stage3Intro() {
+// 💡 부모 컴포넌트(Stage3Game)에서 onStart 이벤트를 받아 마우스 클릭 시에도 시작 가능하게 합니다.
+export default function Stage3Intro({ onStart }) {
   return (
     <div className="stage3-intro">
-      <h1 className="stage3-intro__title">⚠️ 기억의 조각이 떨어진다</h1>
-
-      <div className="stage3-intro__group">
-        <p className="stage3-intro__label stage3-intro__label--real">✅ 진짜 기억 — 받기 (→)</p>
-        <div className="stage3-intro__row">
-          {ASSETS.images.memoryReal.map((src) => (
-            <img key={src} className="stage3-intro__thumb" src={src} alt="" />
-          ))}
-        </div>
+      
+      {/* [상단] 타이틀 */}
+      <div className="info-top-section">
+        <h1 className="stage-title">3단계: 기억의 파편</h1>
       </div>
 
-      <div className="stage3-intro__group">
-        <p className="stage3-intro__label stage3-intro__label--fake">❌ 가짜 기억 — 피하기 (누르지 않음)</p>
-        <div className="stage3-intro__row">
-          {ASSETS.images.memoryFake.map((src) => (
-            <img key={src} className="stage3-intro__thumb" src={src} alt="" />
-          ))}
+      {/* [중앙] 메탈릭 프레임과 방향키 설명 */}
+      <div className="info-middle-section">
+        
+        <img 
+          className="simple-preview-image" 
+          src="/assets/images/bg_stage3_example.png" 
+          alt="Stage 3 Example" 
+        />
+
+        <div className="instruction-item">
+          <div className="arrow-keys-cluster">
+            <div className="arrow-row">
+              <div className="key-cap">↑</div>
+            </div>
+            <div className="arrow-row">
+              <div className="key-cap">←</div>
+              <div className="key-cap">↓</div>
+              {/* 💡 3단계의 핵심 방향키인 오른쪽 발광 */}
+              <div className="key-cap right-active">→</div>
+            </div>
+          </div>
+          
+          <div className="main-instruction-text">
+            떨어지는 기억이 원 안에 위치했을 때<br/>
+            <span className="highlight-key">[→] 키</span>를 누르세요
+          </div>
+          
         </div>
+
       </div>
 
-      <p className="stage3-intro__cta">▶ 준비되면 [Space] 누르기</p>
+      {/* [하단] 시작 버튼 */}
+      <div className="info-bottom-section">
+        <div className="key-icon-wrapper start-btn" onClick={onStart}>
+          <span>GAME START</span>
+        </div>
+        <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+      </div>
+
     </div>
   );
 }

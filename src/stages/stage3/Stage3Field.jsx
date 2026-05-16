@@ -10,7 +10,7 @@ import FallingItem from './FallingItem.jsx';
 import ResultPopup from './ResultPopup.jsx';
 import './Stage3Field.css';
 
-// 시드 기반 PRNG (mulberry32) — 결정적 시퀀스용
+// 시드 기반 PRNG (mulberry32)
 function mulberry32(seed) {
   let a = seed >>> 0;
   return () => {
@@ -22,19 +22,24 @@ function mulberry32(seed) {
   };
 }
 
-// 결정적 아이템 시퀀스 생성
-// 반환: [{ imgSrc, spawnAt: sec, horizontalPct }]
+// 💡 결정적 아이템 시퀀스 생성 (2초 딜레이 반영)
 function buildSequence(config) {
   const seed = config.seed ?? Date.now();
   const rand = mulberry32(seed);
   const baseInterval = config.durationSec / config.itemCount;
+  
+  // 💡 시작 후 아무것도 안 나오는 초기 대기 시간 2초 (2.0)
+  const INITIAL_DELAY_SEC = 2.0; 
 
   return Array.from({ length: config.itemCount }, (_, i) => {
     const offset = (rand() * 2 - 1) * config.spawnIntervalJitterSec;
-    const spawnAt = Math.max(0, i * baseInterval + offset);
+    // 💡 원래 스폰 시간에 INITIAL_DELAY_SEC(2초)를 더해줍니다.
+    const spawnAt = Math.max(0, i * baseInterval + offset) + INITIAL_DELAY_SEC; 
+    
     const horizontalPct = 50 + (rand() * 2 - 1) * config.horizontalRandomRatio * 100;
     const imgSrc = ASSETS.images.memoryReal[Math.floor(rand() * ASSETS.images.memoryReal.length)];
     const fallDurationSec = config.fallDurationSecMin + rand() * (config.fallDurationSecMax - config.fallDurationSecMin);
+    
     return { imgSrc, spawnAt, horizontalPct, fallDurationSec };
   });
 }
@@ -43,8 +48,6 @@ export default function Stage3Field({ isRunning, onResult }) {
   const config = STAGE3_CONFIG;
   const sequence = useMemo(() => buildSequence(config), [config]);
 
-  // 활성 아이템 상태 — { id, imgSrc, spawnAt, horizontalPct, topPercent, status }
-  // status: 'falling' | 'caught' | 'missed'
   const [items, setItems] = useState([]);
   const [popup, setPopup] = useState({ visible: false, label: '', points: null, color: '', key: 0 });
   const [pressesLeft, setPressesLeft] = useState(config.itemCount);
@@ -55,14 +58,11 @@ export default function Stage3Field({ isRunning, onResult }) {
   const itemsRef = useRef(items);
   itemsRef.current = items;
 
-  // 집계용 ref (missedCount는 종료 시점에 config.itemCount - caughtCount로 계산)
   const statsRef = useRef({ caughtCount: 0 });
   const pressesLeftRef = useRef(config.itemCount);
   const gameEndedRef = useRef(false);
-  // 게임 종료 로직 — RAF 만료와 keydown 양쪽에서 호출. 한 번만 실행됨.
   const finishRef = useRef(null);
 
-  // 점수 누적 헬퍼 — ref(동기 읽기용) 업데이트.
   const addPoints = useCallback((delta) => {
     totalPointsRef.current += delta;
   }, []);
@@ -85,29 +85,33 @@ export default function Stage3Field({ isRunning, onResult }) {
     pressesLeftRef.current = config.itemCount;
     gameEndedRef.current = false;
     setPressesLeft(config.itemCount);
+    
     setItems(sequence.map((s, idx) => ({
       id: idx,
       ...s,
-      topPercent: -10,            // 화면 위 시작
+      topPercent: -10, // 화면 위 시작
       status: 'falling',
     })));
 
     // 종료 조건 — 모든 아이템 중 가장 늦게 끝나는 시점 + 0.5초 마진
     const lastEnd = Math.max(...sequence.map(s => s.spawnAt + s.fallDurationSec)) + 0.5;
 
-    // 게임 종료 — RAF 만료 또는 프레스 소진 시 호출. gameEndedRef로 중복 방지.
+    // 게임 종료
     finishRef.current = () => {
       if (gameEndedRef.current) return;
       gameEndedRef.current = true;
       cancelAnimationFrame(rafRef.current);
+      
       const caughtCount = statsRef.current.caughtCount;
       const missedCount = config.itemCount - caughtCount;
       const maxPossible = config.itemCount * config.catchPoints;
       const ratio = Math.max(0, Math.min(1, totalPointsRef.current / maxPossible));
       const metric = 1 - ratio;
+      
       setItems((prev) => prev.map(
         (it) => it.status === 'falling' ? { ...it, status: 'missed' } : it
       ));
+      
       onResult({ metric, caughtCount, missedCount, realCount: config.itemCount, totalScore: totalPointsRef.current });
     };
 
@@ -118,7 +122,10 @@ export default function Stage3Field({ isRunning, onResult }) {
       setItems((prev) => prev.map((it) => {
         if (it.status !== 'falling') return it;
         const localT = elapsed - it.spawnAt;
-        if (localT < 0) return { ...it, topPercent: -10 };
+        
+        // 💡 2초 동안은 localT가 음수이므로 화면 위(-10%)에 계속 대기하게 됩니다.
+        if (localT < 0) return { ...it, topPercent: -10 }; 
+        
         if (localT > it.fallDurationSec) {
           return { ...it, status: 'missed', topPercent: 110 };
         }
@@ -126,6 +133,7 @@ export default function Stage3Field({ isRunning, onResult }) {
         return { ...it, topPercent };
       }));
 
+      // 최후의 아이템이 끝나는 시간(lastEnd)이 지나면 종료
       if (elapsed >= lastEnd) {
         finishRef.current?.();
         return;
@@ -138,7 +146,7 @@ export default function Stage3Field({ isRunning, onResult }) {
     return () => cancelAnimationFrame(rafRef.current);
   }, [isRunning, sequence, config, onResult, addPoints]);
 
-  // → 입력 처리 — 캐치 존 안의 가장 가까운 아이템 캐치
+  // → 입력 처리 (기존 로직 유지)
   useEffect(() => {
     if (!isRunning) return;
 
@@ -147,7 +155,6 @@ export default function Stage3Field({ isRunning, onResult }) {
       if (gameEndedRef.current) return;
       e.preventDefault();
 
-      // 프레스 1회 소모 (zone 비어있어도 차감)
       pressesLeftRef.current -= 1;
       setPressesLeft(pressesLeftRef.current);
 
@@ -174,7 +181,6 @@ export default function Stage3Field({ isRunning, onResult }) {
         ));
       }
 
-      // 회수 소진 시 즉시 게임 종료
       if (pressesLeftRef.current <= 0) {
         finishRef.current?.();
       }
@@ -184,7 +190,6 @@ export default function Stage3Field({ isRunning, onResult }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isRunning, config, showPopup, addPoints]);
 
-  // HUD — 남은 조각: 아직 falling 상태인 아이템 수 (스폰 전 + 낙하 중 모두 포함)
   const remaining = items.filter((it) => it.status === 'falling').length;
   const total = config.itemCount;
 

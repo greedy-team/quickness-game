@@ -1,38 +1,58 @@
-.result-popup {
+/* src/stages/stage3/ResultPopup.css */
+
+.result-popup-container {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.result-popup {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   font-weight: 900;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.1em;
+  /* 💡 전달받은 색상으로 강력한 네온 글로우 생성 */
   text-shadow:
-    0 0 16px rgba(0, 0, 0, 0.95),
-    0 0 32px rgba(0, 0, 0, 0.7),
-    0 2px 6px rgba(0, 0, 0, 0.85);
-  pointer-events: none;
-  animation: result-popup-fade 0.4s ease-out forwards;
+    0 0 10px var(--popup-color),
+    0 0 20px var(--popup-color),
+    0 0 40px var(--popup-color),
+    3px 3px 0px rgba(0, 0, 0, 0.9); /* 검은색 입체감 */
+  
+  /* 💡 '쾅!' 하고 꽂히는 타격감 애니메이션 */
+  animation: popup-glitch-strike 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   white-space: nowrap;
 }
 
 .result-popup__label {
-  font-size: clamp(56px, 7vw, 96px);
+  font-family: 'Malgun Gothic', sans-serif;
+  font-size: clamp(48px, 6vw, 80px);
   line-height: 1;
+  text-transform: uppercase;
 }
 
 .result-popup__points {
-  font-size: clamp(32px, 4vw, 56px);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(36px, 5vw, 64px);
   line-height: 1;
-  font-weight: 800;
-  opacity: 0.95;
+  font-weight: 950;
+  color: #fff; /* 점수는 하얀색으로 쨍하게 */
 }
 
-@keyframes result-popup-fade {
-  0%   { opacity: 0; transform: translate(-50%, -40%) scale(0.8); }
-  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.0); }
-  100% { opacity: 0; transform: translate(-50%, -60%) scale(1.0); }
+/* ── 💡 글리치 스트라이크 연출 ── */
+@keyframes popup-glitch-strike {
+  /* 1. 엄청 크게 퍼져 있다가 */
+  0% { opacity: 0; transform: scale(2.5) skewX(20deg); filter: blur(8px); }
+  /* 2. 화면에 강하게 내리꽂힘 */
+  20% { opacity: 1; transform: scale(0.9) skewX(-10deg); filter: blur(0px); }
+  /* 3. 반동으로 제자리 */
+  40% { transform: scale(1.1) skewX(0deg); }
+  /* 4. 살짝 머물다가 */
+  80% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+  /* 5. 위로 스러지며 사라짐 */
+  100% { opacity: 0; transform: scale(1.05) translateY(-20px); filter: blur(4px); }
 }

@@ -1,4 +1,9 @@
-.stage2-wrapper { width: 100%; height: 100%; position: relative; overflow: hidden; background: #000; cursor: crosshair; }
+/* 1. 기본 배경 및 레이아웃 */
+.stage2-wrapper { 
+  width: 100%; height: 100%; /* 💡 스플릿 모드를 위해 vw, vh 대신 % 사용! */
+  position: relative; overflow: hidden; 
+  background: #0c0d11; cursor: crosshair; color: #f1f2f6; 
+}
 
 .camera-sway { animation: sway 6s ease-in-out infinite; }
 @keyframes sway {
@@ -8,37 +13,115 @@
 
 .stage2-content {
   position: absolute; inset: 0; background-size: cover; background-position: center;
-  z-index: 1; 
-  /* 💡 요청하신 대로 밝게 조정 */
-  filter: brightness(1.2) contrast(1.15); 
+  z-index: 1; filter: brightness(1.2) contrast(1.15); 
 }
 
 .stage2-content.flicker-bright { filter: brightness(1.8) contrast(1.2); }
 
 .camera-viewfinder {
   position: absolute; inset: 0; 
-  /* 💡 하단 흐릿한 영역을 없애기 위해 box-shadow 범위를 대폭 축소 */
   box-shadow: inset 0 0 60px 10px rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.05); z-index: 5; pointer-events: none;
 }
 
-/* 💡 심플한 시작 문구 스타일 */
-.start-minimal {
-  position: absolute;
-  bottom: 12%;
-  width: 100%;
-  text-align: center;
+/* ── 💡 2단계 정보 페이지 (준비 화면) 레이아웃 ── */
+.stage-info-screen {
+  position: absolute; inset: 0; z-index: 110;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 0; background: rgba(12, 13, 17, 0.85);
 }
 
-.start-btn-simple {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-family: 'Malgun Gothic', sans-serif;
-  letter-spacing: 1px;
-  animation: rec-blink 1.5s infinite;
-  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+.info-top-section { position: absolute; top: 50px; text-align: center; }
+
+.stage-title {
+  font-size: 4.5rem; font-weight: 950; color: #fff; margin-bottom: 10px;
+  letter-spacing: -1px;
 }
 
+.info-middle-section {
+  display: flex; align-items: center; justify-content: center;
+  gap: 100px; width: 100%; height: 100%;
+}
+
+.simple-preview-image {
+  width: 550px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.instruction-item { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+/* ── ⌨️ 방향키 아이콘 클러스터 ── */
+.arrow-keys-cluster { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 5px; }
+.arrow-row { display: flex; gap: 8px; }
+
+.key-cap {
+  width: 70px; height: 70px; background: #1e293b; border: 2px solid #475569;
+  border-radius: 12px; display: flex; justify-content: center; align-items: center;
+  color: #64748b; font-size: 1.8rem; font-weight: 900; box-shadow: 0 5px 0 #000;
+}
+
+.key-cap.top-active {
+  background: #2d0a0a; border: 3px solid #ff2222; color: #ff2222;
+  box-shadow: 0 5px 0 #000, 0 0 25px rgba(255, 34, 34, 0.6);
+  animation: red-glow-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes red-glow-pulse {
+  0%, 100% { box-shadow: 0 5px 0 #000, 0 0 15px rgba(255, 34, 34, 0.4); }
+  50% { box-shadow: 0 5px 0 #000, 0 0 40px rgba(255, 34, 34, 0.9); filter: brightness(1.2); }
+}
+
+.main-instruction-text {
+  font-size: 1.6rem; font-weight: 700; color: #cbd5e1; 
+  text-align: center; line-height: 1.5;
+}
+
+.highlight-key {
+  color: #ff2222; font-weight: 900; text-shadow: 0 0 10px rgba(255, 34, 34, 0.4);
+}
+
+.warning-text {
+  font-size: 1.2rem; color: #ff4444; font-weight: 800; margin-top: 5px;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5); letter-spacing: 1px;
+}
+
+/* [하단] 게임 시작 버튼 영역 */
+.info-bottom-section {
+  position: absolute; bottom: 50px; display: flex; flex-direction: column; align-items: center;
+}
+
+.key-icon-wrapper.start-btn {
+  width: 280px; height: 85px; background: #f1f2f6; border-radius: 15px;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer; box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.key-icon-wrapper.start-btn span {
+  color: #0c0d11; font-size: 2rem; font-weight: 950; letter-spacing: 4px;
+}
+
+.key-icon-wrapper.start-btn:hover { animation: hover-pulse-effect 1.2s infinite; }
+
+@keyframes hover-pulse-effect {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 40px rgba(255, 255, 255, 0.8); }
+}
+
+.sub-instruction-text {
+  font-size: 1.3rem; color: #94a3b8; font-weight: 700; margin-top: 20px;
+  animation: text-flicker-pulse 2s infinite ease-in-out;
+}
+
+@keyframes text-flicker-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.99); text-shadow: none; }
+  50% { opacity: 1; transform: scale(1); color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.6); }
+}
+
+/* ── 기타 카메라 인게임 연출 ── */
 @keyframes shake-anim { 0% { transform: translate(10px, -10px); } 100% { transform: translate(-10px, 10px); } }
 .screen-shake { animation: shake-anim 0.1s infinite; }
 
@@ -69,25 +152,6 @@
 
 .stage2-ui-layer { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 200; pointer-events: none; }
 
-.final-message-overlay { 
-  background: rgba(0,0,0,0.85); 
-  padding: 40px; 
-  border: 1px solid #444; 
-  color: #fff; 
-  text-align: center; 
-  pointer-events: auto; 
-  max-width: 80%;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 1);
-}
-
-.main-msg { font-size: 3.5rem; letter-spacing: 8px; margin-bottom: 20px; }
-.msg-success .main-msg { color: #00ffcc; text-shadow: 0 0 20px #00ffcc; }
-.msg-failed .main-msg { color: #ff3333; text-shadow: 0 0 20px #ff3333; }
-.sub-msg { font-size: 1.2rem; color: #aaa; }
-.reaction-time { font-family: 'Courier New', Courier, monospace; font-size: 1.8rem; color: #ffcc00; margin-top: 15px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); animation: pop-in 0.5s ease-out; }
-.result-score { font-family: 'Courier New', Courier, monospace; font-size: 2rem; color: #ffcc00; margin-top: 12px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 12px rgba(255, 204, 0, 0.6); animation: pop-in 0.6s ease-out; }
-
-@keyframes pop-in { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes rec-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 /* 스플릿 모드 (스테이지 4) */
@@ -97,37 +161,3 @@
 .stage2-wrapper.split-mode .camera-viewfinder { Box-shadow: inset 0 0 40px 5px rgba(0, 0, 0, 0.7); }
 .stage2-wrapper.split-mode .rec-info { font-size: 1.2rem; }
 .stage2-wrapper.split-mode .battery-body { width: 25px; height: 14px; }
-.stage2-wrapper.split-mode .start-btn-simple { font-size: 0.9rem; }
-
-.stage2-wrapper.split-mode .stage2-ui-layer {
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-.s2-split-result {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.75);
-  gap: 1vw;
-  animation: pop-in 0.4s ease-out;
-}
-
-.s2-split-time {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 2.8vw;
-  color: #00ffcc;
-  font-weight: bold;
-  text-shadow: 0 0 12px rgba(0, 255, 204, 0.6);
-}
-
-.s2-split-points {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 2.4vw;
-  color: #ffcc00;
-  font-weight: bold;
-  text-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
-}

@@ -1,11 +1,65 @@
-.stage4-host {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background-color: #0a0a14;
-  background-image: url('/assets/images/bg_stage4_bathroom.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+/* src/stages/stage4/Stage4Host.css 기존 코드 아래에 추가 */
+
+/* 💡 3게임 종료 후 대기 모달 */
+.s4-waiting-overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: none; /* Allow clicks to pass through if needed, though button should capture */
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  animation: s4-fade-in 0.5s ease-out;
+}
+
+.s4-waiting-overlay .s4-waiting-btn {
+  pointer-events: auto; /* Re-enable pointer events for the button */
+}
+
+@keyframes s4-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.s4-waiting-btn {
+  width: auto;
+  padding: 0 40px;
+  height: 60px;
+  background: #f1f2f6;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  animation: s4-pulse-heartbeat 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 50px; /* Space from bottom */
+}
+
+.s4-waiting-btn span {
+  color: #0c0d11;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  font-family: 'Malgun Gothic', sans-serif;
+}
+
+@keyframes s4-pulse-heartbeat {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 255, 255, 0.8); }
+}
+
+.s4-waiting-text {
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: s4-text-flicker 1.5s infinite;
+}
+
+@keyframes s4-text-flicker {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }

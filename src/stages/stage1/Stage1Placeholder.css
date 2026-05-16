@@ -2,18 +2,149 @@
 .stage-wrapper {
   width: 100vw; height: 100vh; position: relative;
   display: flex; justify-content: center; align-items: center;
-  background-color: #000; overflow: hidden; z-index: 0;
+  background-color: #0c0d11; overflow: hidden; z-index: 0;
+  color: #f1f2f6;
 }
 
 .stage1-bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center; background-repeat: no-repeat;
-  filter: brightness(1.0); /* 이미지 밝기 조정 */
-  transition: background-image 0.1s ease-in-out; 
+  transition: background-image 0.2s ease-in-out;
   z-index: 1;
 }
 
-/* 2. 눈 감기 연출 */
+/* ── 💡 1단계 정보 페이지 (준비 화면) ── */
+.stage-info-screen {
+  position: absolute; inset: 0; z-index: 110;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 0; background: rgba(12, 13, 17, 0.85);
+}
+
+/* [상단] 타이틀 영역 */
+.info-top-section {
+  position: absolute; top: 50px; text-align: center;
+}
+
+.stage-title {
+  font-size: 4.5rem; font-weight: 950; color: #fff; margin-bottom: 10px;
+  letter-spacing: -1px;
+}
+
+/* [중앙] 이미지 및 방향키 영역 */
+.info-middle-section {
+  display: flex; align-items: center; justify-content: center;
+  gap: 100px; width: 100%; height: 100%;
+}
+
+.simple-preview-image {
+  width: 550px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.instruction-item { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+.arrow-keys-cluster { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.arrow-row { display: flex; gap: 8px; }
+
+.key-cap {
+  width: 70px; height: 70px; background: #1e293b; border: 2px solid #475569;
+  border-radius: 12px; display: flex; justify-content: center; align-items: center;
+  color: #64748b; font-size: 1.8rem; font-weight: 900; box-shadow: 0 5px 0 #000;
+}
+
+.key-cap.left-active {
+  background: #2d0a0a; border: 3px solid #ff2222; color: #ff2222;
+  box-shadow: 0 5px 0 #000, 0 0 25px rgba(255, 34, 34, 0.6);
+  animation: red-glow-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes red-glow-pulse {
+  0%, 100% { box-shadow: 0 5px 0 #000, 0 0 15px rgba(255, 34, 34, 0.4); }
+  50% { box-shadow: 0 5px 0 #000, 0 0 40px rgba(255, 34, 34, 0.9); filter: brightness(1.2); }
+}
+
+/* 설명 문구 수정 */
+.main-instruction-text {
+  font-size: 1.6rem; 
+  font-weight: 700; color: #cbd5e1; 
+  text-align: center; line-height: 1.5;
+  margin-top: 10px;
+}
+
+.highlight-key {
+  color: #ff2222;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(255, 34, 34, 0.4);
+}
+
+/* [하단] 게임 시작 버튼 영역 */
+.info-bottom-section {
+  position: absolute; bottom: 50px; display: flex; flex-direction: column; align-items: center;
+}
+
+/* 마우스 올렸을 때만 펄스 효과 */
+.key-icon-wrapper.start-btn {
+  width: 280px; height: 85px; background: #f1f2f6; border-radius: 15px;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer; 
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.key-icon-wrapper.start-btn span {
+  color: #0c0d11; font-size: 2rem; font-weight: 950; letter-spacing: 4px;
+}
+
+.key-icon-wrapper.start-btn:hover {
+  animation: hover-pulse-effect 1.2s infinite;
+}
+
+@keyframes hover-pulse-effect {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 40px rgba(255, 255, 255, 0.8); }
+}
+
+/* 계속 깜빡이는 안내 텍스트 */
+.sub-instruction-text {
+  font-size: 1.3rem; color: #94a3b8; font-weight: 700; margin-top: 20px;
+  animation: text-flicker-pulse 2s infinite ease-in-out;
+}
+
+@keyframes text-flicker-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.99); text-shadow: none; }
+  50% { opacity: 1; transform: scale(1); color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.6); }
+}
+
+/* ── 💡 게임 플레이 UI (타이머) ── */
+.led-clock-view {
+  position: absolute; top: 53%; left: 50%; transform: translate(-50%, -50%);
+  width: 100%; text-align: center; z-index: 20;
+}
+
+.led-timer {
+  font-family: 'Courier New', Courier, monospace; font-size: 13rem;
+  color: #ff0000; font-weight: 900;
+  text-shadow: 0 0 10px #ff0000, 0 0 25px #ff0000, 0 0 50px #ff0000;
+  margin: 0; letter-spacing: 4px;
+}
+
+.led-timer.flicker { animation: aggressive-flicker 0.15s infinite; }
+.led-timer.off { opacity: 0; visibility: hidden; }
+
+@keyframes aggressive-flicker {
+  0%, 100% { opacity: 1; filter: brightness(1.5); }
+  50% { opacity: 0.3; filter: brightness(0.5); }
+}
+
+.target-hint {
+  color: #550000; font-size: 1.6rem; letter-spacing: 5px; margin-top: 30px;
+  font-family: 'Courier New', monospace; font-weight: bold;
+}
+
+/* 눈 감기 */
 .eye-lid {
   position: absolute; left: 0; width: 100%; height: 50%;
   background-color: #000; z-index: 150;
@@ -23,97 +154,3 @@
 .eye-lid.bottom { bottom: 0; transform: translateY(100%); }
 .eye-lid.top.closed { transform: translateY(0); }
 .eye-lid.bottom.closed { transform: translateY(0); }
-
-/* ── 🛠️ 3. 매뉴얼 안내 문구 (요청사항 반영) ── */
-.manual-overlay {
-  position: absolute; 
-  inset: 0; 
-  z-index: 110;
-  display: flex; 
-  justify-content: center; 
-  align-items: flex-end; 
-  /* Space/Enter를 눌러 게임을 시작합니다 텍스트 위치 조정 */
-  padding-bottom: 18vh; 
-  /* 🛠️ 배경을 어둡게 하던 반투명 레이어 제거 */
-  background: transparent; 
-}
-
-.start-instruction {
-  color: #fff; 
-  font-size: 1.4rem; 
-  font-weight: bold;
-  letter-spacing: 1px;
-  animation: blink 1.5s infinite;
-  /* 검은색 오버레이가 없어도 잘 보이도록 그림자 강화 */
-  text-shadow: 0 0 10px #000, 0 0 20px #000;
-}
-
-/* 4. 게임 플레이 UI (시계) */
-.led-clock-view {
-  position: absolute; 
-  top: 40%; 
-  width: 100%; text-align: center; z-index: 10;
-}
-
-.led-timer {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 8rem;
-  color: #ff2222; font-weight: bold;
-  text-shadow: 0 0 25px #ff0000, 0 0 10px #ff0000;
-  margin: 0;
-}
-
-.led-timer.flicker {
-  animation: aggressive-flicker 0.1s infinite;
-  filter: blur(2px);
-}
-
-@keyframes aggressive-flicker {
-  0% { opacity: 0.1; }
-  10% { opacity: 0.8; }
-  50% { opacity: 0; }
-  100% { opacity: 0.1; }
-}
-
-.led-timer.off {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.target-hint { 
-  color: #444; font-size: 1.3rem; letter-spacing: 4px; margin-top: 30px; 
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: bold;
-}
-
-.hour-min-text {
-  font-size: 0.45em;
-  opacity: 0.6;
-  margin-right: 15px;
-  vertical-align: baseline;
-}
-
-/* 5. 결과 화면 */
-.result-overlay.immersive {
-  position: absolute; inset: 0; z-index: 160;
-  display: flex; justify-content: center; align-items: center;
-  background: #000; 
-}
-
-.result-val { font-size: 8rem; color: #ff0000; font-weight: bold; text-shadow: 0 0 30px #ff0000; }
-.result-story-text { font-size: 1.6rem; color: #ddd; margin-top: 25px; max-width: 800px; line-height: 1.6; word-break: keep-all; }
-.result-score {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 2.4rem;
-  color: #ffcc00;
-  text-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
-  margin-top: 18px;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-.loading-bar-wrap { width: 100%; height: 3px; background: #222; margin-top: 45px; }
-.loading-bar-inner { width: 0; height: 100%; background: #ff0000; animation: load 4.5s linear forwards; }
-
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-@keyframes load { to { width: 100%; } }

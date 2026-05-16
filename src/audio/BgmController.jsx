@@ -30,7 +30,11 @@ export default function BgmController() {
     if (audio.currentSrc === targetSrc && !audio.paused) return undefined;
 
     audio.src = targetFile;
-    audio.volume = volume;
+    let targetVolume = volume;
+    if (targetId === 'hub') {
+      targetVolume = volume * 0.5;
+    }
+    audio.volume = targetVolume;
     audio.loop = BGM_DEFAULTS.loop;
 
     let unlockHandler = null;
@@ -56,8 +60,11 @@ export default function BgmController() {
   // 볼륨 실시간 동기화: 트랙 전환과 별개로 store volume 변경 시 즉시 반영
   useEffect(() => {
     const audio = audioRef.current;
-    if (audio) audio.volume = volume;
-  }, [volume]);
+    if (audio) {
+      const targetId = trackIdForPath(pathname);
+      audio.volume = targetId === 'hub' ? volume * 0.5 : volume;
+    }
+  }, [volume, pathname]);
 
   return <audio ref={audioRef} preload="auto" />;
 }

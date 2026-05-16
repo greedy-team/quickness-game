@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, selectIsDoor4Unlocked } from '../../store.js';
 import { ASSETS } from '../../assets.js';
@@ -15,11 +16,15 @@ export default function HubPage() {
   const navigate = useNavigate();
   const stageResults = useGameStore((s) => s.stageResults);
   const door4Unlocked = useGameStore(selectIsDoor4Unlocked);
+  const [showLockedToast, setShowLockedToast] = useState(false);
 
   const openDoor = (n) => {
-    if (n === 4 && !door4Unlocked) return;
-
-    playSfx(ASSETS.sounds.openDoor);
+    if (n === 4 && !door4Unlocked) {
+      setShowLockedToast(true);
+      setTimeout(() => setShowLockedToast(false), 2000);
+      return;
+    }
+    playSfx(ASSETS.sounds.openDoor, { scale: 0.5 });
     navigate(`/stage/${n}`);
   };
 
@@ -29,33 +34,35 @@ export default function HubPage() {
         {[1, 2, 3, 4].map((n) => {
           const locked = n === 4 && !door4Unlocked;
           const cleared = stageResults[n] !== null;
-          const label = STAGE_LABELS[n];
+          
+          // 💡 이미지 경로 결정
+          let doorSrc = ASSETS.images.door;
+          if (n === 4 && locked) {
+            doorSrc = '/assets/images/door_stage4.png';
+          } else if (cleared) {
+            doorSrc = ASSETS.images.doorClear;
+          }
 
           return (
             <button
               key={n}
-              type="button"
-              className={`hub-page__door ${locked ? 'is-locked' : ''} ${cleared ? 'is-cleared' : ''}`}
+              className={`hub-page__door ${locked ? 'is-locked' : ''}`}
               onClick={() => openDoor(n)}
-              disabled={locked}
             >
-              {/* STAGE 라벨 명판 */}
               <div className="door-plate">
-                <span className="plate-label-big">{label}</span>
+                <span className="plate-label-big">{STAGE_LABELS[n]}</span>
               </div>
-
-              {/* 문 이미지 */}
               <div className="door-view">
-                <img
-                  src={cleared ? ASSETS.images.doorClear : ASSETS.images.door}
-                  alt=""
-                  className="door-img"
-                />
+                <img src={doorSrc} alt="" className="door-img" />
               </div>
             </button>
           );
         })}
       </div>
+
+      {showLockedToast && (
+        <div className="locked-toast">이전 스테이지를 모두 클리어해야 합니다!</div>
+      )}
     </div>
   );
 }

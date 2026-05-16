@@ -1,80 +1,71 @@
-/* src/routes/stage4/Stage4TimerPane.css */
+/* src/stages/stage4/Stage4TimerPane.css */
 
 .s4-timer-pane {
-  position: relative; /* 레이어 겹치기를 위해 필수 */
-  width: 100%;
-  height: 100%;
-  background: #000;
-  overflow: hidden;
+  width: 100%; 
+  height: 100%; /* 스플릿 화면을 위해 100% 사용 */
+  position: relative; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  background-color: #0c0d11; 
+  overflow: hidden; 
 }
 
-/* ── 🛠️ 배경 이미지 스타일 ── */
+/* 💡 1단계와 동일한 시계 배경 */
 .s4-timer-bg {
-  position: absolute;
+  position: absolute; 
   inset: 0;
-  background-image: url('/assets/images/bg_stage1_clock.png'); 
-  /* ── 🛠️ 수정한 부분 ── */
-  background-size: contain; /* 이미지 전체가 다 보이도록 */
+  background-image: url('/assets/images/bg_stage1_clock.png');
+  background-size: cover; 
   background-position: center; 
   background-repeat: no-repeat;
-  opacity: 0.8;
+  filter: grayscale(0.5) brightness(0.4);
   z-index: 1;
 }
 
+/* 💡 1단계와 동일한 LED 타이머 컨테이너 */
 .s4-timer-content {
-  position: relative;
-  z-index: 2; /* 배경보다 위에 표시 */
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* 전광판 배경 내의 시계 칸 위치에 따라 top이나 padding으로 미세 조정하세요 */
-  padding-top: 2%; 
+  position: absolute; 
+  top: 50%; left: 50%; 
+  transform: translate(-50%, -50%);
+  width: 100%; 
+  text-align: center; 
+  z-index: 20;
 }
 
+/* 💡 1단계와 동일한 붉은 LED 폰트 */
 .s4-timer-display {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 5.5vw; /* 분할 화면에서 꽉 차게 보이도록 조절 */
-  color: #ff0000;
-  font-weight: bold;
-  text-shadow: 0 0 20px #ff0000, 0 0 10px rgba(255, 0, 0, 0.5);
-  white-space: nowrap;
+  font-family: 'Courier New', Courier, monospace; 
+  font-size: 6vw; /* 스플릿 화면에 맞춘 크기 */
+  color: #ff0000; 
+  font-weight: 900;
+  text-shadow: 0 0 10px #ff0000, 0 0 25px #ff0000, 0 0 50px #ff0000;
+  margin: 0; 
+  letter-spacing: 4px;
 }
 
-.s4-hour-min {
-  font-size: 0.45em;
-  opacity: 0.7;
-  margin-right: 0.8vw;
-}
-
-/* ResultModal 안의 MEASURED TIME 표시에서는 시·분 prefix(11:59:)를 더 크게 */
-.result-modal__metric .s4-hour-min {
-  font-size: 0.85em;
-  opacity: 0.9;
-  margin-right: 6px;
-}
-
-/* 7초 깜빡임 */
-.s4-timer-display.flicker {
-  animation: s4-aggressive-flicker 0.1s infinite;
-}
-
-/* 8초 꺼짐 */
-.s4-timer-display.off {
-  opacity: 0;
-  visibility: hidden;
-}
+.s4-timer-display.flicker { animation: s4-aggressive-flicker 0.15s infinite; }
+.s4-timer-display.off { opacity: 0; visibility: hidden; }
 
 @keyframes s4-aggressive-flicker {
-  0%, 100% { opacity: 0.1; filter: blur(2px); }
-  50% { opacity: 0.9; filter: blur(0px); }
+  0%, 100% { opacity: 1; filter: brightness(1.5); }
+  50% { opacity: 0.3; filter: brightness(0.5); }
 }
 
+.s4-target-hint {
+  color: #550000; 
+  font-size: 1vw; 
+  letter-spacing: 5px; 
+  margin-top: 15px;
+  font-family: 'Courier New', monospace; 
+  font-weight: bold;
+}
+
+/* 💡 게임 종료 후 결과 텍스트 (합산 전 띄워두는 용도) */
 .s4-result-info {
   position: absolute;
   inset: 0;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -86,15 +77,15 @@
 
 .s4-result-time {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 2.8vw;
-  color: #ff4444;
+  font-size: 3vw;
+  color: #ff0000;
   font-weight: bold;
-  text-shadow: 0 0 14px rgba(255, 68, 68, 0.7);
+  text-shadow: 0 0 14px rgba(255, 0, 0, 0.7);
 }
 
 .s4-result-points {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 2.4vw;
+  font-size: 2vw;
   color: #ffcc00;
   font-weight: bold;
   text-shadow: 0 0 12px rgba(255, 204, 0, 0.7);
@@ -104,4 +95,3 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-

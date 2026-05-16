@@ -1,17 +1,20 @@
-// 캐치/페널티 직후 0.4초간 표시되는 텍스트 팝업.
-// 부모가 visible/label/points/color/key를 바꿔서 매번 새 인스턴스로 강제 리렌더.
+// src/stages/stage3/ResultPopup.jsx
 import './ResultPopup.css';
 
 export default function ResultPopup({ visible, label, points, color }) {
   if (!visible) return null;
   const sign = points > 0 ? '+' : '';
   const showPoints = typeof points === 'number';
+  
   return (
-    <div className="result-popup" style={{ color }}>
-      <span className="result-popup__label">{label}</span>
-      {showPoints && (
-        <span className="result-popup__points">{sign}{points}</span>
-      )}
+    <div className="result-popup-container">
+      {/* 💡 --popup-color 변수를 통해 전달받은 색상(ex. 골드, 레드)으로 네온 효과 적용 */}
+      <div className="result-popup" style={{ '--popup-color': color }}>
+        <span className="result-popup__label" style={{ color: color }}>{label}</span>
+        {showPoints && (
+          <span className="result-popup__points">{sign}{points}</span>
+        )}
+      </div>
     </div>
   );
 }
