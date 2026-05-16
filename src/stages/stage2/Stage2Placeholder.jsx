@@ -15,9 +15,7 @@ const SOUNDS = {
 const BGS = {
   INFO: '/assets/images/bg_stage2_info.png',
   BASE: '/assets/images/bg_stage2_library.png', 
-  G1: '/assets/images/bg_stage2_library_greenie1.png',
-  G2: '/assets/images/bg_stage2_library_greenie2.png',
-  G3: '/assets/images/bg_stage2_library_greenie3.png',
+  FAKE: '/assets/images/bg_stage2_library_fake.png',
   REAL: '/assets/images/greenie_real.png',
 };
 
@@ -44,6 +42,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     bgm: null,
     fake: null,
     real: null,
+    realClone: null,
     shutter: null,
   });
 
@@ -61,6 +60,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     audioRefs.current.bgm.loop = true; 
     audioRefs.current.fake = new Audio(SOUNDS.FAKE);
     audioRefs.current.real = new Audio(SOUNDS.REAL);
+    audioRefs.current.realClone = new Audio(SOUNDS.REAL);
     audioRefs.current.shutter = new Audio(SOUNDS.SHUTTER);
 
     return () => {
@@ -140,6 +140,10 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       audioRefs.current.real.pause();
       audioRefs.current.real.currentTime = 0;
     }
+    if (audioRefs.current.realClone) {
+      audioRefs.current.realClone.pause();
+      audioRefs.current.realClone.currentTime = 0;
+    }
 
     // 💡 split 모드에서는 엔터를 기다리지 않고 1.5초 후 자동 반환
     if (mode === 'split' && onResult) {
@@ -155,6 +159,10 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     if (audioRefs.current.real) {
       audioRefs.current.real.pause();
       audioRefs.current.real.currentTime = 0;
+    }
+    if (audioRefs.current.realClone) {
+      audioRefs.current.realClone.pause();
+      audioRefs.current.realClone.currentTime = 0;
     }
     if (jumpscareAudioTimeoutRef.current) {
       clearTimeout(jumpscareAudioTimeoutRef.current);
@@ -202,16 +210,8 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     }, 1000);
 
     const attackTime = Math.floor(Math.random() * 3000) + 5000;
-    const pool = [BGS.G1, BGS.G2, BGS.G3];
-    let selectedFakes = [];
     const fakeCount = Math.random() > 0.5 ? 3 : 2;
-
-    if (fakeCount === 3) {
-      selectedFakes = [BGS.G1, BGS.G2, BGS.G3];
-    } else {
-      const skipIndex = Math.floor(Math.random() * 3);
-      selectedFakes = pool.filter((_, index) => index !== skipIndex); 
-    }
+    const selectedFakes = Array(fakeCount).fill(BGS.FAKE);
 
     const windowStart = 1000; 
     const windowEnd = attackTime - 800; 
@@ -250,10 +250,16 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       jumpscareAudioTimeoutRef.current = setTimeout(() => {
         if (!stateRef.current.isFinished) {
           const realAudio = audioRefs.current.real;
+          const realClone = audioRefs.current.realClone;
           if (realAudio) {
             realAudio.currentTime = 0.5; 
             realAudio.volume = 1.0;
             realAudio.play().catch(() => {});
+          }
+          if (realClone) {
+            realClone.currentTime = 0.5;
+            realClone.volume = 1.0;
+            realClone.play().catch(() => {});
           }
         }
       }, 0);
@@ -310,10 +316,11 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           </div>
 
           <div className="info-middle-section">
-            <div className="image-frame">
-              <div className="image-frame-header">STAGE 02 미리보기</div>
-              <div className="preview-content" />
-            </div>
+            <img 
+              className="simple-preview-image" 
+              src="/assets/images/bg_stage2_library_fake.png" 
+              alt="Stage 2 Example" 
+            />
 
             <div className="instruction-item">
               <div className="arrow-keys-cluster">
@@ -331,7 +338,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
                 그린이가 눈 앞에 크게 나타나는 순간<br/>
                 <span className="highlight-key">[↑] 키</span>를 눌러 플래시를 터뜨리세요
               </div>
-              <p className="warning-text">※ 주의: 훼이크에 속지 마세요!</p>
+              <p className="warning-text">※ 주의: 왼쪽 이미지와 같은 훼이크에 속지 마세요!</p>
             </div>
           </div>
 
@@ -374,6 +381,12 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
             rangeLabel: t.maxError === Infinity ? '그 외' : `≤ ${t.maxError}s` 
           }))}
           hint={resultTier.id === 'bare' ? "훼이크에 속지 말고 끝까지 집중하세요." : ""} 
+          continueText={mode === 'split' ? null : "ENTER를 눌러 계속"}
+          onContinue={() => {
+            if (onResult && pendingMetricRef.current !== null) {
+              onResult(pendingMetricRef.current);
+            }
+          }}
         />
       )}
     </div>

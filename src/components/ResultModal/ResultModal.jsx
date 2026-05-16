@@ -12,6 +12,8 @@ export default function ResultModal({
   tone = 'failed',
   hint,
   tiers,
+  continueText,
+  onContinue,
 }) {
   // maxScore가 주어지면 `현재 / 최대` 포맷, 없으면 기존 `+N` 포맷 (호환성).
   const scoreText = typeof maxScore === 'number'
@@ -65,6 +67,13 @@ export default function ResultModal({
         )}
         {score != null && <p className="result-modal__score">{scoreText}</p>}
         {hint && <p className="result-modal__hint">{hint}</p>}
+        {continueText && (
+          <div className="result-modal__continue-wrapper">
+            <div className="result-modal-continue-btn" onClick={onContinue}>
+              <span>{continueText}</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

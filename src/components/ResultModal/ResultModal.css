@@ -148,3 +148,36 @@
   text-shadow: 0 0 16px rgba(255, 204, 0, 0.7);
   letter-spacing: 3px;
 }
+
+.result-modal__continue-wrapper {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.result-modal-continue-btn {
+  width: auto;
+  padding: 0 40px;
+  height: 60px;
+  background: #f1f2f6;
+  border-radius: 30px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  animation: result-pulse-btn 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.result-modal-continue-btn span {
+  color: #0c0d11;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  font-family: 'Malgun Gothic', sans-serif;
+}
+
+@keyframes result-pulse-btn {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 255, 255, 0.8); }
+}

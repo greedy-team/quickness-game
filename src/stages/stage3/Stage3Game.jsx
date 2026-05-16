@@ -84,7 +84,7 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     if (!resultData) return;
 
     const handleKeyDown = (e) => {
-      if (e.code === 'Space' || e.code === 'Enter' || e.key === 'ArrowRight') {
+      if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
         onResult(resultData.metric, { score: resultData.totalScore });
       }
@@ -128,7 +128,10 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
       breakdown,
       score: totalScore,
       tone: isSuccess ? 'success' : 'failed',
-      hint: mode === 'standalone' ? 'Space / Enter 로 계속' : null,
+      continueText: mode === 'split' ? null : "ENTER를 눌러 계속",
+      onContinue: () => {
+        onResult(resultData.metric, { score: resultData.totalScore });
+      }
     };
   })();
 

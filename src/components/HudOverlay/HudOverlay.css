@@ -48,3 +48,39 @@
   outline-offset: 4px;
   border-radius: 2px;
 }
+
+.hud-overlay__action-wrapper {
+  position: relative;
+}
+
+.hud-overlay__tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  background: rgba(255, 204, 0, 0.95);
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'Malgun Gothic', sans-serif;
+  font-weight: 900;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: tooltip-bounce 1.5s infinite;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.hud-overlay__tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 12px; /* point down towards the icon */
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(255, 204, 0, 0.95);
+}
+
+@keyframes tooltip-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}

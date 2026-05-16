@@ -5,19 +5,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* 본문(이미지·점수·자막)을 위쪽에 모음 — hint는 absolute로 하단 고정. */
   justify-content: flex-start;
   gap: 20px;
   padding: 6vh 24px 24px;
   text-align: center;
-  opacity: 0;
-  transition: opacity 1000ms ease;
 }
 
-/* phase 매핑: revealMs (1000ms), leaveMs (500ms)와 정합 */
-.ending-cutscene--entered { opacity: 0; transition-duration: 0ms; }
-.ending-cutscene--visible { opacity: 1; transition-duration: 1000ms; }
-.ending-cutscene--leaving { opacity: 0; transition-duration: 500ms; }
+.ending-cutscene--entered { opacity: 0; }
+.ending-cutscene--visible { opacity: 1; transition: opacity 0ms; }
+.ending-cutscene--leaving { opacity: 0; transition: opacity 500ms; }
 
 .ending-cutscene__image {
   max-height: 60vh;
@@ -25,6 +21,58 @@
   object-fit: contain;
   user-select: none;
   filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+  opacity: 0;
+  transform-origin: center 15%; /* Focus zoom on the giraffe's face */
+}
+
+.ending-cutscene--visible .ending-cutscene__image {
+  animation: jumpscare-sequence 0.8s forwards;
+}
+
+@keyframes jumpscare-sequence {
+  /* 0s: Hidden */
+  0% { transform: scale(0.1) rotate(0deg); opacity: 0; filter: brightness(1); }
+  
+  /* Extremely fast, bizarre flashes */
+  10% { transform: scale(1.5) rotate(-10deg) skew(10deg); opacity: 1; filter: brightness(2) contrast(1.5) invert(0.2); }
+  20% { transform: scale(2.0) rotate(15deg) skew(-15deg); opacity: 1; filter: brightness(0.5) contrast(2) invert(0); }
+  30% { transform: scale(3.5) rotate(-5deg); opacity: 1; filter: brightness(2) drop-shadow(0 0 50px red); }
+  40% { transform: scale(2.5) rotate(5deg); opacity: 1; filter: brightness(0.3); }
+  50% { transform: scale(5.5) rotate(-2deg); opacity: 1; filter: brightness(3) contrast(2) invert(1) drop-shadow(0 0 100px red); }
+  75% { transform: scale(5.5) rotate(2deg); opacity: 1; filter: brightness(1) drop-shadow(0 0 50px red); }
+  
+  /* 0.8s: Snap back to normal, clean view */
+  100% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1) drop-shadow(0 8px 24px rgba(0,0,0,0.6)); }
+}
+
+@keyframes shake-heavy {
+  0%, 100% { margin-left: 0; margin-top: 0; }
+  10% { margin-left: -30px; margin-top: 25px; }
+  20% { margin-left: 30px; margin-top: -25px; }
+  30% { margin-left: -25px; margin-top: 30px; }
+  40% { margin-left: 25px; margin-top: -30px; }
+  50% { margin-left: -15px; margin-top: 15px; }
+  60% { margin-left: 15px; margin-top: -15px; }
+  70% { margin-left: -10px; margin-top: 10px; }
+  80% { margin-left: 10px; margin-top: -10px; }
+}
+
+.ending-cutscene__score,
+.ending-cutscene__caption,
+.ending-cutscene__hint {
+  opacity: 0;
+}
+
+.ending-cutscene--visible .ending-cutscene__score,
+.ending-cutscene--visible .ending-cutscene__caption,
+.ending-cutscene--visible .ending-cutscene__hint {
+  animation: text-fade-in 0.5s forwards;
+  animation-delay: 0.8s; /* Fades in exactly as the image shrinks to normal */
+}
+
+@keyframes text-fade-in {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .ending-cutscene__caption {
@@ -46,7 +94,6 @@
 }
 
 .ending-cutscene__hint {
-  /* 본문 바로 아래(flex 흐름)로 합류 — 이미지·점수·자막과 함께 상단 클러스터 형성. */
   margin: 16px 0 0;
   font-size: 22px;
   font-weight: 600;

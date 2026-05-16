@@ -24,7 +24,7 @@ export default function HubPage() {
       setTimeout(() => setShowLockedToast(false), 2000);
       return;
     }
-    playSfx(ASSETS.sounds.openDoor);
+    playSfx(ASSETS.sounds.openDoor, { scale: 0.5 });
     navigate(`/stage/${n}`);
   };
 

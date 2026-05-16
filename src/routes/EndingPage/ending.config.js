@@ -26,11 +26,11 @@ export const ENDING_CONFIG = {
   assetsByOutcome: {
     alive: {
       image:  ASSETS.images.endingAlive,
-      sfxSrc: ASSETS.sounds.endingAliveSfx,
+      sfxSrc: ASSETS.sounds.cutsceneJumpscareSfx,
     },
     silhouette: {
       image:  ASSETS.images.endingSilhouette,
-      sfxSrc: ASSETS.sounds.endingSilhouetteSfx,
+      sfxSrc: ASSETS.sounds.cutsceneJumpscareSfx,
     },
   },
 };

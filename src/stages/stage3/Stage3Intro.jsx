@@ -14,27 +14,11 @@ export default function Stage3Intro({ onStart }) {
       {/* [중앙] 메탈릭 프레임과 방향키 설명 */}
       <div className="info-middle-section">
         
-        <div className="image-frame">
-          <div className="image-frame-header">STAGE 03: MEMORY FRAGMENTS</div>
-          
-          <div className="stage3-intro__group" style={{marginTop: '20px'}}>
-            <p className="stage3-intro__label stage3-intro__label--real">✅ 진짜 기억 — 받기 (→)</p>
-            <div className="stage3-intro__row">
-              {ASSETS.images.memoryReal.map((src) => (
-                <img key={src} className="stage3-intro__thumb" src={src} alt="" />
-              ))}
-            </div>
-          </div>
-
-          <div className="stage3-intro__group">
-            <p className="stage3-intro__label stage3-intro__label--fake">❌ 가짜 기억 — 피하기 (누르지 않음)</p>
-            <div className="stage3-intro__row">
-              {ASSETS.images.memoryFake.map((src) => (
-                <img key={src} className="stage3-intro__thumb" src={src} alt="" />
-              ))}
-            </div>
-          </div>
-        </div>
+        <img 
+          className="simple-preview-image" 
+          src="/assets/images/bg_stage3_example.png" 
+          alt="Stage 3 Example" 
+        />
 
         <div className="instruction-item">
           <div className="arrow-keys-cluster">
@@ -50,7 +34,7 @@ export default function Stage3Intro({ onStart }) {
           </div>
           
           <div className="main-instruction-text">
-            기억이 원 안에 위치했을 때<br/>
+            떨어지는 기억이 원 안에 위치했을 때<br/>
             <span className="highlight-key">[→] 키</span>를 누르세요
           </div>
           

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Info, LogIn } from 'lucide-react';
-import { useGameStore, selectTotalScore } from '../../store.js';
+import { useGameStore, selectTotalScore, selectClearedCount } from '../../store.js';
 import { endingOutcomeFromTotal } from '../../scoring.js';
 import InfoModal from '../InfoModal/InfoModal.jsx';
 import './HudOverlay.css';
@@ -12,6 +12,7 @@ export default function HudOverlay() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const total = useGameStore(selectTotalScore);
+  const clearedCount = useGameStore(selectClearedCount);
   const stageResults = useGameStore((s) => s.stageResults);
   const [infoOpen, setInfoOpen] = useState(false);
 
@@ -44,14 +45,21 @@ export default function HudOverlay() {
         >
           <Info size={30} />
         </button>
-        <button
-          type="button"
-          className="hud-overlay__action-btn"
-          onClick={() => navigate(`/ending/${endingOutcomeFromTotal(total)}`)}
-          aria-label="결과 확인"
-        >
-          <LogIn size={30} />
-        </button>
+        <div className="hud-overlay__action-wrapper">
+          <button
+            type="button"
+            className="hud-overlay__action-btn"
+            onClick={() => navigate(`/ending/${endingOutcomeFromTotal(total)}`)}
+            aria-label="결과 확인"
+          >
+            <LogIn size={30} />
+          </button>
+          {clearedCount === 4 && pathname === '/hub' && (
+            <div className="hud-overlay__tooltip">
+              여기를 눌러서 결과를 확인해보세요!
+            </div>
+          )}
+        </div>
       </div>
       {infoOpen && <InfoModal onClose={() => setInfoOpen(false)} />}
     </div>

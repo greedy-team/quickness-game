@@ -27,16 +27,26 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
   const requestRef = useRef();
   const pendingMetricRef = useRef(null);
   const bgmRef = useRef(null);
+  const bgmCloneRef = useRef(null);
 
   useEffect(() => {
     if (!bgmRef.current) {
       bgmRef.current = new Audio(BGM_PATH);
       bgmRef.current.loop = true;
+      
+      bgmCloneRef.current = new Audio(BGM_PATH);
+      bgmCloneRef.current.loop = true;
     }
-    return () => { if (bgmRef.current) { bgmRef.current.pause(); bgmRef.current = null; } };
+    return () => { 
+      if (bgmRef.current) { bgmRef.current.pause(); bgmRef.current = null; } 
+      if (bgmCloneRef.current) { bgmCloneRef.current.pause(); bgmCloneRef.current = null; } 
+    };
   }, []);
 
-  useEffect(() => { if (bgmRef.current) bgmRef.current.volume = bgmVolume; }, [bgmVolume]);
+  useEffect(() => { 
+    if (bgmRef.current) bgmRef.current.volume = bgmVolume; 
+    if (bgmCloneRef.current) bgmCloneRef.current.volume = bgmVolume; 
+  }, [bgmVolume]);
 
   const formatTime = (elapsed) => {
     const s = Math.floor(elapsed).toString().padStart(2, '0');
@@ -45,6 +55,12 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
   };
 
   const handleFinish = (time) => {
+    if (bgmRef.current) {
+      bgmRef.current.pause();
+    }
+    if (bgmCloneRef.current) {
+      bgmCloneRef.current.pause();
+    }
     cancelAnimationFrame(requestRef.current);
     setFinalResultTime(time);
     setCurrentTime(time);
@@ -76,6 +92,11 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
       bgmRef.current.currentTime = 0.1;
       bgmRef.current.playbackRate = 1.15;
       bgmRef.current.play().catch(() => {});
+    }
+    if (bgmCloneRef.current) {
+      bgmCloneRef.current.currentTime = 0.1;
+      bgmCloneRef.current.playbackRate = 1.15;
+      bgmCloneRef.current.play().catch(() => {});
     }
     startTimeRef.current = Date.now();
     requestRef.current = requestAnimationFrame(animate);
@@ -124,10 +145,11 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
           </div>
 
           <div className="info-middle-section">
-            <div className="image-frame">
-              <div className="image-frame-header">STAGE 01: SENSE OF TIME</div>
-              <div className="preview-content" />
-            </div>
+            <img 
+              className="simple-preview-image" 
+              src="/assets/images/bg_stage1_clock_example.png" 
+              alt="Stage 1 Example" 
+            />
 
             <div className="instruction-item">
               <div className="arrow-keys-cluster">
@@ -179,6 +201,10 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
           tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({ ...t, isCurrent: resultTier.id === t.id, rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError}s` }))}
           hint="" 
+          continueText="ENTER를 눌러 계속"
+          onContinue={() => {
+            if (onResult && pendingMetricRef.current !== null) onResult(pendingMetricRef.current);
+          }}
         />
       )}
     </div>
