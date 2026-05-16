@@ -1,7 +1,22 @@
 # Changelog
 
-**현재 버전:** 0.0.32  
-**마지막 업데이트:** 2026-05-14T01:46:58Z  
+**현재 버전:** 0.0.34  
+**마지막 업데이트:** 2026-05-16T07:01:41Z  
+
+---
+
+## [0.0.34] - 2026-05-16
+
+**PR:** #50  
+
+**새 기능**
+- 전체 스테이지 사운드·UI 최적화 및 최종 엔딩 점프스케어 연출 추가
+- 스테이지 4 (스플릿 모드) 레이아웃 안정화 및 최종 합산 연출 추가
+
+**기타**
+- Merge pull request #49 from greedy-team/feature/48-ui-sound-ending
+- Merge branch 'main' of https://github.com/greedy-team/quickness-game
+- Delete quickness-game
 
 ---
 
