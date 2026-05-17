@@ -108,19 +108,21 @@ export default function EndingPage({ outcome }) {
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    const result = await submitResult({ userId, score: totalScore });
+    // submit과 nickname 조회를 병렬 호출 — outro 진입 전 highlight 준비 완료를 보장.
+    // (직렬 + fire-and-forget이었을 때 사용자가 success → outro로 빨리 넘어가면
+    //  lookup 결과가 도착하기 전에 navigate가 발생해 강조가 빠지는 문제가 있었음.)
+    const [result, userResult] = await Promise.all([
+      submitResult({ userId, score: totalScore }),
+      getUserById(userId),
+    ]);
 
     if (result.ok) {
+      if (userResult.ok && userResult.user?.nickname) {
+        setMyHighlight({ nickname: userResult.user.nickname, score: totalScore });
+      }
       setSubmittedScore(totalScore);
       setIsSubmitting(false);
       setPhase('success');
-      // 강조용 nickname 조회는 비동기 — outro 진행을 막지 않음.
-      // lookup이 늦거나 실패하면 강조 없이 진입 (graceful).
-      void getUserById(userId).then((r) => {
-        if (r.ok && r.user?.nickname) {
-          setMyHighlight({ nickname: r.user.nickname, score: totalScore });
-        }
-      });
       return;
     }
 
