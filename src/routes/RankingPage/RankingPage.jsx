@@ -59,7 +59,7 @@ export default function RankingPage() {
 
   return (
     <div className="ranking-page">
-      <h1 className="ranking-page__title">🏆 RANKING BOARD</h1>
+      <h1 className="ranking-page__headline">RANKING</h1>
 
       {isLoading && (
         <p className="ranking-page__status">기록을 불러오는 중…</p>
@@ -74,24 +74,15 @@ export default function RankingPage() {
       )}
 
       {hasRows && (
-        <table className="ranking-page__table">
-          <thead>
-            <tr>
-              <th>순위</th>
-              <th>닉네임</th>
-              <th>점수</th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((e) => (
-              <tr key={e.rank} className="ranking-page__row">
-                <td>{e.rank}</td>
-                <td>{e.nickname}</td>
-                <td>{e.score}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="ranking-list">
+          {entries.map((e) => (
+            <li key={e.rank} className="ranking-list__row">
+              <span className="ranking-list__rank">#{e.rank}</span>
+              <span className="ranking-list__nickname">{e.nickname}</span>
+              <span className="ranking-list__score">{e.score}점</span>
+            </li>
+          ))}
+        </ul>
       )}
 
       <p className="ranking-page__hint">

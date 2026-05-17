@@ -59,7 +59,7 @@ describe('RankingPage', () => {
     renderPage();
     expect(await screen.findByText('AAA')).toBeInTheDocument();
     expect(screen.getByText('BBB')).toBeInTheDocument();
-    expect(screen.getByText('500')).toBeInTheDocument();
+    expect(screen.getByText('500점')).toBeInTheDocument();
   });
 
   it('빈 응답 시 "아직 기록이 없습니다." 표시', async () => {
