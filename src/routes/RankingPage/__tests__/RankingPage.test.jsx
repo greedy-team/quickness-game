@@ -30,6 +30,7 @@ describe('RankingPage', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    vi.useRealTimers();
     useGameStore.getState().resetGame();
   });
 
@@ -91,7 +92,6 @@ describe('RankingPage', () => {
     renderPage();
     await vi.advanceTimersByTimeAsync(60000);
     expect(mockNavigate).not.toHaveBeenCalled();
-    vi.useRealTimers();
   });
 
   it('"처음으로" 버튼 클릭 시 / 로 이동한다', async () => {

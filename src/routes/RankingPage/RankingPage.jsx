@@ -48,6 +48,7 @@ export default function RankingPage() {
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
+    // navigate(react-router)와 resetGame(zustand selector)은 안정적 참조라 deps 생략 안전.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
