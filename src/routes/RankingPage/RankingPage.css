@@ -1,4 +1,5 @@
 .ranking-page {
+  position: relative;
   width: 100%;
   height: 100%;
   padding: 32px 24px;
@@ -108,4 +109,41 @@
 
 .ranking-page__back:hover {
   border-color: rgba(255, 255, 255, 0.8);
+}
+
+.ranking-page__lookup {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  z-index: 2;
+}
+
+.ranking-page__lookup-input {
+  width: 180px;
+  padding: 6px 10px;
+  background: #000;
+  color: #fff;
+  border: 1px solid rgba(0, 255, 204, 0.6);
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  outline: none;
+}
+
+.ranking-page__lookup-input:focus {
+  border-color: #00ffcc;
+  box-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+}
+
+.ranking-page__lookup-status {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #888;
 }
