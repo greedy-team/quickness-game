@@ -19,6 +19,17 @@
   letter-spacing: 0.04em;
 }
 
+.ranking-page__status {
+  margin: 24px 0;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.ranking-page__status--error {
+  color: #f4a4a4;
+  opacity: 1;
+}
+
 .ranking-page__empty {
   margin: 24px 0;
   font-size: 18px;
@@ -42,21 +53,6 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   opacity: 0.6;
-  font-weight: 600;
-}
-
-.ranking-page__row--me {
-  background: rgba(244, 196, 100, 0.18);
-  box-shadow: inset 4px 0 0 #f4c464;
-}
-
-.ranking-page__myrow {
-  margin: 12px 0 0;
-  padding: 10px 16px;
-  background: rgba(244, 196, 100, 0.18);
-  border-left: 4px solid #f4c464;
-  border-radius: 4px;
-  font-size: 18px;
   font-weight: 600;
 }
 
