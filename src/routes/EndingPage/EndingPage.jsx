@@ -25,7 +25,6 @@ export default function EndingPage({ outcome }) {
   const totalScore = useGameStore(selectTotalScore);
 
   const [phase, setPhase] = useState('entered');
-  const [highlightId, setHighlightId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [submittedScore, setSubmittedScore] = useState(null);
@@ -57,11 +56,11 @@ export default function EndingPage({ outcome }) {
   useEffect(() => {
     if (phase !== 'outro') return undefined;
     const id = setTimeout(
-      () => navigate('/ranking', { state: { highlightId } }),
+      () => navigate('/ranking'),
       ENDING_CONFIG.outroMs,
     );
     return () => clearTimeout(id);
-  }, [phase, navigate, highlightId]);
+  }, [phase, navigate]);
 
   // reveal/hold 키 입력 — leaving 진입
   useEffect(() => {
@@ -95,12 +94,12 @@ export default function EndingPage({ outcome }) {
     const handle = (e) => {
       if (ADVANCE_KEYS.has(e.code)) {
         e.preventDefault();
-        navigate('/ranking', { state: { highlightId } });
+        navigate('/ranking');
       }
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
-  }, [phase, navigate, highlightId]);
+  }, [phase, navigate]);
 
   const handleUserIdSubmit = async (userId) => {
     if (isSubmitting) return;
@@ -111,7 +110,6 @@ export default function EndingPage({ outcome }) {
 
     if (result.ok) {
       setSubmittedScore(totalScore);
-      setHighlightId(userId);
       setIsSubmitting(false);
       setPhase('success');
       return;
