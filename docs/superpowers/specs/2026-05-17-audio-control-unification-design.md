@@ -61,9 +61,9 @@
 
 #### Fake SFX (fire-and-forget, 짧음)
 
-- `audioRefs.current.fake` 인스턴스 보관을 제거하고 `playSfx(SOUNDS.FAKE, { scale: 0.8 })` 로 전환한다.
-- 기존 `playSound('fake', 0.8, 400)` 호출은 사실상 fire-and-forget 이므로 인스턴스를 보관할 이유가 없다.
-- `durationMs` 가 필요하면 옵션으로 전달한다.
+- `audioRefs.current.fake` 인스턴스 보관을 제거하고 `playSfx(SOUNDS.FAKE, { scale: 0.8, durationMs: 400 })` 로 전환한다.
+- 기존 `playSound('fake', 0.8, 400)` 의 400ms 트림은 보존한다 (페이크 글리치 짧게 끊는 의도).
+- fire-and-forget 이므로 인스턴스를 보관할 이유가 없다.
 
 #### Shutter SFX (fire-and-forget, 500ms 트림)
 
