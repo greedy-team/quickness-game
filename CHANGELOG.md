@@ -1,7 +1,19 @@
 # Changelog
 
-**현재 버전:** 1.0.2  
-**마지막 업데이트:** 2026-05-17T09:35:53Z  
+**현재 버전:** 1.0.3  
+**마지막 업데이트:** 2026-05-17T09:57:46Z  
+
+---
+
+## [1.0.3] - 2026-05-17
+
+**PR:** #55  
+
+**버그 수정**
+- vite8 / vitest3 의존성 정합 및 lockfile 재생성
+
+**기타**
+- Merge branch 'main' of https://github.com/greedy-team/quickness-game
 
 ---
 
