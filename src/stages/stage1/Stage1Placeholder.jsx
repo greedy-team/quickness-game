@@ -123,7 +123,7 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
   // 💡 배경 교체 로직 수정 (준비: 복도 / 게임: 시계)
   const getBackgroundImage = () => {
     if (phase === 'result') return null;
-    if (phase === 'ready') return '/assets/images/bg_stage1_corridor_ledclock.png'; 
+    if (phase === 'ready') return '/assets/images/bg_stage1_corridor.png'; 
     if (phase === 'running') return '/assets/images/bg_stage1_clock.png'; 
     return currentDialogueIndex === 1 ? '/assets/images/bg_stage1_corridor_그린이.png' : '/assets/images/bg_stage1_corridor.png';
   };
@@ -199,7 +199,13 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
         <ResultModal
           metricValue={`${finalResultTime.toFixed(3)}초`}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({ ...t, isCurrent: resultTier.id === t.id, rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError}s` }))}
+          tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({
+            ...t,
+            isCurrent: resultTier.id === t.id,
+            rangeLabel: t.maxError === Infinity
+              ? '그 외'
+              : `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}s~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}s`,
+          }))}
           hint="" 
           continueText="ENTER를 눌러 계속"
           onContinue={() => {

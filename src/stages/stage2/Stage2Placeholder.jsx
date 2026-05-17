@@ -374,12 +374,16 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
         <ResultModal
           metricValue={reaction.time ? `${reaction.time}초` : 'FAIL'}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE2_CONFIG.accuracyTiers.map(t => ({ 
-            ...t, 
-            isCurrent: resultTier.id === t.id, 
-            // maxError 기준 포맷팅 (ex: ≤ 0.2s, 그 외)
-            rangeLabel: t.maxError === Infinity ? '그 외' : `≤ ${t.maxError}s` 
-          }))}
+          tiers={STAGE2_CONFIG.accuracyTiers.map((t, idx, arr) => {
+            const prevMax = idx === 0 ? 0 : arr[idx - 1].maxError;
+            return {
+              ...t,
+              isCurrent: resultTier.id === t.id,
+              rangeLabel: t.maxError === Infinity
+                ? '그 외'
+                : `${prevMax.toFixed(2)}s~${t.maxError.toFixed(2)}s`,
+            };
+          })}
           hint={resultTier.id === 'bare' ? "훼이크에 속지 말고 끝까지 집중하세요." : ""} 
           continueText={mode === 'split' ? null : "ENTER를 눌러 계속"}
           onContinue={() => {
