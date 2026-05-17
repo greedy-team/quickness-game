@@ -4,6 +4,9 @@ import { STAGE2_CONFIG } from './stage2.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
+import { useGameStore } from '../../store.js';
+import { useAudioVolume } from '../../audio/useAudioVolume.js';
+import { playSfx } from '../../audio/playSfx.js';
 
 const SOUNDS = {
   BGM: '/assets/sounds/stage2_bgm_static.mp3',
@@ -31,19 +34,20 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   const [reaction, setReaction] = useState({ time: null, comment: "" });
   const [resultTier, setResultTier] = useState(null);
 
+  const bgmVolume = useAudioVolume('bgm');
+  const sfxVolume = useAudioVolume('sfx');
+
   const stateRef = useRef({
     phase: 'MANUAL',
     gameState: 'IDLE',
     isFinished: false,
-    attackStartTime: 0 
+    attackStartTime: 0
   });
 
   const audioRefs = useRef({
     bgm: null,
-    fake: null,
     real: null,
     realClone: null,
-    shutter: null,
   });
 
   const jumpscareAudioTimeoutRef = useRef(null);
@@ -57,11 +61,9 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     Object.values(BGS).forEach(src => { const img = new Image(); img.src = src; });
 
     audioRefs.current.bgm = new Audio(SOUNDS.BGM);
-    audioRefs.current.bgm.loop = true; 
-    audioRefs.current.fake = new Audio(SOUNDS.FAKE);
+    audioRefs.current.bgm.loop = true;
     audioRefs.current.real = new Audio(SOUNDS.REAL);
     audioRefs.current.realClone = new Audio(SOUNDS.REAL);
-    audioRefs.current.shutter = new Audio(SOUNDS.SHUTTER);
 
     return () => {
       Object.values(audioRefs.current).forEach(audio => {
@@ -73,31 +75,12 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
     };
   }, []);
 
-  const playSound = useCallback((type, volume = 1.0, durationMs = null) => {
-    const audio = audioRefs.current[type];
-    if (audio) {
-      audio.currentTime = 0; 
-      audio.volume = volume;
-      audio.play().catch(() => {}); 
-
-      if (durationMs) {
-        setTimeout(() => {
-          if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-          }
-        }, durationMs);
-      }
-    }
-  }, []);
-
   useEffect(() => {
     const bgm = audioRefs.current.bgm;
     if (!bgm) return;
 
     if (phase === 'PLAY' && isRunning) {
-      bgm.volume = 0.5; 
-      bgm.currentTime = 86; 
+      bgm.currentTime = 86;
       bgm.play().catch(() => {});
     } else {
       bgm.pause();
@@ -105,10 +88,26 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
   }, [phase, isRunning]);
 
   useEffect(() => {
+    const bgm = audioRefs.current.bgm;
+    if (bgm) bgm.volume = bgmVolume * 0.5;
+  }, [bgmVolume]);
+
+  const sfxVolumeRef = useRef(sfxVolume);
+  useEffect(() => { sfxVolumeRef.current = sfxVolume; }, [sfxVolume]);
+
+  useEffect(() => {
     if (mode === 'split' && isRunning && stateRef.current.phase === 'MANUAL') {
       startGame();
     }
   }, [isRunning, mode]);
+
+  useEffect(() => {
+    if (phase !== 'PLAY') return undefined;
+    if (mode === 'split') return undefined;
+    const { setActivePlayStageId } = useGameStore.getState();
+    setActivePlayStageId(2);
+    return () => setActivePlayStageId(null);
+  }, [phase, mode]);
 
   const startGame = () => {
     if (stateRef.current.phase !== 'MANUAL') return;
@@ -168,7 +167,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       clearTimeout(jumpscareAudioTimeoutRef.current);
     }
 
-    playSound('shutter', 1.0, 500);
+    playSfx(SOUNDS.SHUTTER, { scale: 1.0, durationMs: 500 });
 
     stateRef.current.isFinished = true;
     setIsFlash(true);
@@ -199,7 +198,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       setIsFlash(false);
       handleFinish(finalMetric, finalState, finalTier, rTime, "");
     }, 300);
-  }, [handleFinish, playSound]);
+  }, [handleFinish]);
 
   useEffect(() => {
     if (phase !== 'PLAY') return;
@@ -226,7 +225,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
         if (stateRef.current.isFinished) return;
         syncGameState('FLICKERING');
         setCurrentBG(bg);
-        playSound('fake', 0.8, 400);
+        playSfx(SOUNDS.FAKE, { scale: 0.8, durationMs: 400 });
 
         const tRevert = setTimeout(() => {
           if (!stateRef.current.isFinished && stateRef.current.gameState !== 'JUMPING') {
@@ -252,13 +251,13 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           const realAudio = audioRefs.current.real;
           const realClone = audioRefs.current.realClone;
           if (realAudio) {
-            realAudio.currentTime = 0.5; 
-            realAudio.volume = 1.0;
+            realAudio.currentTime = 0.5;
+            realAudio.volume = sfxVolumeRef.current;
             realAudio.play().catch(() => {});
           }
           if (realClone) {
             realClone.currentTime = 0.5;
-            realClone.volume = 1.0;
+            realClone.volume = sfxVolumeRef.current;
             realClone.play().catch(() => {});
           }
         }
@@ -280,7 +279,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       clearInterval(countdown);
       timeouts.forEach(clearTimeout);
     };
-  }, [phase, handleFinish, playSound]);
+  }, [phase, handleFinish]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -374,12 +373,16 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
         <ResultModal
           metricValue={reaction.time ? `${reaction.time}초` : 'FAIL'}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE2_CONFIG.accuracyTiers.map(t => ({ 
-            ...t, 
-            isCurrent: resultTier.id === t.id, 
-            // maxError 기준 포맷팅 (ex: ≤ 0.2s, 그 외)
-            rangeLabel: t.maxError === Infinity ? '그 외' : `≤ ${t.maxError}s` 
-          }))}
+          tiers={STAGE2_CONFIG.accuracyTiers.map((t, idx, arr) => {
+            const prevMax = idx === 0 ? 0 : arr[idx - 1].maxError;
+            return {
+              ...t,
+              isCurrent: resultTier.id === t.id,
+              rangeLabel: t.maxError === Infinity
+                ? '그 외'
+                : `${prevMax.toFixed(2)}s~${t.maxError.toFixed(2)}s`,
+            };
+          })}
           hint={resultTier.id === 'bare' ? "훼이크에 속지 말고 끝까지 집중하세요." : ""} 
           continueText={mode === 'split' ? null : "ENTER를 눌러 계속"}
           onContinue={() => {

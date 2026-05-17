@@ -6,6 +6,7 @@ import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
+import { useGameStore } from '../../store.js';
 
 const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
 
@@ -43,10 +44,17 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
     };
   }, []);
 
-  useEffect(() => { 
-    if (bgmRef.current) bgmRef.current.volume = bgmVolume; 
-    if (bgmCloneRef.current) bgmCloneRef.current.volume = bgmVolume; 
+  useEffect(() => {
+    if (bgmRef.current) bgmRef.current.volume = bgmVolume;
+    if (bgmCloneRef.current) bgmCloneRef.current.volume = bgmVolume;
   }, [bgmVolume]);
+
+  useEffect(() => {
+    if (phase !== 'running') return undefined;
+    const { setActivePlayStageId } = useGameStore.getState();
+    setActivePlayStageId(1);
+    return () => setActivePlayStageId(null);
+  }, [phase]);
 
   const formatTime = (elapsed) => {
     const s = Math.floor(elapsed).toString().padStart(2, '0');
@@ -123,7 +131,7 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
   // 💡 배경 교체 로직 수정 (준비: 복도 / 게임: 시계)
   const getBackgroundImage = () => {
     if (phase === 'result') return null;
-    if (phase === 'ready') return '/assets/images/bg_stage1_corridor_ledclock.png'; 
+    if (phase === 'ready') return '/assets/images/bg_stage1_corridor.png'; 
     if (phase === 'running') return '/assets/images/bg_stage1_clock.png'; 
     return currentDialogueIndex === 1 ? '/assets/images/bg_stage1_corridor_그린이.png' : '/assets/images/bg_stage1_corridor.png';
   };
@@ -199,7 +207,29 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
         <ResultModal
           metricValue={`${finalResultTime.toFixed(3)}초`}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({ ...t, isCurrent: resultTier.id === t.id, rangeLabel: t.maxError === Infinity ? '그 외' : `±${t.maxError}s` }))}
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t, i, arr) => {
+            const target = STAGE1_CONFIG.targetSec;
+            const prev = i > 0 ? arr[i - 1] : null;
+            const fmt = (v) => v.toFixed(2);
+            let rangeLabel;
+            if (t.maxError === Infinity) {
+              const prevErr = prev ? prev.maxError : 0;
+              rangeLabel = `<${fmt(target - prevErr)} 또는 >${fmt(target + prevErr)}s`;
+            } else if (prev) {
+              const lowFar = fmt(target - t.maxError);
+              const lowNear = fmt(target - prev.maxError);
+              const highNear = fmt(target + prev.maxError);
+              const highFar = fmt(target + t.maxError);
+              rangeLabel = `${lowFar}~${lowNear} 또는 ${highNear}~${highFar}s`;
+            } else {
+              rangeLabel = `${fmt(target - t.maxError)}~${fmt(target + t.maxError)}s`;
+            }
+            return {
+              ...t,
+              isCurrent: resultTier.id === t.id,
+              rangeLabel,
+            };
+          })}
           hint="" 
           continueText="ENTER를 눌러 계속"
           onContinue={() => {

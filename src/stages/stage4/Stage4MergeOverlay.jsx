@@ -10,8 +10,6 @@ export default function Stage4MergeOverlay({ scores, onComplete }) {
 
   return (
     <div className="s4-merge-overlay">
-      <h1 className="s4-merge-title">FINAL SYNCHRONIZATION</h1>
-      
       <div className="s4-merge-math-container">
         <div className="s4-merge-math-row">
           <span className="s4-score-item s4-score-1">{p1}</span>

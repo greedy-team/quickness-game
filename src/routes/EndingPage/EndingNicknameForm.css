@@ -85,3 +85,18 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.ending-nickname__input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ending-nickname__error {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ff6b6b;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  max-width: min(480px, 80vw);
+  text-align: center;
+}

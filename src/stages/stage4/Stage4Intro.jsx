@@ -1,35 +1,45 @@
-// 통합 인트로 — 3 sub-stage 미리보기 + Space 안내.
-import { maxScoreForStage } from '../../scoring.js';
+// Stage 4 ready 화면 — Stage 1/2/3과 동일한 stage-info-screen 패턴
+import React from 'react';
 import './Stage4Intro.css';
 
-const PREVIEWS = [
-  { key: '←', title: 'Stage 1', subtitle: '괘종시계 / 타이밍' },
-  { key: '↑', title: 'Stage 2', subtitle: '반응속도' },
-  { key: '→', title: 'Stage 3', subtitle: '캐치' },
-];
-
-export default function Stage4Intro() {
+export default function Stage4Intro({ onStart }) {
   return (
-    <div className="stage4-intro">
-      <h1 className="stage4-intro__title">최종 시련 — 거울방</h1>
-      <p className="stage4-intro__subtitle">⚠️ 3개 시련을 동시에 통과하라</p>
-
-      <div className="stage4-intro__panes">
-        {PREVIEWS.map((p) => (
-          <div key={p.title} className="stage4-intro__pane">
-            <div className="stage4-intro__key">{p.key}</div>
-            <div className="stage4-intro__pane-title">{p.title}</div>
-            <div className="stage4-intro__pane-subtitle">{p.subtitle}</div>
-          </div>
-        ))}
+    <div className="stage-info-screen stage4-intro-screen">
+      <div className="info-top-section">
+        <h1 className="stage-title">4단계: 최종 시련</h1>
       </div>
 
-      <p className="stage4-intro__weight">
-        <span className="stage4-intro__weight-boost">⚡ 최대 {maxScoreForStage(4)}점</span>
-        {' '}— 3개 시련 점수의 합 ({maxScoreForStage(1)} + {maxScoreForStage(2)} + {maxScoreForStage(3)})
-      </p>
+      <div className="info-middle-section">
+        <div className="simple-preview-image stage4-preview-triptych">
+          <img src="/assets/images/bg_stage1_clock_example.png" alt="Stage 1 Preview" />
+          <img src="/assets/images/bg_stage2_library_fake.png" alt="Stage 2 Preview" />
+          <img src="/assets/images/bg_stage3_example.png" alt="Stage 3 Preview" />
+        </div>
 
-      <p className="stage4-intro__cta">▶ 준비되면 [Space] 누르기</p>
+        <div className="instruction-item">
+          <div className="arrow-keys-cluster">
+            <div className="arrow-row">
+              <div className="key-cap top-active">↑</div>
+            </div>
+            <div className="arrow-row">
+              <div className="key-cap left-active">←</div>
+              <div className="key-cap">↓</div>
+              <div className="key-cap right-active">→</div>
+            </div>
+          </div>
+          <div className="main-instruction-text">
+            3개 시련을 동시에<br/>
+            <span className="highlight-key">[←][↑][→] 키</span>로 클리어하세요
+          </div>
+        </div>
+      </div>
+
+      <div className="info-bottom-section">
+        <div className="key-icon-wrapper start-btn" onClick={onStart}>
+          <span>GAME START</span>
+        </div>
+        <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+      </div>
     </div>
   );
 }

@@ -2,81 +2,150 @@
   width: 100%;
   height: 100%;
   padding: 32px 24px;
-  background: #0a0a0a;
-  color: #f4f4f4;
+  background: #000;
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   text-align: center;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
-.ranking-page__title {
-  margin: 0;
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+.ranking-page__headline {
+  margin: 0 0 18px 0;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  letter-spacing: 3px;
+  color: #00ffcc;
+  text-shadow: 0 0 20px #00ffcc;
+}
+
+.ranking-page__status {
+  margin: 24px 0;
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  opacity: 0.7;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
+}
+
+.ranking-page__status--error {
+  color: #f4a4a4;
+  opacity: 1;
 }
 
 .ranking-page__empty {
   margin: 24px 0;
-  font-size: 18px;
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
   opacity: 0.6;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
 }
 
-.ranking-page__table {
-  border-collapse: collapse;
-  width: min(720px, 90vw);
-  font-size: 20px;
+.ranking-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  width: min(600px, 92vw);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
 }
 
-.ranking-page__table th,
-.ranking-page__table td {
+.ranking-list__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 18px;
+  align-items: center;
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(244, 244, 244, 0.12);
-}
-
-.ranking-page__table th {
-  font-size: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.6;
-  font-weight: 600;
-}
-
-.ranking-page__row--me {
-  background: rgba(244, 196, 100, 0.18);
-  box-shadow: inset 4px 0 0 #f4c464;
-}
-
-.ranking-page__myrow {
-  margin: 12px 0 0;
-  padding: 10px 16px;
-  background: rgba(244, 196, 100, 0.18);
-  border-left: 4px solid #f4c464;
   border-radius: 4px;
-  font-size: 18px;
-  font-weight: 600;
+  letter-spacing: 1px;
+  color: #888;
+}
+
+.ranking-list__rank {
+  text-align: left;
+  font-weight: bold;
+}
+
+.ranking-list__nickname {
+  text-align: left;
+}
+
+.ranking-list__score {
+  text-align: right;
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+.ranking-list__row--current {
+  background: rgba(255, 255, 255, 0.08);
+  outline: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: clamp(1.55rem, 2.5vw, 2rem);
+  padding: 12px 14px;
 }
 
 .ranking-page__hint {
-  margin-top: 8px;
-  font-size: 14px;
-  opacity: 0.5;
+  margin-top: 22px;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  color: #888;
+  letter-spacing: 1px;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .ranking-page__back {
   margin-top: 8px;
-  padding: 10px 24px;
+  padding: 12px 28px;
   background: transparent;
-  color: #f4f4f4;
-  border: 1px solid rgba(244, 244, 244, 0.4);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 6px;
-  font-size: 16px;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
   cursor: pointer;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
 }
 
 .ranking-page__back:hover {
-  border-color: rgba(244, 244, 244, 0.8);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.ranking-page__lookup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.ranking-page__lookup-input {
+  width: clamp(220px, 36vw, 320px);
+  padding: 6px 8px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  border-bottom: 1px solid rgba(0, 255, 204, 0.55);
+  border-radius: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  letter-spacing: 1px;
+  outline: none;
+  text-align: center;
+}
+
+.ranking-page__lookup-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ranking-page__lookup-input:focus {
+  border-bottom-color: #00ffcc;
+  box-shadow: 0 2px 8px -4px rgba(0, 255, 204, 0.6);
+}
+
+.ranking-page__lookup-status {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  letter-spacing: 1px;
+  color: #888;
 }

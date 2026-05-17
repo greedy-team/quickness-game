@@ -1,0 +1,416 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "2026 Leaderboard API",
+    "description": "리더보드 서비스 API 문서",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "백엔드 주소",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Leaderboard",
+      "description": "리더보드 관련 API"
+    },
+    {
+      "name": "User",
+      "description": "유저 관련 API"
+    },
+    {
+      "name": "GameScore",
+      "description": "게임 점수 관련 API"
+    }
+  ],
+  "paths": {
+    "/api/users": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "유저 생성",
+        "description": "닉네임과 전화번호로 신규 유저를 등록합니다. 이미 등록된 전화번호면 기존 유저 정보를 반환합니다.",
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scores/force": {
+      "post": {
+        "tags": [
+          "GameScore"
+        ],
+        "summary": "점수 강제 수정",
+        "description": "관리자 권한으로 유저의 게임 점수를 강제로 수정합니다.\n\n사용 가능한 게임 이름 (gameName):\n- green-neck: 그린이 목 늘리기\n- green-blue-white: 그린이 청기 백기\n- protect-baby-green: 아기 그린이 지키기\n- quickness-game: 순발력 게임\n",
+        "operationId": "forceUpdateUserScore",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoreSubmitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreUpdateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/result": {
+      "post": {
+        "tags": [
+          "GameScore"
+        ],
+        "summary": "게임 결과 등록",
+        "description": "유저의 게임 점수를 등록합니다. 기존 최고 점수보다 좋으면 갱신됩니다.\n\n사용 가능한 게임 이름 (gameName):\n- green-neck: 그린이 목 늘리기\n- green-blue-white: 그린이 청기 백기\n- protect-baby-green: 아기 그린이 지키기\n- quickness-game: 순발력 게임\n",
+        "operationId": "registerGameResult",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoreSubmitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreSubmitResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "유저 조회 (ID)",
+        "description": "userId로 유저 정보를 조회합니다.",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/phone": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "유저 조회 (전화번호)",
+        "description": "전화번호 뒷 8자리(숫자만)로 유저 정보를 조회합니다. 예: 12345678",
+        "operationId": "getUserByPhone",
+        "parameters": [
+          {
+            "name": "phone",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/leader-board/{gameName}": {
+      "get": {
+        "tags": [
+          "Leaderboard"
+        ],
+        "summary": "게임별 순위 조회",
+        "description": "특정 게임의 상위 5명 순위를 조회합니다.\n\n사용 가능한 게임 이름 (gameName):\n- green-neck: 그린이 목 늘리기 (단위: 초, 낮을수록 좋음)\n- green-blue-white: 그린이 청기 백기 (단위: 점)\n- protect-baby-green: 아기 그린이 지키기 (단위: 점)\n- quickness-game: 순발력 게임 (단위: 점)\n\n응답의 unit 필드: 게임 점수 단위 (예: \"초\", \"점\")\n",
+        "operationId": "getSingleGameRankings",
+        "parameters": [
+          {
+            "name": "gameName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameRankingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/leader-board/overall": {
+      "get": {
+        "tags": [
+          "Leaderboard"
+        ],
+        "summary": "종합 순위 조회",
+        "description": "모든 게임을 합산한 종합 순위 상위 5명을 조회합니다.",
+        "operationId": "getOverallRanking",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderboardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "minLength": 1
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^\\d{8}$"
+          }
+        },
+        "required": [
+          "nickname"
+        ]
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "ScoreSubmitRequest": {
+        "type": "object",
+        "properties": {
+          "gameName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "userId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "score": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0
+          },
+          "apiKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "apiKey",
+          "gameName",
+          "score",
+          "userId"
+        ]
+      },
+      "ScoreUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "gameNameKR": {
+            "type": "string"
+          },
+          "previousScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedScore": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ScoreSubmitResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "gameNameKR": {
+            "type": "string"
+          }
+        }
+      },
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "GameRankingResponse": {
+        "type": "object",
+        "properties": {
+          "gameName": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "rankings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ranking"
+            }
+          }
+        }
+      },
+      "Ranking": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "LeaderboardRanking": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LeaderboardResponse": {
+        "type": "object",
+        "properties": {
+          "rankings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeaderboardRanking"
+            }
+          }
+        }
+      }
+    }
+  }
+}

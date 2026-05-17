@@ -1,0 +1,70 @@
+/* src/routes/EndingPage/RegisterSuccessModal.css */
+.register-success-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: clamp(16px, 4vw, 40px);
+}
+
+.register-success-modal {
+  background: #0e0e0e;
+  border: 1px solid rgba(180, 0, 0, 0.5);
+  border-radius: clamp(6px, 1vw, 12px);
+  padding: clamp(28px, 5vw, 60px);
+  max-width: min(640px, 92vw);
+  width: 100%;
+  color: #ffffff;
+  box-shadow: 0 0 40px rgba(160, 0, 0, 0.25), inset 0 0 60px rgba(0, 0, 0, 0.6);
+}
+
+.register-success-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.register-success-modal__header h2 {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.register-success-modal__close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.register-success-modal__close:hover {
+  color: rgba(200, 0, 0, 0.9);
+}
+
+.register-success-modal__lead {
+  margin: 0 0 clamp(8px, 1.5vw, 14px);
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.register-success-modal__score {
+  margin: 0 0 clamp(12px, 2vw, 20px);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.register-success-modal__hint {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+  color: rgba(255, 255, 255, 0.55);
+}

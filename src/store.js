@@ -15,6 +15,9 @@ const initialState = {
   // 사용자가 타이틀에서 "시작"을 눌렀는가 (게임 진행 여부 마커).
   // BGM 게이팅은 BgmController가 자체적으로 처리 — 본 플래그와 무관.
   hasUserStarted: false,
+  // 현재 실제 플레이 중인 스테이지 id (1~4). intro/ready/result 단계에서는 null.
+  // HudOverlay 힌트 노출 조건으로 사용 — 각 스테이지가 자신의 play phase에서 set/clear.
+  activePlayStageId: null,
 };
 
 export const useGameStore = create(
@@ -52,6 +55,9 @@ export const useGameStore = create(
           false,
           'clearStageResult',
         ),
+
+      setActivePlayStageId: (id) =>
+        set({ activePlayStageId: id }, false, 'setActivePlayStageId'),
 
       resetGame: () =>
         set({ ...initialState }, false, 'resetGame'),

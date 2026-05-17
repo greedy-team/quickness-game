@@ -8,12 +8,20 @@ import './HudOverlay.css';
 
 const HIDDEN_ROUTES = new Set(['/', '/ranking']);
 
+const STAGE_HINTS = {
+  1: '10초가 되면 ← 키로 멈추기',
+  2: '진짜 모습이 보이면 ↑ 키',
+  3: '기억이 원 안에 있을 때 → 키',
+  // Stage 4: 화면에 화살표가 직접 표시되므로 hint 미노출
+};
+
 export default function HudOverlay() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const total = useGameStore(selectTotalScore);
   const clearedCount = useGameStore(selectClearedCount);
   const stageResults = useGameStore((s) => s.stageResults);
+  const activePlayStageId = useGameStore((s) => s.activePlayStageId);
   const [infoOpen, setInfoOpen] = useState(false);
 
   useEffect(() => {
@@ -26,7 +34,13 @@ export default function HudOverlay() {
   if (HIDDEN_ROUTES.has(pathname)) return null;
 
   if (pathname.startsWith('/stage/')) {
-    return null;
+    const hint = STAGE_HINTS[activePlayStageId];
+    if (!hint) return null;
+    return (
+      <div className="hud-overlay" aria-hidden="false">
+        <div className={`hud-overlay__hint hud-overlay__hint--stage${activePlayStageId}`}>{hint}</div>
+      </div>
+    );
   }
 
   const scoreText = [1, 2, 3, 4]

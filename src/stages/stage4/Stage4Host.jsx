@@ -6,6 +6,7 @@ import Stage4MergeOverlay from './Stage4MergeOverlay.jsx';
 import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
+import { useGameStore } from '../../store.js';
 import './Stage4Host.css';
 
 export default function Stage4Host({ onResult }) {
@@ -58,6 +59,13 @@ export default function Stage4Host({ onResult }) {
     const audio = bgmAudioRef.current;
     if (audio) audio.volume = bgmVolume;
   }, [bgmVolume]);
+
+  useEffect(() => {
+    if (phase !== 'running') return undefined;
+    const { setActivePlayStageId } = useGameStore.getState();
+    setActivePlayStageId(4);
+    return () => setActivePlayStageId(null);
+  }, [phase]);
 
   // 💡 [변경] 3개 모두 종료 시 'waitingForMerge' 상태로 대기
   useEffect(() => {
@@ -112,7 +120,7 @@ export default function Stage4Host({ onResult }) {
         />
       )}
       
-      {phase === 'intro' && <Stage4Intro />}
+      {phase === 'intro' && <Stage4Intro onStart={() => setPhase('running')} />}
       
       {/* 💡 3게임 모두 종료 후 점수 확인 대기 오버레이 */}
       {phase === 'waitingForMerge' && (

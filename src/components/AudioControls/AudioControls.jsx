@@ -111,6 +111,6 @@ function AudioControlsInner() {
 
 export default function AudioControls() {
   const { pathname } = useLocation();
-  if (pathname.startsWith('/stage/')) return null;
+  if (pathname !== '/hub') return null;
   return <AudioControlsInner />;
 }

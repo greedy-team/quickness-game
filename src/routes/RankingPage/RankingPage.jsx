@@ -1,49 +1,62 @@
 // /ranking — 영속 랭킹 보드.
-// - 엔딩 흐름에서 진입: location.state.highlightId 로 본인 행 식별.
-//   Top N 안에 들어갔으면 그 행을 강조, 밖이면 보드 아래 별도 행으로 노출.
-// - 타이틀에서 직접 진입: highlightId 없음 → 보드만 표시.
-// - 자동 복귀: autoReturnMs 만료 또는 Space/Enter → resetGame + navigate('/').
+// - 마운트 시 GET /api/leader-board/quickness-game 호출.
+// - 사용자 입력 없이는 자동 복귀하지 않는다.
+// - Space/Enter 또는 "처음으로" 버튼 → resetGame + navigate('/').
+//   단, 우측 상단 ID 조회 input에 포커스가 있을 땐 키 입력을 가로채지 않는다.
+// - 우측 상단 input에 userId 입력 + Enter → getUserById로 nickname 조회 후 매칭 행 강조.
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store.js';
-import { RANKING_CONFIG } from '../../ranking/ranking.config.js';
+import { fetchLeaderboard } from '../../api/leaderboard.js';
+import { getUserById } from '../../api/users.js';
 import './RankingPage.css';
 
 const ADVANCE_KEYS = new Set(['Space', 'Enter']);
+const TEXT_INPUT_TAGS = new Set(['INPUT', 'TEXTAREA']);
 
 export default function RankingPage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const resetGame = useGameStore((s) => s.resetGame);
+  const location = useLocation();
+  // 엔딩 흐름에서 전달된 본인 닉네임. score는 백엔드의 best-score 갱신 규칙 때문에
+  // 매칭 기준으로 쓰면 갱신이 안 된 경우 강조가 빠지므로 nickname 단독 매칭.
+  const myNickname = location.state?.nickname ?? null;
 
-  const highlightId = location.state?.highlightId ?? null;
+  // null = 로딩 중, [] = 비어있음, [...] = 데이터 있음
+  const [entries, setEntries] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  // TODO: 백엔드 API 연동 — GET /api/ranking?limit={RANKING_CONFIG.topN}
-  //       응답 데이터를 entries에 세팅, highlightId로 본인 행 강조
-  const [entries] = useState([]);
-  const top = entries.slice(0, RANKING_CONFIG.topN);
-  const myEntry = highlightId
-    ? entries.find((e) => e.id === highlightId) ?? null
-    : null;
-  const myRank = myEntry ? entries.findIndex((e) => e.id === highlightId) + 1 : null;
-  const myInTop = myEntry ? myRank <= RANKING_CONFIG.topN : false;
+  // 우측 상단 수동 조회 상태
+  const [userIdInput, setUserIdInput] = useState('');
+  const [manualHighlight, setManualHighlight] = useState(null); // string | null (nickname)
+  const [lookupStatus, setLookupStatus] = useState('idle'); // 'idle' | 'loading' | 'not_found' | 'error' | 'done'
+  const lookupCounterRef = useRef(0);
 
   const goTitle = () => {
     resetGame();
     navigate('/');
   };
 
-  // 자동 복귀 타이머
   useEffect(() => {
-    const id = setTimeout(goTitle, RANKING_CONFIG.autoReturnMs);
-    return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false;
+    (async () => {
+      const result = await fetchLeaderboard();
+      if (cancelled) return;
+      if (result.ok) {
+        setEntries(result.rankings);
+      } else {
+        setEntries([]);
+        setErrorMessage(result.message);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  // Space/Enter → 즉시 복귀
   useEffect(() => {
     const handle = (e) => {
+      // input/textarea 포커스 중엔 페이지 단축키 비활성 (입력 충돌 방지)
+      if (e.target && TEXT_INPUT_TAGS.has(e.target.tagName)) return;
       if (ADVANCE_KEYS.has(e.code)) {
         e.preventDefault();
         goTitle();
@@ -51,55 +64,123 @@ export default function RankingPage() {
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
+    // navigate(react-router)와 resetGame(zustand selector)은 안정적 참조라 deps 생략 안전.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleLookupSubmit = async (e) => {
+    e.preventDefault();
+    const trimmed = userIdInput.trim();
+    if (trimmed === '') {
+      // 빈 입력 → 강조 해제
+      setManualHighlight(null);
+      setLookupStatus('idle');
+      return;
+    }
+
+    const myCounter = lookupCounterRef.current + 1;
+    lookupCounterRef.current = myCounter;
+    setLookupStatus('loading');
+
+    const r = await getUserById(trimmed);
+
+    // 더 최근 요청이 있으면 이 응답은 버린다
+    if (myCounter !== lookupCounterRef.current) return;
+
+    if (r.ok && r.user?.nickname) {
+      setManualHighlight(r.user.nickname);
+      setLookupStatus('done');
+    } else if (!r.ok && (r.status === 0 || r.status >= 500)) {
+      setManualHighlight(null);
+      setLookupStatus('error');
+    } else {
+      // ok이지만 nickname 없음, 또는 4xx
+      setManualHighlight(null);
+      setLookupStatus('not_found');
+    }
+  };
+
+  const isLoading = entries === null;
+  const hasError = Boolean(errorMessage);
+  const isEmpty = !isLoading && !hasError && entries.length === 0;
+  const hasRows = !isLoading && !hasError && entries.length > 0;
+
+  // 매칭 결정: manual 우선, 그 다음 location.state.nickname, 둘 다 없으면 매칭 없음.
+  // 둘 다 nickname 단독 매칭 (백엔드가 userId를 응답에 포함하지 않음).
+  const isMine = (entry) => {
+    if (manualHighlight != null) return entry.nickname === manualHighlight;
+    if (myNickname != null) return entry.nickname === myNickname;
+    return false;
+  };
+
+  // 조회 상태 메시지 (loading/not_found/error/탑5 밖)
+  let lookupMessage = '';
+  if (lookupStatus === 'loading') {
+    lookupMessage = '조회 중…';
+  } else if (lookupStatus === 'not_found') {
+    lookupMessage = 'ID를 찾을 수 없습니다';
+  } else if (lookupStatus === 'error') {
+    lookupMessage = '조회 오류, 잠시 후 다시 시도';
+  } else if (
+    lookupStatus === 'done'
+    && manualHighlight != null
+    && hasRows
+    && !entries.some((e) => e.nickname === manualHighlight)
+  ) {
+    lookupMessage = '탑5에 기록이 없습니다';
+  }
+
   return (
     <div className="ranking-page">
-      <h1 className="ranking-page__title">🏆 RANKING BOARD</h1>
+      <h1 className="ranking-page__headline">RANKING</h1>
 
-      {top.length === 0 && (
+      <form className="ranking-page__lookup" onSubmit={handleLookupSubmit}>
+        <input
+          type="text"
+          className="ranking-page__lookup-input"
+          placeholder="유저 ID로 내 행 찾기"
+          value={userIdInput}
+          onChange={(ev) => setUserIdInput(ev.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
+        {lookupMessage && (
+          <p className="ranking-page__lookup-status">{lookupMessage}</p>
+        )}
+      </form>
+
+      {isLoading && (
+        <p className="ranking-page__status">기록을 불러오는 중…</p>
+      )}
+
+      {hasError && (
+        <p className="ranking-page__status ranking-page__status--error">{errorMessage}</p>
+      )}
+
+      {isEmpty && (
         <p className="ranking-page__empty">아직 기록이 없습니다.</p>
       )}
 
-      {top.length > 0 && (
-        <table className="ranking-page__table">
-          <thead>
-            <tr>
-              <th>순위</th>
-              <th>닉네임</th>
-              <th>점수</th>
-              <th>결말</th>
-            </tr>
-          </thead>
-          <tbody>
-            {top.map((e, i) => {
-              const rank = i + 1;
-              const isMe = e.id === highlightId;
-              return (
-                <tr
-                  key={e.id}
-                  className={isMe ? 'ranking-page__row ranking-page__row--me' : 'ranking-page__row'}
-                >
-                  <td>{rank}</td>
-                  <td>{e.nickname}</td>
-                  <td>{e.score}</td>
-                  <td>{RANKING_CONFIG.outcomeLabels[e.outcome] ?? e.outcome}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      )}
-
-      {myEntry && !myInTop && (
-        <p className="ranking-page__myrow">
-          내 기록: {myRank}위 — {myEntry.nickname} {myEntry.score} ({RANKING_CONFIG.outcomeLabels[myEntry.outcome] ?? myEntry.outcome})
-        </p>
+      {hasRows && (
+        <ul className="ranking-list">
+          {entries.map((e) => {
+            const mine = isMine(e);
+            const rowClass = mine
+              ? 'ranking-list__row ranking-list__row--current'
+              : 'ranking-list__row';
+            return (
+              <li key={e.rank} className={rowClass}>
+                <span className="ranking-list__rank">#{e.rank}</span>
+                <span className="ranking-list__nickname">{e.nickname}</span>
+                <span className="ranking-list__score">{e.score}점</span>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       <p className="ranking-page__hint">
-        Space / Enter 또는 잠시 후 타이틀로 돌아갑니다.
+        Space / Enter 키로 처음 화면으로 돌아갑니다.
       </p>
 
       <button type="button" className="ranking-page__back" onClick={goTitle}>

@@ -9,9 +9,6 @@ export const RANKING_CONFIG = {
   // 보드
   topN: 10,
 
-  // /ranking 자동 복귀 (Space/Enter 또는 만료 시 resetGame + navigate('/'))
-  autoReturnMs: 15000,
-
   // 결말 라벨 (보드 표시용)
   outcomeLabels: {
     alive:      '⭐ 생존',
