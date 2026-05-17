@@ -77,6 +77,14 @@
   font-weight: bold;
 }
 
+.ranking-list__row--current {
+  background: rgba(255, 255, 255, 0.08);
+  outline: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  padding: 9px 10px;
+}
+
 .ranking-page__hint {
   margin-top: 22px;
   font-size: clamp(0.9rem, 1.4vw, 1.1rem);

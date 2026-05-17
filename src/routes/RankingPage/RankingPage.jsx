@@ -4,7 +4,7 @@
 // - Space/Enter 또는 "처음으로" 버튼 → resetGame + navigate('/').
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store.js';
 import { fetchLeaderboard } from '../../api/leaderboard.js';
 import './RankingPage.css';
@@ -14,6 +14,12 @@ const ADVANCE_KEYS = new Set(['Space', 'Enter']);
 export default function RankingPage() {
   const navigate = useNavigate();
   const resetGame = useGameStore((s) => s.resetGame);
+  const location = useLocation();
+  const myNickname = location.state?.nickname ?? null;
+  const myScore = location.state?.score ?? null;
+  const matchKey = (myNickname != null && myScore != null)
+    ? `${myNickname} ${myScore}`
+    : null;
 
   // null = 로딩 중, [] = 비어있음, [...] = 데이터 있음
   const [entries, setEntries] = useState(null);
@@ -75,13 +81,19 @@ export default function RankingPage() {
 
       {hasRows && (
         <ul className="ranking-list">
-          {entries.map((e) => (
-            <li key={e.rank} className="ranking-list__row">
-              <span className="ranking-list__rank">#{e.rank}</span>
-              <span className="ranking-list__nickname">{e.nickname}</span>
-              <span className="ranking-list__score">{e.score}점</span>
-            </li>
-          ))}
+          {entries.map((e) => {
+            const isMine = matchKey != null && `${e.nickname} ${e.score}` === matchKey;
+            const rowClass = isMine
+              ? 'ranking-list__row ranking-list__row--current'
+              : 'ranking-list__row';
+            return (
+              <li key={e.rank} className={rowClass}>
+                <span className="ranking-list__rank">#{e.rank}</span>
+                <span className="ranking-list__nickname">{e.nickname}</span>
+                <span className="ranking-list__score">{e.score}점</span>
+              </li>
+            );
+          })}
         </ul>
       )}
 
