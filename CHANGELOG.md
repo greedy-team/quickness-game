@@ -1,7 +1,58 @@
 # Changelog
 
-**현재 버전:** 0.0.34  
-**마지막 업데이트:** 2026-05-16T07:01:41Z  
+**현재 버전:** 1.0.2  
+**마지막 업데이트:** 2026-05-17T09:35:53Z  
+
+---
+
+## [1.0.2] - 2026-05-17
+
+**PR:** #54  
+
+**새 기능**
+- /ranking 우측 상단에 ID 조회 입력 추가 — 본인 행 강조 #51
+- 엔딩 등록 직후 nickname 조회 후 /ranking에 강조 정보 전달 #51
+- /ranking에서 내 행을 nickname+score 매칭으로 강조 #51
+- /ranking 비주얼 톤을 ResultModal 톤으로 교체 #51
+- 유저 조회 API 클라이언트 추가 #51
+- 타이틀에서 시작 버튼 제거 - 키 입력으로만 시작 #51
+- 타이틀에서 랭킹 버튼 제거 + Enter 키 시작 안내 추가 #51
+- /ranking 리더보드 API 연동 + 자동 복귀 제거 #51
+- 리더보드 조회 API 클라이언트 추가 #51
+- 엔딩 결과 등록 API 연동 - 클라이언트/성공 모달/userId 폼/UX + .env 정리
+- ready 화면을 Stage 1/2/3과 통일 + preview 확대 + split mode hint 차단
+
+**버그 수정**
+- /ranking 자동 강조 매칭 기준을 nickname 단독으로 변경 (best-score 미갱신 케이스) #51
+- 엔딩 submit + nickname 조회를 병렬화해 /ranking 자동 강조 누락 해결 #51
+- /hub 에서만 노출 (title/ranking/ending 포함 그 외 라우트 숨김)
+- 행 key를 rank로 단순화 + 로딩 중 키 게이트 테스트 추가 #51
+- 가짜 타이머 정리를 afterEach로 이동 + 키 핸들러 deps 주석 보강 #51
+
+**개선**
+- /ranking ID 조회 input을 RANKING 아래 underline 형태로 + 텍스트 사이즈 키움 #51
+- 엔딩 → /ranking 진입 시 highlightId 전달 제거 #51
+
+**문서**
+- /ranking 우측 상단 ID 조회 입력 구현 계획 추가 #51
+- /ranking 우측 상단 ID 조회 입력 설계 스펙 추가 #51
+- /ranking UI 톤 교체 + 하이라이트 구현 계획 추가 #51
+- /ranking UI 톤 교체 + 내 행 하이라이트 설계 스펙 추가 #51
+- /ranking 기록 표시 + 키 게이트 구현 계획 추가 #51
+- /ranking 기록 표시 + 키 게이트 설계 스펙 추가 #51
+
+**기타**
+- docs : 리포트 문서 작성 #51
+- Merge pull request #53 from greedy-team/20260517_#51_랭킹_API_연동_및_힌트_텍스트_추가
+- docs : API, 스테이지4 계획 문서 #51
+- chore : 버전 1.0.0 / build_number 40 으로 정식 릴리즈 번호 부여
+- style : Stage 4 머지 오버레이 'FINAL SYNCHRONIZATION' 타이틀 제거
+- style : Stage 1 ResultModal 정확도 범위 라벨을 정밀 범위 표기로 개선 #51
+- feat : 게임 진행 화면 힌트 텍스트 표시 #51
+- style : 결과 모달 정확도 범위 라벨 표기 개선 #51
+- 이슈 메모 + 설계 문서(audio/stage4/result-api) + 서브모듈 정리
+- update package-lock.json to sync with package.json
+- bump version to 0.0.37 to resolve deploy conflict
 
 ---
 
