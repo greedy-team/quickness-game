@@ -1,14 +1,22 @@
-// 엔딩 컷씬 종료 후 닉네임 입력 폼.
-// trim 후 1~8자만 등록 허용. 그 외 문자 검증 없음(정규식 X — 후속 이슈로 분리).
-// IME(한글) 조합 중 Enter는 submit 무시 — 조합 끝난 직후 Enter만 동작.
+// src/routes/EndingPage/EndingNicknameForm.jsx
+// 엔딩 컷씬 종료 후 userId 입력 폼.
+// - 검증: trim 후 1자 이상만 허용 (형식 검증은 백엔드 담당).
+// - IME(한글) 조합 중 Enter는 submit 무시 — 조합 끝난 직후 Enter만 동작.
+// - isSubmitting 동안 버튼/Enter submit 차단.
 
 import { useEffect, useRef, useState } from 'react';
-import { RANKING_CONFIG } from '../../ranking/ranking.config.js';
 import { ENDING_CONFIG } from './ending.config.js';
 import { TOTAL_MAX_SCORE } from '../../scoring.js';
+import { RANKING_CONFIG } from '../../ranking/ranking.config.js';
 import './EndingNicknameForm.css';
 
-export default function EndingNicknameForm({ outcome, totalScore, onSubmit }) {
+export default function EndingNicknameForm({
+  outcome,
+  totalScore,
+  isSubmitting = false,
+  errorMessage = null,
+  onSubmit,
+}) {
   const [value, setValue] = useState('');
   const [composing, setComposing] = useState(false);
   const inputRef = useRef(null);
@@ -17,21 +25,26 @@ export default function EndingNicknameForm({ outcome, totalScore, onSubmit }) {
     inputRef.current?.focus();
   }, []);
 
+  // 제출 실패 후 isSubmitting이 false로 돌아오면 input에 다시 포커스 — 재시도 흐름 매끄럽게.
+  useEffect(() => {
+    if (!isSubmitting) {
+      inputRef.current?.focus();
+    }
+  }, [isSubmitting]);
+
   const trimmed = value.trim();
-  const isValid =
-    trimmed.length >= RANKING_CONFIG.nicknameMinLength &&
-    trimmed.length <= RANKING_CONFIG.nicknameMaxLength;
+  const isValid = trimmed.length >= 1;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (composing) return;
     if (!isValid) return;
+    if (isSubmitting) return;
     onSubmit(trimmed);
   };
 
   const outcomeLabel = RANKING_CONFIG.outcomeLabels[outcome] ?? outcome;
   const captionByOutcome = ENDING_CONFIG.captions[outcome] ?? '';
-  // ENDING_CONFIG.formRevealMs를 CSS custom property로 전달 — 애니메이션 길이의 단일 소스.
   const formStyle = { '--ending-nickname-reveal-ms': `${ENDING_CONFIG.formRevealMs}ms` };
 
   return (
@@ -51,18 +64,22 @@ export default function EndingNicknameForm({ outcome, totalScore, onSubmit }) {
         onChange={(e) => setValue(e.target.value)}
         onCompositionStart={() => setComposing(true)}
         onCompositionEnd={() => setComposing(false)}
-        maxLength={RANKING_CONFIG.nicknameMaxLength}
-        placeholder={`닉네임 (${RANKING_CONFIG.nicknameMinLength}-${RANKING_CONFIG.nicknameMaxLength}자)`}
+        placeholder="유저 ID 입력"
         autoComplete="off"
         spellCheck={false}
+        disabled={isSubmitting}
       />
+
+      {errorMessage && (
+        <p className="ending-nickname__error" role="alert">{errorMessage}</p>
+      )}
 
       <button
         type="submit"
         className="ending-nickname__submit"
-        disabled={!isValid || composing}
+        disabled={!isValid || composing || isSubmitting}
       >
-        등록 (Enter)
+        {isSubmitting ? '등록 중…' : '등록 (Enter)'}
       </button>
     </form>
   );
