@@ -207,13 +207,29 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
         <ResultModal
           metricValue={`${finalResultTime.toFixed(3)}초`}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
-          tiers={STAGE1_CONFIG.accuracyTiers.map(t => ({
-            ...t,
-            isCurrent: resultTier.id === t.id,
-            rangeLabel: t.maxError === Infinity
-              ? '그 외'
-              : `${(STAGE1_CONFIG.targetSec - t.maxError).toFixed(2)}s~${(STAGE1_CONFIG.targetSec + t.maxError).toFixed(2)}s`,
-          }))}
+          tiers={STAGE1_CONFIG.accuracyTiers.map((t, i, arr) => {
+            const target = STAGE1_CONFIG.targetSec;
+            const prev = i > 0 ? arr[i - 1] : null;
+            const fmt = (v) => v.toFixed(2);
+            let rangeLabel;
+            if (t.maxError === Infinity) {
+              const prevErr = prev ? prev.maxError : 0;
+              rangeLabel = `<${fmt(target - prevErr)} 또는 >${fmt(target + prevErr)}s`;
+            } else if (prev) {
+              const lowFar = fmt(target - t.maxError);
+              const lowNear = fmt(target - prev.maxError);
+              const highNear = fmt(target + prev.maxError);
+              const highFar = fmt(target + t.maxError);
+              rangeLabel = `${lowFar}~${lowNear} 또는 ${highNear}~${highFar}s`;
+            } else {
+              rangeLabel = `${fmt(target - t.maxError)}~${fmt(target + t.maxError)}s`;
+            }
+            return {
+              ...t,
+              isCurrent: resultTier.id === t.id,
+              rangeLabel,
+            };
+          })}
           hint="" 
           continueText="ENTER를 눌러 계속"
           onContinue={() => {
