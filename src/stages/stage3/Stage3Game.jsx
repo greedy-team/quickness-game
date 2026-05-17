@@ -6,6 +6,7 @@ import { ASSETS } from '../../assets.js';
 import { BGM_DEFAULTS } from '../../audio/trackRegistry.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import { STAGE3_CONFIG } from './stage3.config.js';
+import { useGameStore } from '../../store.js';
 import './Stage3Game.css';
 
 export default function Stage3Game({ mode = 'standalone', isRunning, onResult }) {
@@ -65,6 +66,13 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
     const audio = audioRef.current;
     if (audio) audio.volume = bgmVolume;
   }, [bgmVolume]);
+
+  useEffect(() => {
+    if (phase !== 'running') return undefined;
+    const { setActivePlayStageId } = useGameStore.getState();
+    setActivePlayStageId(3);
+    return () => setActivePlayStageId(null);
+  }, [phase]);
 
   const handleFieldDone = useCallback((data) => {
     setResultData(data);

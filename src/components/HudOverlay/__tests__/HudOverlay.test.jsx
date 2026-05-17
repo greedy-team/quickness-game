@@ -47,9 +47,29 @@ describe('HudOverlay', () => {
     expect(container.querySelector('.hud-overlay')).toBeNull();
   });
 
-  it('/stage/* 라우트에서는 HUD가 렌더되지 않는다', () => {
+  it('/stage/:id 라우트에서 activePlayStageId가 null이면 힌트도 노출되지 않는다', () => {
     const { container } = renderHud({ path: '/stage/1' });
     expect(container.querySelector('.hud-overlay')).toBeNull();
+  });
+
+  it('/stage/:id 라우트 + activePlayStageId=1이면 우측 상단 힌트만 노출된다', () => {
+    useGameStore.getState().setActivePlayStageId(1);
+    const { container } = renderHud({ path: '/stage/1' });
+    expect(container.querySelector('.hud-overlay')).not.toBeNull();
+    expect(container.querySelector('.hud-overlay__hint')).not.toBeNull();
+    expect(container.querySelector('.hud-overlay__scores')).toBeNull();
+    expect(container.querySelector('.hud-overlay__actions')).toBeNull();
+    expect(screen.getByText('10초가 되면 ← 키로 멈추기')).toBeInTheDocument();
+  });
+
+  it.each([
+    [2, '진짜 모습이 보이면 ↑ 키'],
+    [3, '기억이 원 안에 있을 때 → 키'],
+    [4, '← ↑ → 동시 도전!'],
+  ])('activePlayStageId=%i이면 해당 스테이지 힌트가 노출된다', (stageId, hint) => {
+    useGameStore.getState().setActivePlayStageId(stageId);
+    renderHud({ path: `/stage/${stageId}` });
+    expect(screen.getByText(hint)).toBeInTheDocument();
   });
 
   it('초기 상태 — 스테이지 점수 0 · 0 · 0 · 0 텍스트가 노출된다', () => {

@@ -4,6 +4,7 @@ import { STAGE2_CONFIG } from './stage2.config.js';
 import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
+import { useGameStore } from '../../store.js';
 
 const SOUNDS = {
   BGM: '/assets/sounds/stage2_bgm_static.mp3',
@@ -109,6 +110,13 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       startGame();
     }
   }, [isRunning, mode]);
+
+  useEffect(() => {
+    if (phase !== 'PLAY') return undefined;
+    const { setActivePlayStageId } = useGameStore.getState();
+    setActivePlayStageId(2);
+    return () => setActivePlayStageId(null);
+  }, [phase]);
 
   const startGame = () => {
     if (stateRef.current.phase !== 'MANUAL') return;

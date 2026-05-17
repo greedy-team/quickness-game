@@ -17,6 +17,22 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
 }
 
+.hud-overlay__hint {
+  position: absolute;
+  top: clamp(12px, 2.5vw, 22px);
+  right: clamp(12px, 3vw, 28px);
+  font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(200, 200, 200, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Stage 2 — 카메라 HUD(REC/배터리)와 겹치지 않도록 아래로 내림 */
+.hud-overlay__hint--stage2 {
+  top: max(80px, 8vh);
+}
+
 .hud-overlay__actions {
   position: absolute;
   bottom: clamp(12px, 2.5vw, 22px);

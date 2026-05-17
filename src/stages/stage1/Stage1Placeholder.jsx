@@ -6,6 +6,7 @@ import { pointsForError, metricFromPoints } from '../common/reactionScoring.js';
 import { scoreFromMetric } from '../../scoring.js';
 import { useAudioVolume } from '../../audio/useAudioVolume.js';
 import ResultModal from '../../components/ResultModal/ResultModal.jsx';
+import { useGameStore } from '../../store.js';
 
 const BGM_PATH = '/assets/sounds/heartbeat_10s.mp3';
 
@@ -43,10 +44,17 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
     };
   }, []);
 
-  useEffect(() => { 
-    if (bgmRef.current) bgmRef.current.volume = bgmVolume; 
-    if (bgmCloneRef.current) bgmCloneRef.current.volume = bgmVolume; 
+  useEffect(() => {
+    if (bgmRef.current) bgmRef.current.volume = bgmVolume;
+    if (bgmCloneRef.current) bgmCloneRef.current.volume = bgmVolume;
   }, [bgmVolume]);
+
+  useEffect(() => {
+    if (phase !== 'running') return undefined;
+    const { setActivePlayStageId } = useGameStore.getState();
+    setActivePlayStageId(1);
+    return () => setActivePlayStageId(null);
+  }, [phase]);
 
   const formatTime = (elapsed) => {
     const s = Math.floor(elapsed).toString().padStart(2, '0');
