@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, selectTotalScore } from '../../store.js';
 import { submitResult } from '../../api/result.js';
+import { getUserById } from '../../api/users.js';
 import { ENDING_CONFIG } from './ending.config.js';
 import EndingCutscene from './EndingCutscene.jsx';
 import EndingNicknameForm from './EndingNicknameForm.jsx';
@@ -28,6 +29,7 @@ export default function EndingPage({ outcome }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [submittedScore, setSubmittedScore] = useState(null);
+  const [myHighlight, setMyHighlight] = useState(null);
 
   // entered → reveal (즉시)
   useEffect(() => {
@@ -56,11 +58,11 @@ export default function EndingPage({ outcome }) {
   useEffect(() => {
     if (phase !== 'outro') return undefined;
     const id = setTimeout(
-      () => navigate('/ranking'),
+      () => navigate('/ranking', myHighlight ? { state: myHighlight } : undefined),
       ENDING_CONFIG.outroMs,
     );
     return () => clearTimeout(id);
-  }, [phase, navigate]);
+  }, [phase, navigate, myHighlight]);
 
   // reveal/hold 키 입력 — leaving 진입
   useEffect(() => {
@@ -94,12 +96,12 @@ export default function EndingPage({ outcome }) {
     const handle = (e) => {
       if (ADVANCE_KEYS.has(e.code)) {
         e.preventDefault();
-        navigate('/ranking');
+        navigate('/ranking', myHighlight ? { state: myHighlight } : undefined);
       }
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
-  }, [phase, navigate]);
+  }, [phase, navigate, myHighlight]);
 
   const handleUserIdSubmit = async (userId) => {
     if (isSubmitting) return;
@@ -112,6 +114,13 @@ export default function EndingPage({ outcome }) {
       setSubmittedScore(totalScore);
       setIsSubmitting(false);
       setPhase('success');
+      // 강조용 nickname 조회는 비동기 — outro 진행을 막지 않음.
+      // lookup이 늦거나 실패하면 강조 없이 진입 (graceful).
+      void getUserById(userId).then((r) => {
+        if (r.ok && r.user?.nickname) {
+          setMyHighlight({ nickname: r.user.nickname, score: totalScore });
+        }
+      });
       return;
     }
 
