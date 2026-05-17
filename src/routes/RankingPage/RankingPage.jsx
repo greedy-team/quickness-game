@@ -84,7 +84,7 @@ export default function RankingPage() {
           </thead>
           <tbody>
             {entries.map((e) => (
-              <tr key={`${e.rank}-${e.nickname}`} className="ranking-page__row">
+              <tr key={e.rank} className="ranking-page__row">
                 <td>{e.rank}</td>
                 <td>{e.nickname}</td>
                 <td>{e.score}</td>

@@ -40,6 +40,14 @@ describe('RankingPage', () => {
     expect(screen.getByText(/불러오는 중/)).toBeInTheDocument();
   });
 
+  it('로딩 중에도 Space 키 입력 시 / 로 이동한다', async () => {
+    vi.spyOn(leaderboardApi, 'fetchLeaderboard').mockReturnValue(new Promise(() => {}));
+    renderPage();
+    expect(screen.getByText(/불러오는 중/)).toBeInTheDocument();
+    await userEvent.keyboard('[Space]');
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
+
   it('정상 응답 시 표에 기록을 렌더한다', async () => {
     vi.spyOn(leaderboardApi, 'fetchLeaderboard').mockResolvedValue({
       ok: true,
