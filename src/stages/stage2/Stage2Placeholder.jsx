@@ -103,10 +103,11 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
 
   useEffect(() => {
     if (phase !== 'PLAY') return undefined;
+    if (mode === 'split') return undefined;
     const { setActivePlayStageId } = useGameStore.getState();
     setActivePlayStageId(2);
     return () => setActivePlayStageId(null);
-  }, [phase]);
+  }, [phase, mode]);
 
   const startGame = () => {
     if (stateRef.current.phase !== 'MANUAL') return;

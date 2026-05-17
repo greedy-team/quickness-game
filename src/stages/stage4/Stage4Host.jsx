@@ -120,7 +120,7 @@ export default function Stage4Host({ onResult }) {
         />
       )}
       
-      {phase === 'intro' && <Stage4Intro />}
+      {phase === 'intro' && <Stage4Intro onStart={() => setPhase('running')} />}
       
       {/* 💡 3게임 모두 종료 후 점수 확인 대기 오버레이 */}
       {phase === 'waitingForMerge' && (

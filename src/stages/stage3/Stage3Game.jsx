@@ -69,10 +69,11 @@ export default function Stage3Game({ mode = 'standalone', isRunning, onResult })
 
   useEffect(() => {
     if (phase !== 'running') return undefined;
+    if (mode === 'split') return undefined;
     const { setActivePlayStageId } = useGameStore.getState();
     setActivePlayStageId(3);
     return () => setActivePlayStageId(null);
-  }, [phase]);
+  }, [phase, mode]);
 
   const handleFieldDone = useCallback((data) => {
     setResultData(data);

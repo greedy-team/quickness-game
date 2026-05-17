@@ -12,7 +12,7 @@ const STAGE_HINTS = {
   1: '10초가 되면 ← 키로 멈추기',
   2: '진짜 모습이 보이면 ↑ 키',
   3: '기억이 원 안에 있을 때 → 키',
-  4: '← ↑ → 동시 도전!',
+  // Stage 4: 화면에 화살표가 직접 표시되므로 hint 미노출
 };
 
 export default function HudOverlay() {

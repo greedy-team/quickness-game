@@ -65,11 +65,16 @@ describe('HudOverlay', () => {
   it.each([
     [2, '진짜 모습이 보이면 ↑ 키'],
     [3, '기억이 원 안에 있을 때 → 키'],
-    [4, '← ↑ → 동시 도전!'],
   ])('activePlayStageId=%i이면 해당 스테이지 힌트가 노출된다', (stageId, hint) => {
     useGameStore.getState().setActivePlayStageId(stageId);
     renderHud({ path: `/stage/${stageId}` });
     expect(screen.getByText(hint)).toBeInTheDocument();
+  });
+
+  it('activePlayStageId=4(스테이지 4)일 때 HUD hint는 노출되지 않는다', () => {
+    useGameStore.getState().setActivePlayStageId(4);
+    const { container } = renderHud({ path: '/stage/4' });
+    expect(container.querySelector('.hud-overlay')).toBeNull();
   });
 
   it('초기 상태 — 스테이지 점수 0 · 0 · 0 · 0 텍스트가 노출된다', () => {
