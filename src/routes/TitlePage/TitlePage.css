@@ -29,14 +29,10 @@
     z-index: 3; /* 오버레이보다 위에 표시 */
 }
 
-/* 시작 버튼 위치 */
+/* 시작 안내 텍스트 위치 */
 .title-page__action--start {
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
 }
 
 .title-page .sub-instruction-text {
@@ -50,30 +46,4 @@
 @keyframes title-page-text-flicker {
     0%, 100% { opacity: 0.5; transform: scale(0.99); text-shadow: none; }
     50% { opacity: 1; transform: scale(1); color: #fff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.6); }
-}
-
-/* 공통 버튼 스타일 */
-.title-page__btn {
-  padding: clamp(14px, 1.5vh, 20px) clamp(30px, 3vw, 50px);
-  font-size: clamp(20px, 2vw, 26px);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
-  backdrop-filter: blur(5px);
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  white-space: nowrap;
-}
-
-/* 호버 시 스타일 강화 */
-.title-page__btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  border-color: #00ffcc;
-  color: #00ffcc;
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
 }

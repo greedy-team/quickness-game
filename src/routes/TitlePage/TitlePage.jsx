@@ -35,9 +35,6 @@ export default function TitlePage() {
       style={{ backgroundImage: 'url(/assets/images/bg_chalkboard.png)' }}
     >
       <div className="title-page__action title-page__action--start">
-        <button type="button" className="title-page__btn" onClick={handleStart}>
-          시작 ▶
-        </button>
         <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
       </div>
 
