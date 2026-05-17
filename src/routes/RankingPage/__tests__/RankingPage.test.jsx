@@ -146,7 +146,9 @@ describe('RankingPage', () => {
     expect(row).not.toHaveClass('ranking-list__row--current');
   });
 
-  it('nickname만 일치하고 score가 다르면 강조하지 않는다', async () => {
+  it('state.nickname이 매칭되면 score가 달라도 강조한다 (서버 best 점수가 더 높은 경우)', async () => {
+    // /api/result는 best 점수보다 좋을 때만 갱신 → 새 점수가 낮으면 leaderboard는 기존 best를 반환.
+    // 따라서 nickname 단독 매칭이어야 강조가 누락되지 않는다.
     vi.spyOn(leaderboardApi, 'fetchLeaderboard').mockResolvedValue({
       ok: true,
       rankings: [
@@ -156,7 +158,7 @@ describe('RankingPage', () => {
     renderPage({ state: { nickname: '나', score: 420 } });
 
     const row = (await screen.findByText('나')).closest('li');
-    expect(row).not.toHaveClass('ranking-list__row--current');
+    expect(row).toHaveClass('ranking-list__row--current');
   });
 
   it('input에 userId 입력 + Enter → 매칭 행에 --current 클래스가 붙는다', async () => {

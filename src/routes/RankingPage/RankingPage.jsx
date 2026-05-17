@@ -19,8 +19,9 @@ export default function RankingPage() {
   const navigate = useNavigate();
   const resetGame = useGameStore((s) => s.resetGame);
   const location = useLocation();
+  // 엔딩 흐름에서 전달된 본인 닉네임. score는 백엔드의 best-score 갱신 규칙 때문에
+  // 매칭 기준으로 쓰면 갱신이 안 된 경우 강조가 빠지므로 nickname 단독 매칭.
   const myNickname = location.state?.nickname ?? null;
-  const myScore = location.state?.score ?? null;
 
   // null = 로딩 중, [] = 비어있음, [...] = 데이터 있음
   const [entries, setEntries] = useState(null);
@@ -104,12 +105,11 @@ export default function RankingPage() {
   const isEmpty = !isLoading && !hasError && entries.length === 0;
   const hasRows = !isLoading && !hasError && entries.length > 0;
 
-  // 매칭 결정: manual 우선, 그 다음 location.state, 둘 다 없으면 매칭 없음.
+  // 매칭 결정: manual 우선, 그 다음 location.state.nickname, 둘 다 없으면 매칭 없음.
+  // 둘 다 nickname 단독 매칭 (백엔드가 userId를 응답에 포함하지 않음).
   const isMine = (entry) => {
     if (manualHighlight != null) return entry.nickname === manualHighlight;
-    if (myNickname != null && myScore != null) {
-      return entry.nickname === myNickname && entry.score === myScore;
-    }
+    if (myNickname != null) return entry.nickname === myNickname;
     return false;
   };
 
