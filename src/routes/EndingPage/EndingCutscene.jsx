@@ -25,6 +25,21 @@ export default function EndingCutscene({ outcome, phase, totalScore }) {
     };
   }, [phase, sfxSrc]);
 
+  const renderCaption = () => {
+    if (outcome === 'alive') {
+      return (
+        <span>
+          공격 방어 <span className="ending-cutscene__highlight-success">성공</span>
+        </span>
+      );
+    }
+    return (
+      <span>
+        공격 방어 <span className="ending-cutscene__highlight-failure">실패</span>
+      </span>
+    );
+  };
+
   // phase가 'leaving'이면 페이드아웃, 'entered'이면 미가시(즉시 reveal로 전환됨)
   const visibilityClass =
     phase === 'leaving' ? 'ending-cutscene--leaving'
@@ -40,8 +55,9 @@ export default function EndingCutscene({ outcome, phase, totalScore }) {
         draggable={false}
       />
       <p className="ending-cutscene__score">최종 점수 {totalScore} / {TOTAL_MAX_SCORE}</p>
-      <p className="ending-cutscene__caption">{caption}</p>
-      <p className="ending-cutscene__hint">Space / Enter 로 다음</p>
+      <p className="ending-cutscene__criteria-hint">(방어성공 기준점: 400점)</p>
+      <p className="ending-cutscene__caption">{renderCaption()}</p>
+      <p className="ending-cutscene__hint">ENTER 키로 다음</p>
     </div>
   );
 }

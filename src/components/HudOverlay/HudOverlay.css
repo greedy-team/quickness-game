@@ -5,8 +5,18 @@
   z-index: 100;
 }
 
-.hud-overlay__score-simple,
-.hud-overlay__scores {
+.hud-overlay__left-container {
+  position: absolute;
+  bottom: clamp(12px, 2.5vw, 22px);
+  left: clamp(12px, 3vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.hud-overlay__score-simple {
   position: absolute;
   bottom: clamp(12px, 2.5vw, 22px);
   left: clamp(12px, 3vw, 28px);
@@ -15,6 +25,24 @@
   letter-spacing: 0.08em;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+}
+
+.hud-overlay__scores {
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
+  line-height: 1.1;
+}
+
+.hud-overlay__criteria {
+  font-size: clamp(0.75rem, 1.3vw, 0.95rem);
+  font-weight: 700;
+  color: #cbd5e1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif;
+  letter-spacing: 0.5px;
 }
 
 .hud-overlay__hint {

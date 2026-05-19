@@ -2,8 +2,17 @@ import React from 'react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import AudioControls from '../AudioControls.jsx';
 import { useAudioStore } from '../../../audio/useAudioStore.js';
+
+function renderAudioControls() {
+  return render(
+    <MemoryRouter>
+      <AudioControls />
+    </MemoryRouter>
+  );
+}
 
 describe('AudioControls', () => {
   beforeEach(() => {
@@ -14,13 +23,13 @@ describe('AudioControls', () => {
   afterEach(() => cleanup());
 
   it('마운트 시 popover 닫혀있음 (슬라이더 미노출)', () => {
-    render(<AudioControls />);
+    renderAudioControls();
     expect(screen.queryByLabelText(/BGM 볼륨/)).toBeNull();
   });
 
   it('아이콘 클릭 시 popover 열림 (BGM/SFX 슬라이더 + 음소거 버튼 노출)', async () => {
     const user = userEvent.setup();
-    render(<AudioControls />);
+    renderAudioControls();
     await user.click(screen.getByRole('button', { name: /사운드 설정/ }));
     expect(screen.getByLabelText(/BGM 볼륨/)).toBeInTheDocument();
     expect(screen.getByLabelText(/효과음 볼륨/)).toBeInTheDocument();
@@ -29,7 +38,7 @@ describe('AudioControls', () => {
 
   it('BGM 슬라이더 change → store.bgmVolume 갱신 (0~100 → 0~1 변환)', async () => {
     const user = userEvent.setup();
-    render(<AudioControls />);
+    renderAudioControls();
     await user.click(screen.getByRole('button', { name: /사운드 설정/ }));
     const slider = screen.getByLabelText(/BGM 볼륨/);
     fireEvent.change(slider, { target: { value: '40' } });
@@ -38,7 +47,7 @@ describe('AudioControls', () => {
 
   it('SFX 슬라이더 change → store.sfxVolume 갱신', async () => {
     const user = userEvent.setup();
-    render(<AudioControls />);
+    renderAudioControls();
     await user.click(screen.getByRole('button', { name: /사운드 설정/ }));
     const slider = screen.getByLabelText(/효과음 볼륨/);
     fireEvent.change(slider, { target: { value: '20' } });
@@ -47,7 +56,7 @@ describe('AudioControls', () => {
 
   it('마스터 음소거 토글 클릭 → isMuted 반전, 아이콘에 muted 클래스 적용', async () => {
     const user = userEvent.setup();
-    const { container } = render(<AudioControls />);
+    const { container } = renderAudioControls();
     await user.click(screen.getByRole('button', { name: /사운드 설정/ }));
     await user.click(screen.getByRole('button', { name: /마스터 음소거/ }));
     expect(useAudioStore.getState().isMuted).toBe(true);
@@ -56,7 +65,7 @@ describe('AudioControls', () => {
 
   it('popover 외부 클릭 → 닫힘', async () => {
     const user = userEvent.setup();
-    render(<AudioControls />);
+    renderAudioControls();
     await user.click(screen.getByRole('button', { name: /사운드 설정/ }));
     expect(screen.getByLabelText(/BGM 볼륨/)).toBeInTheDocument();
     fireEvent.pointerDown(document.body);
@@ -65,7 +74,7 @@ describe('AudioControls', () => {
 
   it('Escape 키 → popover 닫힘', async () => {
     const user = userEvent.setup();
-    render(<AudioControls />);
+    renderAudioControls();
     await user.click(screen.getByRole('button', { name: /사운드 설정/ }));
     expect(screen.getByLabelText(/BGM 볼륨/)).toBeInTheDocument();
     await user.keyboard('{Escape}');

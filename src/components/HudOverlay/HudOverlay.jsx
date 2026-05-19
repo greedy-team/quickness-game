@@ -10,8 +10,8 @@ const HIDDEN_ROUTES = new Set(['/', '/ranking']);
 
 const STAGE_HINTS = {
   1: '10초가 되면 ← 키로 멈추기',
-  2: '진짜 모습이 보이면 ↑ 키',
-  3: '기억이 원 안에 있을 때 → 키',
+  2: '눈 앞에 나타나는 순간 ↑키',
+  3: '물건이 원 안에 위치한 순간 → 키',
   // Stage 4: 화면에 화살표가 직접 표시되므로 hint 미노출
 };
 
@@ -49,7 +49,10 @@ export default function HudOverlay() {
 
   return (
     <div className="hud-overlay" aria-hidden="false">
-      <div className="hud-overlay__scores">{scoreText}</div>
+      <div className="hud-overlay__left-container">
+        <div className="hud-overlay__scores">{scoreText}</div>
+        <div className="hud-overlay__criteria">방어성공 기준점: 400</div>
+      </div>
       <div className="hud-overlay__actions">
         <button
           type="button"

@@ -23,7 +23,7 @@ export default function Stage4MergeOverlay({ scores, onComplete }) {
 
         <div className="s4-total-row">
           <span className="s4-math-sign equals">=</span>
-          <span className="s4-total-score">{totalScore}</span>
+          <span className="s4-total-score" data-testid="merge-total">{totalScore}</span>
         </div>
       </div>
 

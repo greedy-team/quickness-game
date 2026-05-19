@@ -47,13 +47,25 @@ export default function EndingNicknameForm({
   const captionByOutcome = ENDING_CONFIG.captions[outcome] ?? '';
   const formStyle = { '--ending-nickname-reveal-ms': `${ENDING_CONFIG.formRevealMs}ms` };
 
+  const renderCaption = () => {
+    if (outcome === 'alive') {
+      return (
+        <span>
+          공격 방어 <span className="ending-nickname__highlight-success">성공</span>
+        </span>
+      );
+    }
+    return (
+      <span>
+        공격 방어 <span className="ending-nickname__highlight-failure">실패</span>
+      </span>
+    );
+  };
+
   return (
     <form className="ending-nickname" style={formStyle} onSubmit={handleSubmit}>
-      <p className="ending-nickname__heading">기록을 남겨주세요</p>
-      <p className="ending-nickname__outcome">
-        결말 <span className="ending-nickname__outcome-label">{outcomeLabel}</span>
-      </p>
-      <p className="ending-nickname__caption">{captionByOutcome}</p>
+      <p className="ending-nickname__heading">대시보드에 스코어를 남겨주세요!</p>
+      <p className="ending-nickname__caption">{renderCaption()}</p>
       <p className="ending-nickname__score">점수 {totalScore} / {TOTAL_MAX_SCORE}</p>
 
       <input

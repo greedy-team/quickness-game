@@ -8,7 +8,7 @@ export default function Stage3Intro({ onStart }) {
       
       {/* [상단] 타이틀 */}
       <div className="info-top-section">
-        <h1 className="stage-title">3단계: 기억의 파편</h1>
+        <h1 className="stage-title">3단계: 정확도 게임</h1>
       </div>
 
       {/* [중앙] 메탈릭 프레임과 방향키 설명 */}
@@ -34,8 +34,8 @@ export default function Stage3Intro({ onStart }) {
           </div>
           
           <div className="main-instruction-text">
-            떨어지는 기억이 원 안에 위치했을 때<br/>
-            <span className="highlight-key">[→] 키</span>를 누르세요
+            떨어지는 물건이 원 안에 위치한 순간,<br/>
+            <span className="highlight-key">[→] 키</span>를 누르세요.
           </div>
           
         </div>
@@ -44,10 +44,7 @@ export default function Stage3Intro({ onStart }) {
 
       {/* [하단] 시작 버튼 */}
       <div className="info-bottom-section">
-        <div className="key-icon-wrapper start-btn" onClick={onStart}>
-          <span>GAME START</span>
-        </div>
-        <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+        <p className="sub-instruction-text" onClick={onStart} style={{ cursor: 'pointer' }}>ENTER 키를 눌러 시작</p>
       </div>
 
     </div>
