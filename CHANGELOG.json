@@ -1,11 +1,37 @@
 {
   "metadata": {
-    "lastUpdated": "2026-05-17T09:57:46Z",
-    "currentVersion": "1.0.3",
+    "lastUpdated": "2026-05-19T04:56:53Z",
+    "currentVersion": "1.0.5",
     "projectType": "react",
-    "totalReleases": 6
+    "totalReleases": 7
   },
   "releases": [
+    {
+      "version": "1.0.5",
+      "project_type": "react",
+      "date": "2026-05-19",
+      "pr_number": 58,
+      "raw_summary": "## 릴리스 노트\n\n* **새 기능**\n\n  * UX/UI 개선 통합 작업 (안내창 제거, 반응형 결과창 및 기준점 추가, 엔딩 강화)\n\n* **기타**\n\n  * Merge pull request #57 from greedy-team/20260519_#52_UX_UI_개선_통합_작업\n  * refactor : Stage 4 결과 모달 공통 ResultModal로 통합 #52\n  * style : Stage 4 인트로 위쪽 화살표 아이콘 통일 #52\n  * style : Stage 3 HUD 라벨 \"조각\" → \"물건\" 변경 #52\n  * Update README.md\n\n> 💡 더 정확한 릴리스 노트를 원한다면 Claude Code에서 `/github` 스킬로 PR 릴리스 노트를 업데이트할 수 있습니다.",
+      "parsed_changes": {
+        "새_기능": {
+          "title": "새 기능",
+          "items": [
+            "UX/UI 개선 통합 작업 (안내창 제거, 반응형 결과창 및 기준점 추가, 엔딩 강화)"
+          ]
+        },
+        "기타": {
+          "title": "기타",
+          "items": [
+            "Merge pull request #57 from greedy-team/20260519_#52_UX_UI_개선_통합_작업",
+            "refactor : Stage 4 결과 모달 공통 ResultModal로 통합 #52",
+            "style : Stage 4 인트로 위쪽 화살표 아이콘 통일 #52",
+            "style : Stage 3 HUD 라벨 \"조각\" → \"물건\" 변경 #52",
+            "Update README.md"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "1.0.3",
       "project_type": "react",
