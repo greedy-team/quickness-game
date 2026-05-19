@@ -21,7 +21,7 @@
      그 위에 차례로 페인트됨. z-index 별도 지정 불필요. */
 }
 
-/* HUD — 좌상단 점수 + 남은 조각 */
+/* HUD — 좌상단 점수 + 남은 물건 */
 .stage3-hud {
   position: absolute;
   top: 16px;
