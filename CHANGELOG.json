@@ -1,11 +1,33 @@
 {
   "metadata": {
-    "lastUpdated": "2026-05-19T04:56:53Z",
-    "currentVersion": "1.0.5",
+    "lastUpdated": "2026-05-19T07:19:31Z",
+    "currentVersion": "1.0.6",
     "projectType": "react",
-    "totalReleases": 7
+    "totalReleases": 8
   },
   "releases": [
+    {
+      "version": "1.0.6",
+      "project_type": "react",
+      "date": "2026-05-19",
+      "pr_number": 61,
+      "raw_summary": "## 릴리스 노트\n\n* **기타**\n\n  * Merge pull request #60 from greedy-team/20260519_#59_Vercel_배포_환경_이미지_렌더링_속도_개선\n  * docs : 리포트 문서 작성 #59\n  * perf : Vercel 정적 자산 immutable 캐시 헤더 추가 #59\n  * perf : 이미지 WebP 변환 및 경로 갱신 #59\n  * feat : sharp 기반 이미지 최적화 스크립트 추가 #59\n  * chore : 미사용 이미지 6장 삭제 #59\n  * docs : 이슈 문서 작성 #59\n\n> 💡 더 정확한 릴리스 노트를 원한다면 Claude Code에서 `/github` 스킬로 PR 릴리스 노트를 업데이트할 수 있습니다.",
+      "parsed_changes": {
+        "기타": {
+          "title": "기타",
+          "items": [
+            "Merge pull request #60 from greedy-team/20260519_#59_Vercel_배포_환경_이미지_렌더링_속도_개선",
+            "docs : 리포트 문서 작성 #59",
+            "perf : Vercel 정적 자산 immutable 캐시 헤더 추가 #59",
+            "perf : 이미지 WebP 변환 및 경로 갱신 #59",
+            "feat : sharp 기반 이미지 최적화 스크립트 추가 #59",
+            "chore : 미사용 이미지 6장 삭제 #59",
+            "docs : 이슈 문서 작성 #59"
+          ]
+        }
+      },
+      "parse_method": "markdown"
+    },
     {
       "version": "1.0.5",
       "project_type": "react",
