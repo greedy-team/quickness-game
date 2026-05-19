@@ -29,7 +29,7 @@ export default function TitlePage() {
   return (
     <div
       className="title-page"
-      style={{ backgroundImage: 'url(/assets/images/bg_chalkboard.png)' }}
+      style={{ backgroundImage: 'url(/assets/images/bg_chalkboard.webp)' }}
     >
       <div className="title-page__action title-page__action--start">
         <p className="sub-instruction-text" style={{ cursor: 'pointer' }} onClick={handleStart}>

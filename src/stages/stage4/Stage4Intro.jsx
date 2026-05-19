@@ -11,9 +11,9 @@ export default function Stage4Intro({ onStart }) {
 
       <div className="info-middle-section">
         <div className="simple-preview-image stage4-preview-triptych">
-          <img src="/assets/images/bg_stage1_clock_example.png" alt="Stage 1 Preview" />
-          <img src="/assets/images/bg_stage2_library_fake.png" alt="Stage 2 Preview" />
-          <img src="/assets/images/bg_stage3_example.png" alt="Stage 3 Preview" />
+          <img src="/assets/images/bg_stage1_clock_example.webp" alt="Stage 1 Preview" />
+          <img src="/assets/images/bg_stage2_library_fake.webp" alt="Stage 2 Preview" />
+          <img src="/assets/images/bg_stage3_example.webp" alt="Stage 3 Preview" />
         </div>
 
         <div className="instruction-item">

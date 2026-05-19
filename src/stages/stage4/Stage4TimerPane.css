@@ -15,7 +15,7 @@
 .s4-timer-bg {
   position: absolute; 
   inset: 0;
-  background-image: url('/assets/images/bg_stage1_clock.png');
+  background-image: url('/assets/images/bg_stage1_clock.webp');
   background-size: cover; 
   background-position: center; 
   background-repeat: no-repeat;
