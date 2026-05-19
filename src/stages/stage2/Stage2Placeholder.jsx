@@ -185,12 +185,13 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       finalMetric = metricFromPoints(points, STAGE2_CONFIG);
       finalState = 'SUCCESS';
       finalTier = tier;
-      rTime = reactionSec.toFixed(3);
+      rTime = `${reactionSec.toFixed(3)}초`;
     } else {
       const bareTier = STAGE2_CONFIG.accuracyTiers.find((t) => t.id === 'bare');
       finalMetric = metricFromPoints(bareTier.points, STAGE2_CONFIG);
       finalState = 'FAILED';
       finalTier = bareTier;
+      rTime = '너무 빨리 눌렀어요!';
     }
 
     syncGameState(finalState);
@@ -267,7 +268,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
         if (!stateRef.current.isFinished) {
           const bareTier = STAGE2_CONFIG.accuracyTiers.find((t) => t.id === 'bare');
           const metric = metricFromPoints(bareTier.points, STAGE2_CONFIG);
-          handleFinish(metric, 'FAILED', bareTier, null, "");
+          handleFinish(metric, 'FAILED', bareTier, '시간 초과', "");
         }
       }, STAGE2_CONFIG.attackWindowMs);
       timeouts.push(tFail);
@@ -311,7 +312,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       {phase === 'MANUAL' && (
         <div className="stage-info-screen">
           <div className="info-top-section">
-            <h1 className="stage-title">2단계: 반응 게임</h1>
+            <h1 className="stage-title">2단계: 순발력 게임</h1>
           </div>
 
           <div className="info-middle-section">
@@ -334,18 +335,14 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
               </div>
               
               <div className="main-instruction-text">
-                그린이가 눈 앞에 크게 나타나는 순간<br/>
-                <span className="highlight-key">[↑] 키</span>를 눌러 플래시를 터뜨리세요
+                가짜 그린이가 눈 앞에 크게 나타나는 순간<br/>
+                <span className="highlight-key">↑키</span>를 누르세요.
               </div>
-              <p className="warning-text">※ 주의: 왼쪽 이미지와 같은 훼이크에 속지 마세요!</p>
             </div>
           </div>
 
           <div className="info-bottom-section">
-            <div className="key-icon-wrapper start-btn" onClick={() => { if(phase === 'MANUAL') startGame(); }}>
-              <span>GAME START</span>
-            </div>
-            <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+            <p className="sub-instruction-text" onClick={() => { if(phase === 'MANUAL') startGame(); }} style={{ cursor: 'pointer' }}>ENTER 키를 눌러 시작</p>
           </div>
         </div>
       )}
@@ -371,7 +368,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
       {/* 💡 1단계와 동일한 규격의 통합 ResultModal 연동 */}
       {phase === 'END' && resultTier && (
         <ResultModal
-          metricValue={reaction.time ? `${reaction.time}초` : 'FAIL'}
+          metricValue={reaction.time || '시간 초과'}
           tone={resultTier.id === 'bare' ? 'failed' : 'success'}
           tiers={STAGE2_CONFIG.accuracyTiers.map((t, idx, arr) => {
             const prevMax = idx === 0 ? 0 : arr[idx - 1].maxError;

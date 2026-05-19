@@ -63,8 +63,8 @@ describe('HudOverlay', () => {
   });
 
   it.each([
-    [2, '진짜 모습이 보이면 ↑ 키'],
-    [3, '기억이 원 안에 있을 때 → 키'],
+    [2, '눈 앞에 나타나는 순간 ↑키'],
+    [3, '물건이 원 안에 위치한 순간 → 키'],
   ])('activePlayStageId=%i이면 해당 스테이지 힌트가 노출된다', (stageId, hint) => {
     useGameStore.getState().setActivePlayStageId(stageId);
     renderHud({ path: `/stage/${stageId}` });

@@ -178,13 +178,7 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
           </div>
 
           <div className="info-bottom-section">
-            <div 
-              className="key-icon-wrapper start-btn" 
-              onClick={() => { if(phase === 'ready') startGame(); }}
-            >
-              <span>GAME START</span>
-            </div>
-            <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+            <p className="sub-instruction-text" onClick={() => { if(phase === 'ready') startGame(); }} style={{ cursor: 'pointer' }}>ENTER 키를 눌러 시작</p>
           </div>
         </div>
       )}

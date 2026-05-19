@@ -6,7 +6,7 @@ import Stage4Intro from '../Stage4Intro.jsx';
 describe('Stage4Intro', () => {
   it('Stage 4 타이틀을 렌더한다', () => {
     render(<Stage4Intro onStart={() => {}} />);
-    expect(screen.getByText('4단계: 최종 시련')).toBeInTheDocument();
+    expect(screen.getByText('4단계: 통합 게임')).toBeInTheDocument();
   });
 
   it('Stage 1/2/3 프리뷰 이미지 3장을 모두 렌더한다', () => {
@@ -25,10 +25,10 @@ describe('Stage4Intro', () => {
     expect(container.querySelector('.key-cap.right-active')).toBeTruthy();
   });
 
-  it('GAME START 버튼 클릭 시 onStart를 호출한다', () => {
+  it('ENTER 키를 눌러 시작 텍스트 클릭 시 onStart를 호출한다', () => {
     const onStart = vi.fn();
     render(<Stage4Intro onStart={onStart} />);
-    fireEvent.click(screen.getByText('GAME START'));
+    fireEvent.click(screen.getByText('ENTER 키를 눌러 시작'));
     expect(onStart).toHaveBeenCalledTimes(1);
   });
 

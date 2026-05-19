@@ -6,7 +6,7 @@ export default function Stage4Intro({ onStart }) {
   return (
     <div className="stage-info-screen stage4-intro-screen">
       <div className="info-top-section">
-        <h1 className="stage-title">4단계: 최종 시련</h1>
+        <h1 className="stage-title">4단계: 통합 게임</h1>
       </div>
 
       <div className="info-middle-section">
@@ -27,18 +27,17 @@ export default function Stage4Intro({ onStart }) {
               <div className="key-cap right-active">→</div>
             </div>
           </div>
-          <div className="main-instruction-text">
-            3개 시련을 동시에<br/>
-            <span className="highlight-key">[←][↑][→] 키</span>로 클리어하세요
+          <div className="main-instruction-text" style={{ textAlign: 'left', paddingLeft: '10px' }}>
+            10초 게임 : <span className="highlight-key">[←] 키</span><br/>
+            순발력 게임 : <span className="highlight-key">[↑] 키</span><br/>
+            정확도 게임 : <span className="highlight-key">[→] 키</span><br/>
+            <span style={{ display: 'block', marginTop: '10px', textAlign: 'center', fontWeight: 'bold' }}>세 게임이 동시에 진행됩니다.</span>
           </div>
         </div>
       </div>
 
       <div className="info-bottom-section">
-        <div className="key-icon-wrapper start-btn" onClick={onStart}>
-          <span>GAME START</span>
-        </div>
-        <p className="sub-instruction-text">ENTER 키를 눌러 시작</p>
+        <p className="sub-instruction-text" onClick={onStart} style={{ cursor: 'pointer' }}>ENTER 키를 눌러 시작</p>
       </div>
     </div>
   );

@@ -203,7 +203,7 @@ export default function Stage3Field({ isRunning, onResult }) {
           </span>
         </div>
         <div className="stage3-hud__row">
-          <span className="stage3-hud__label">남은 조각</span>
+          <span className="stage3-hud__label">남은 물건</span>
           <span className="stage3-hud__count">
             <strong>{remaining}</strong> / {total}
           </span>
