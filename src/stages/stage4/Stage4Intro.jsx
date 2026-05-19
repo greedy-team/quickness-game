@@ -29,7 +29,7 @@ export default function Stage4Intro({ onStart }) {
           </div>
           <div className="main-instruction-text" style={{ textAlign: 'left', paddingLeft: '10px' }}>
             10초 게임 : <span className="highlight-key">[←] 키</span><br/>
-            순발력 게임 : <span className="highlight-key">[⬆️] 키</span><br/>
+            순발력 게임 : <span className="highlight-key">[↑] 키</span><br/>
             정확도 게임 : <span className="highlight-key">[→] 키</span><br/>
             <span style={{ display: 'block', marginTop: '10px', textAlign: 'center', fontWeight: 'bold' }}>세 게임이 동시에 진행됩니다.</span>
           </div>
