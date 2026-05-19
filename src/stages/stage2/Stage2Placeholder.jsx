@@ -16,10 +16,10 @@ const SOUNDS = {
 };
 
 const BGS = {
-  INFO: '/assets/images/bg_stage2_info.png',
-  BASE: '/assets/images/bg_stage2_library.png', 
-  FAKE: '/assets/images/bg_stage2_library_fake.png',
-  REAL: '/assets/images/greenie_real.png',
+  INFO: '/assets/images/bg_stage2_info.webp',
+  BASE: '/assets/images/bg_stage2_library.webp', 
+  FAKE: '/assets/images/bg_stage2_library_fake.webp',
+  REAL: '/assets/images/greenie_real.webp',
 };
 
 export default function Stage2Placeholder({ onResult, isRunning, mode }) {
@@ -318,7 +318,7 @@ export default function Stage2Placeholder({ onResult, isRunning, mode }) {
           <div className="info-middle-section">
             <img 
               className="simple-preview-image" 
-              src="/assets/images/bg_stage2_library_fake.png" 
+              src="/assets/images/bg_stage2_library_fake.webp" 
               alt="Stage 2 Example" 
             />
 

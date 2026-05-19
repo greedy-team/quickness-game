@@ -16,7 +16,7 @@ export default function Stage3Intro({ onStart }) {
         
         <img 
           className="simple-preview-image" 
-          src="/assets/images/bg_stage3_example.png" 
+          src="/assets/images/bg_stage3_example.webp" 
           alt="Stage 3 Example" 
         />
 

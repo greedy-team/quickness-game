@@ -38,7 +38,7 @@ export default function HubPage() {
           // 💡 이미지 경로 결정
           let doorSrc = ASSETS.images.door;
           if (n === 4 && locked) {
-            doorSrc = '/assets/images/door_stage4.png';
+            doorSrc = '/assets/images/door_stage4.webp';
           } else if (cleared) {
             doorSrc = ASSETS.images.doorClear;
           }

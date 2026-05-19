@@ -131,9 +131,9 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
   // 💡 배경 교체 로직 수정 (준비: 복도 / 게임: 시계)
   const getBackgroundImage = () => {
     if (phase === 'result') return null;
-    if (phase === 'ready') return '/assets/images/bg_stage1_corridor.png'; 
-    if (phase === 'running') return '/assets/images/bg_stage1_clock.png'; 
-    return currentDialogueIndex === 1 ? '/assets/images/bg_stage1_corridor_그린이.png' : '/assets/images/bg_stage1_corridor.png';
+    if (phase === 'ready') return '/assets/images/bg_stage1_corridor.webp'; 
+    if (phase === 'running') return '/assets/images/bg_stage1_clock.webp'; 
+    return currentDialogueIndex === 1 ? '/assets/images/bg_stage1_corridor_그린이.webp' : '/assets/images/bg_stage1_corridor.webp';
   };
 
   return (
@@ -155,7 +155,7 @@ export default function Stage1Placeholder({ onResult, isRunning = true }) {
           <div className="info-middle-section">
             <img 
               className="simple-preview-image" 
-              src="/assets/images/bg_stage1_clock_example.png" 
+              src="/assets/images/bg_stage1_clock_example.webp" 
               alt="Stage 1 Example" 
             />
 

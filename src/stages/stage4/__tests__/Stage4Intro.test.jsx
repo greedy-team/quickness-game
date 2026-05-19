@@ -13,9 +13,9 @@ describe('Stage4Intro', () => {
     render(<Stage4Intro onStart={() => {}} />);
     const previews = screen.getAllByRole('img');
     const srcs = previews.map((img) => img.getAttribute('src'));
-    expect(srcs).toContain('/assets/images/bg_stage1_clock_example.png');
-    expect(srcs).toContain('/assets/images/bg_stage2_library_fake.png');
-    expect(srcs).toContain('/assets/images/bg_stage3_example.png');
+    expect(srcs).toContain('/assets/images/bg_stage1_clock_example.webp');
+    expect(srcs).toContain('/assets/images/bg_stage2_library_fake.webp');
+    expect(srcs).toContain('/assets/images/bg_stage3_example.webp');
   });
 
   it('←, ↑, → 세 키를 모두 active 클래스로 렌더한다', () => {
