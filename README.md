@@ -97,6 +97,6 @@ VSCode에 **ESLint 확장**만 설치하면 **Cmd+S / Ctrl+S** 누를 때 자동
 ---
 
 <!-- AUTO-VERSION-SECTION: DO NOT EDIT MANUALLY -->
-## 최신 버전 : v1.0.6 (2026-06-13)
+## 최신 버전 : v1.0.6 (2026-06-20)
 
 [전체 버전 기록 보기](CHANGELOG.md)
